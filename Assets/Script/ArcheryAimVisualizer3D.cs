@@ -15,22 +15,33 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
 
     [Header("스케일 설정")]
     [Tooltip("제일 약하게 당겼을 때의 화살 크기 배율")]
-    public float minScale = 20.5f;
+    public float minScale = 0.5f;
 
     [Tooltip("최대로 당겼을 때의 화살 크기 배율")]
-    public float maxScale = 200.5f;
+    public float maxScale = 1.5f;
 
     [Header("각도 설정")]
     [Tooltip("제스처의 수직 방향을 피치 각도로 사용할지 여부")]
     public bool useGestureAngleForPitch = true;
 
+    [Tooltip("제스처의 수평 방향을 요(yaw) 각도로 사용할지 여부")]
+    public bool useGestureAngleForYaw = true;
+
     [Tooltip("위/아래로 조정 가능한 최대 피치 각도")]
     public float maxPitchAngle = 45f;
+
+    [Tooltip("좌/우로 조정 가능한 최대 요(yaw) 각도")]
+    public float maxYawAngle = 45f;
 
     private ArcheryGestureManager gestureManager;
     private GameObject previewInstance;
     private Transform previewTransform;
     private Vector3 baseLocalScale = Vector3.one;
+    /// <summary>
+    /// 프리팹 메쉬의 "시각적인 중심"이 로컬 피벗(Transform.position)에서 얼마나 떨어져 있는지 (로컬 좌표계 기준)
+    /// </summary>
+    private Vector3 previewCenterLocalOffset = Vector3.zero;
+    private bool hasPreviewCenterOffset = false;
 
     private void OnEnable()
     {
@@ -66,8 +77,18 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
 
         if (arrowSpawnPoint != null)
         {
-            previewTransform.position = arrowSpawnPoint.position;
+            // 먼저 회전을 맞춘 뒤, 메쉬 "중심"이 spawnPoint 에 오도록 위치를 보정
             previewTransform.rotation = arrowSpawnPoint.rotation;
+
+            if (hasPreviewCenterOffset)
+            {
+                previewTransform.position =
+                    arrowSpawnPoint.position - previewTransform.rotation * previewCenterLocalOffset;
+            }
+            else
+            {
+                previewTransform.position = arrowSpawnPoint.position;
+            }
         }
     }
 
@@ -75,21 +96,56 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
     {
         if (previewInstance == null || arrowSpawnPoint == null) return;
 
+        Camera cam = Camera.main;
+
+        // 기본 방향
+        Vector3 baseDir = arrowSpawnPoint.forward;
+
         // 발사 방향 계산 (ArcheryShooter와 동일한 방식으로 맞춰줌)
-        Vector3 dir = arrowSpawnPoint.forward;
+        Vector2 dragDir = (data.startPosition - data.currentPosition).normalized;
+
+        float pitchDeg = 0f;
+        float yawDeg = 0f;
 
         if (useGestureAngleForPitch)
         {
-            float pitch = Mathf.Clamp(-data.direction.y * maxPitchAngle, -maxPitchAngle, maxPitchAngle);
-            dir = Quaternion.Euler(pitch, 0f, 0f) * dir;
+            pitchDeg = Mathf.Clamp(dragDir.y * maxPitchAngle, -maxPitchAngle, maxPitchAngle);
         }
 
-        previewTransform.position = arrowSpawnPoint.position;
+        if (useGestureAngleForYaw)
+        {
+            yawDeg = Mathf.Clamp(-dragDir.x * maxYawAngle, -maxYawAngle, maxYawAngle);
+        }
+
+        Quaternion rot = Quaternion.identity;
+        if (cam != null)
+        {
+            rot = Quaternion.AngleAxis(yawDeg, Vector3.up) *
+                  Quaternion.AngleAxis(pitchDeg, cam.transform.right);
+        }
+        else
+        {
+            rot = Quaternion.Euler(pitchDeg, yawDeg, 0f);
+        }
+
+        Vector3 dir = rot * baseDir;
+
+        // 회전 먼저 적용
         previewTransform.rotation = Quaternion.LookRotation(dir, Vector3.up);
 
-        // 파워에 따라 크기 조절
-        float t = Mathf.Clamp01(data.normalizedPower);
-        float scale = Mathf.Lerp(minScale, maxScale, t);
+        // 그 다음, 메쉬의 "시각적인 중심"이 spawnPoint 에 위치하도록 보정
+        if (hasPreviewCenterOffset)
+        {
+            previewTransform.position =
+                arrowSpawnPoint.position - previewTransform.rotation * previewCenterLocalOffset;
+        }
+        else
+        {
+            previewTransform.position = arrowSpawnPoint.position;
+        }
+
+        // 이 게임은 항상 최대 힘으로 쏘므로, 프리뷰 화살도 항상 최대 크기로 표시
+        float scale = maxScale;
         previewTransform.localScale = baseLocalScale * scale;
     }
 
@@ -129,6 +185,26 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
         previewInstance = Instantiate(arrowPreviewPrefab);
         previewTransform = previewInstance.transform;
         baseLocalScale = previewTransform.localScale;
+
+        // 프리팹의 메쉬 중심을 계산해서, 이후에는 "메쉬 중심"이 arrowSpawnPoint를 기준으로
+        // 움직이도록 보정한다.
+        var renderer = previewInstance.GetComponentInChildren<Renderer>();
+        if (renderer != null)
+        {
+            // bounds.center 는 월드 좌표이므로, 이를 프리뷰 Transform 로컬 좌표로 변환
+            Vector3 worldCenter = renderer.bounds.center;
+            Vector3 localCenter = previewTransform.InverseTransformPoint(worldCenter);
+
+            // 로컬 피벗(0,0,0)에서 메쉬 중심까지의 오프셋
+            previewCenterLocalOffset = localCenter;
+            hasPreviewCenterOffset = (previewCenterLocalOffset != Vector3.zero);
+        }
+        else
+        {
+            previewCenterLocalOffset = Vector3.zero;
+            hasPreviewCenterOffset = false;
+        }
+
         previewInstance.SetActive(false);
     }
 
