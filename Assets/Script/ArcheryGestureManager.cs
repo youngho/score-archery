@@ -50,10 +50,20 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             _instance = this;
             DontDestroyOnLoad(gameObject);
+
+            if (logDebugEvents)
+            {
+                Debug.Log("[ArcheryGestureManager] Awake - set as singleton instance", this); // ARCHERY_DEBUG_LOG
+            }
         }
         else if (_instance != this)
         {
             // 다른 씬에서 이미 생성된 매니저가 있다면, 중복 객체는 제거
+            if (logDebugEvents)
+            {
+                Debug.Log("[ArcheryGestureManager] Awake - duplicate instance found, destroying this one", this); // ARCHERY_DEBUG_LOG
+            }
+
             Destroy(gameObject);
         }
     }
@@ -89,7 +99,9 @@ public class ArcheryGestureManager : MonoBehaviour
     public float cancelBorderSize = 100f;
 
     [Header("디버그")]
-    public bool showDebugInfo = false;
+    public bool showDebugInfo = true;
+    [Tooltip("제스처 처리/이벤트 흐름을 Debug.Log로 출력할지 여부")]
+    public bool logDebugEvents = true;
     public Color drawLineColor = Color.yellow;
     public Color aimLineColor = Color.cyan;
     #endregion
@@ -187,10 +199,20 @@ public class ArcheryGestureManager : MonoBehaviour
         if (!EnhancedTouchSupport.enabled)
         {
             EnhancedTouchSupport.Enable();
+
+            if (logDebugEvents)
+            {
+                Debug.Log("[ArcheryGestureManager] OnEnable - EnhancedTouch enabled", this); // ARCHERY_DEBUG_LOG
+            }
         }
 
         // 씬이 바뀔 때 제스처 상태를 초기화하기 위해 구독
         SceneManager.sceneLoaded += OnSceneLoaded;
+
+        if (logDebugEvents)
+        {
+            Debug.Log("[ArcheryGestureManager] OnEnable - subscribed to sceneLoaded", this); // ARCHERY_DEBUG_LOG
+        }
     }
 
     private void OnDisable()
@@ -203,6 +225,16 @@ public class ArcheryGestureManager : MonoBehaviour
             if (EnhancedTouchSupport.enabled)
             {
                 EnhancedTouchSupport.Disable();
+
+                if (logDebugEvents)
+                {
+                    Debug.Log("[ArcheryGestureManager] OnDisable - EnhancedTouch disabled", this); // ARCHERY_DEBUG_LOG
+                }
+            }
+
+            if (logDebugEvents)
+            {
+                Debug.Log("[ArcheryGestureManager] OnDisable - unsubscribed from sceneLoaded", this); // ARCHERY_DEBUG_LOG
             }
         }
     }
@@ -226,6 +258,11 @@ public class ArcheryGestureManager : MonoBehaviour
         // 새 씬이 로드되면 제스처 상태 및 터치 정보 초기화
         ResetGesture();
         activeTouches.Clear();
+
+        if (logDebugEvents)
+        {
+            Debug.Log($"[ArcheryGestureManager] OnSceneLoaded - scene='{scene.name}', state reset", this); // ARCHERY_DEBUG_LOG
+        }
     }
     #endregion
 
@@ -316,6 +353,12 @@ public class ArcheryGestureManager : MonoBehaviour
         if (IsNearScreenBorder(position))
             return;
 
+        if (logDebugEvents)
+        {
+            Debug.Log($"[ArcheryGestureManager] HandleTouchBegan - fingerId={fingerId}, pos={position}, state={currentState}",
+                this); // ARCHERY_DEBUG_LOG
+        }
+
         TouchInfo touchInfo = new TouchInfo(fingerId, position);
         activeTouches[fingerId] = touchInfo;
 
@@ -329,6 +372,17 @@ public class ArcheryGestureManager : MonoBehaviour
             currentState = GestureState.Drawing;
 
             GestureData data = CreateGestureData();
+
+            if (logDebugEvents)
+            {
+                Debug.Log(
+                    $"[ArcheryGestureManager] Begin Drawing - primaryId={primaryTouchId}, startPos={drawStartPosition}",
+                    this); // ARCHERY_DEBUG_LOG
+                Debug.Log(
+                    $"[ArcheryGestureManager] OnDrawStart Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}",
+                    this); // ARCHERY_DEBUG_LOG
+            }
+
             OnDrawStart?.Invoke(data);
         }
         else if (currentState == GestureState.Drawing && secondaryTouchId == -1)
@@ -336,6 +390,13 @@ public class ArcheryGestureManager : MonoBehaviour
             // 두 번째 터치 - 조준 조정 모드
             secondaryTouchId = fingerId;
             currentState = GestureState.Aiming;
+
+            if (logDebugEvents)
+            {
+                Debug.Log(
+                    $"[ArcheryGestureManager] Enter Aiming mode - secondaryId={secondaryTouchId}, primaryId={primaryTouchId}",
+                    this); // ARCHERY_DEBUG_LOG
+            }
         }
     }
 
@@ -355,12 +416,27 @@ public class ArcheryGestureManager : MonoBehaviour
             // 최소 거리를 당겼는지 확인
             if (data.distance >= minDrawDistance)
             {
+                if (logDebugEvents)
+                {
+                    Debug.Log(
+                        $"[ArcheryGestureManager] OnDrawing Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}",
+                        this); // ARCHERY_DEBUG_LOG
+                }
+
                 OnDrawing?.Invoke(data);
             }
         }
         else if (fingerId == secondaryTouchId && currentState == GestureState.Aiming)
         {
             GestureData data = CreateGestureData();
+
+            if (logDebugEvents)
+            {
+                Debug.Log(
+                    $"[ArcheryGestureManager] OnAimAdjust Invoke - aimOffset={data.aimOffset}, distance={data.distance:F1}",
+                    this); // ARCHERY_DEBUG_LOG
+            }
+
             OnAimAdjust?.Invoke(data);
         }
 
@@ -381,6 +457,13 @@ public class ArcheryGestureManager : MonoBehaviour
 
         if (fingerId == primaryTouchId)
         {
+            if (logDebugEvents)
+            {
+                Debug.Log(
+                    $"[ArcheryGestureManager] HandleTouchEnded (primary) - fingerId={fingerId}, pos={position}, state={currentState}",
+                    this); // ARCHERY_DEBUG_LOG
+            }
+
             // 주 터치가 끝남 - 화살 발사 또는 취소
             GestureData data = CreateGestureData();
 
@@ -393,6 +476,14 @@ public class ArcheryGestureManager : MonoBehaviour
                     data.velocity = velocity;
 
                     currentState = GestureState.Released;
+
+                    if (logDebugEvents)
+                    {
+                        Debug.Log(
+                            $"[ArcheryGestureManager] OnRelease Invoke - distance={data.distance:F1}, velocity={velocity.magnitude:F1}",
+                            this); // ARCHERY_DEBUG_LOG
+                    }
+
                     OnRelease?.Invoke(data);
                 }
                 else
@@ -403,6 +494,12 @@ public class ArcheryGestureManager : MonoBehaviour
             }
 
             OnDrawEnd?.Invoke(data);
+
+            if (logDebugEvents)
+            {
+                Debug.Log("[ArcheryGestureManager] OnDrawEnd Invoke - gesture finished", this); // ARCHERY_DEBUG_LOG
+            }
+
             ResetGesture();
         }
         else if (fingerId == secondaryTouchId)
@@ -412,6 +509,13 @@ public class ArcheryGestureManager : MonoBehaviour
             if (currentState == GestureState.Aiming)
             {
                 currentState = GestureState.Drawing;
+
+                if (logDebugEvents)
+                {
+                    Debug.Log(
+                        "[ArcheryGestureManager] Secondary touch ended - back to Drawing state",
+                        this); // ARCHERY_DEBUG_LOG
+                }
             }
         }
 
@@ -438,10 +542,20 @@ public class ArcheryGestureManager : MonoBehaviour
         secondaryTouchId = -1;
         drawStartPosition = Vector2.zero;
         currentDrawPosition = Vector2.zero;
+
+        if (logDebugEvents)
+        {
+            Debug.Log("[ArcheryGestureManager] ResetGesture - state set to Idle, ids cleared", this); // ARCHERY_DEBUG_LOG
+        }
     }
 
     private void CancelGesture()
     {
+        if (logDebugEvents)
+        {
+            Debug.Log("[ArcheryGestureManager] CancelGesture - invoking OnCancel and clearing touches", this); // ARCHERY_DEBUG_LOG
+        }
+
         OnCancel?.Invoke();
         ResetGesture();
         activeTouches.Clear();

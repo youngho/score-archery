@@ -33,6 +33,10 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
     [Tooltip("좌/우로 조정 가능한 최대 요(yaw) 각도")]
     public float maxYawAngle = 45f;
 
+    [Header("디버그")]
+    [Tooltip("조준 프리뷰의 생성/갱신 과정을 로그로 출력할지 여부")]
+    public bool logDebug = false;
+
     private ArcheryGestureManager gestureManager;
     private GameObject previewInstance;
     private Transform previewTransform;
@@ -47,6 +51,11 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
     {
         gestureManager = ArcheryGestureManager.Instance;
 
+        if (logDebug)
+        {
+            Debug.Log("[ArcheryAimVisualizer3D] OnEnable - subscribing gesture events", this); // ARCHERY_DEBUG_LOG
+        }
+
         gestureManager.OnDrawStart.AddListener(OnDrawStart);
         gestureManager.OnDrawing.AddListener(OnDrawing);
         gestureManager.OnDrawEnd.AddListener(OnDrawEnd);
@@ -58,6 +67,11 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
     private void OnDisable()
     {
         if (gestureManager == null) return;
+
+        if (logDebug)
+        {
+            Debug.Log("[ArcheryAimVisualizer3D] OnDisable - unsubscribing gesture events", this); // ARCHERY_DEBUG_LOG
+        }
 
         gestureManager.OnDrawStart.RemoveListener(OnDrawStart);
         gestureManager.OnDrawing.RemoveListener(OnDrawing);
@@ -74,6 +88,13 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
         if (previewInstance == null) return;
 
         previewInstance.SetActive(true);
+
+        if (logDebug)
+        {
+            Debug.Log(
+                $"[ArcheryAimVisualizer3D] OnDrawStart - startPos={data.startPosition}, baseScale={baseLocalScale}",
+                this); // ARCHERY_DEBUG_LOG
+        }
 
         if (arrowSpawnPoint != null)
         {
@@ -130,6 +151,13 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
 
         Vector3 dir = rot * baseDir;
 
+        if (logDebug)
+        {
+            Debug.Log(
+                $"[ArcheryAimVisualizer3D] OnDrawing - dragDir={dragDir}, pitch={pitchDeg:F1}, yaw={yawDeg:F1}, baseDir={baseDir}, dir={dir}",
+                this); // ARCHERY_DEBUG_LOG
+        }
+
         // 회전 먼저 적용
         previewTransform.rotation = Quaternion.LookRotation(dir, Vector3.up);
 
@@ -147,10 +175,22 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
         // 이 게임은 항상 최대 힘으로 쏘므로, 프리뷰 화살도 항상 최대 크기로 표시
         float scale = maxScale;
         previewTransform.localScale = baseLocalScale * scale;
+
+        if (logDebug)
+        {
+            Debug.Log(
+                $"[ArcheryAimVisualizer3D] Updated preview - pos={previewTransform.position}, rot={previewTransform.rotation.eulerAngles}, scale={previewTransform.localScale}",
+                this); // ARCHERY_DEBUG_LOG
+        }
     }
 
     private void OnDrawEnd(ArcheryGestureManager.GestureData data)
     {
+        if (logDebug)
+        {
+            Debug.Log("[ArcheryAimVisualizer3D] OnDrawEnd - hiding preview", this); // ARCHERY_DEBUG_LOG
+        }
+
         HidePreview();
     }
 
@@ -158,16 +198,29 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
     {
         // 실제 발사는 다른 스크립트(ArcheryShooter)가 담당
         // 여기서는 시 بص주얼만, OnDrawEnd에서 숨김 처리
+        if (logDebug)
+        {
+            Debug.Log("[ArcheryAimVisualizer3D] OnRelease - visual only (no action)", this); // ARCHERY_DEBUG_LOG
+        }
     }
 
     private void OnAimAdjust(ArcheryGestureManager.GestureData data)
     {
         // 필요하다면 두 손가락 조준 오프셋(data.aimOffset)을 이용해
         // 좌우/상하 미세 조정 비주얼을 추가할 수 있음.
+        if (logDebug)
+        {
+            Debug.Log($"[ArcheryAimVisualizer3D] OnAimAdjust - aimOffset={data.aimOffset}", this); // ARCHERY_DEBUG_LOG
+        }
     }
 
     private void OnCancel()
     {
+        if (logDebug)
+        {
+            Debug.Log("[ArcheryAimVisualizer3D] OnCancel - hiding preview", this); // ARCHERY_DEBUG_LOG
+        }
+
         HidePreview();
     }
     #endregion
@@ -175,7 +228,14 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
     #region Helpers
     private void EnsurePreviewInstance()
     {
-        if (previewInstance != null) return;
+        if (previewInstance != null)
+        {
+            if (logDebug)
+            {
+                Debug.Log("[ArcheryAimVisualizer3D] EnsurePreviewInstance - already exists", this); // ARCHERY_DEBUG_LOG
+            }
+            return;
+        }
         if (arrowPreviewPrefab == null)
         {
             Debug.LogWarning("[ArcheryAimVisualizer3D] arrowPreviewPrefab 이 설정되어 있지 않습니다.");
@@ -185,6 +245,13 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
         previewInstance = Instantiate(arrowPreviewPrefab);
         previewTransform = previewInstance.transform;
         baseLocalScale = previewTransform.localScale;
+
+        if (logDebug)
+        {
+            Debug.Log(
+                $"[ArcheryAimVisualizer3D] EnsurePreviewInstance - instantiated preview, baseScale={baseLocalScale}",
+                this); // ARCHERY_DEBUG_LOG
+        }
 
         // 프리팹의 메쉬 중심을 계산해서, 이후에는 "메쉬 중심"이 arrowSpawnPoint를 기준으로
         // 움직이도록 보정한다.
@@ -198,11 +265,23 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
             // 로컬 피벗(0,0,0)에서 메쉬 중심까지의 오프셋
             previewCenterLocalOffset = localCenter;
             hasPreviewCenterOffset = (previewCenterLocalOffset != Vector3.zero);
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    $"[ArcheryAimVisualizer3D] Calculated preview center offset - localCenter={localCenter}, hasOffset={hasPreviewCenterOffset}",
+                    this); // ARCHERY_DEBUG_LOG
+            }
         }
         else
         {
             previewCenterLocalOffset = Vector3.zero;
             hasPreviewCenterOffset = false;
+
+            if (logDebug)
+            {
+                Debug.Log("[ArcheryAimVisualizer3D] EnsurePreviewInstance - no Renderer found on preview", this); // ARCHERY_DEBUG_LOG
+            }
         }
 
         previewInstance.SetActive(false);
@@ -213,6 +292,11 @@ public class ArcheryAimVisualizer3D : MonoBehaviour
         if (previewInstance != null)
         {
             previewInstance.SetActive(false);
+
+            if (logDebug)
+            {
+                Debug.Log("[ArcheryAimVisualizer3D] HidePreview - preview disabled", this); // ARCHERY_DEBUG_LOG
+            }
         }
     }
     #endregion

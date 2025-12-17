@@ -39,6 +39,12 @@ public class ArcheryShooter : MonoBehaviour
     {
         // ArcheryGestureManager 싱글톤을 통해 이벤트 구독
         var mgr = ArcheryGestureManager.Instance;
+
+        if (logDebug)
+        {
+            Debug.Log("[ArcheryShooter] OnEnable - subscribing gesture events", this); // ARCHERY_DEBUG_LOG
+        }
+
         mgr.OnDrawStart.AddListener(OnDrawStart);
         mgr.OnDrawing.AddListener(OnDrawing);
         mgr.OnDrawEnd.AddListener(OnDrawEnd);
@@ -51,6 +57,12 @@ public class ArcheryShooter : MonoBehaviour
     {
         // 씬 종료 시 자동으로 제거되지만, 안전하게 이벤트 해제
         var mgr = ArcheryGestureManager.Instance;
+
+        if (logDebug)
+        {
+            Debug.Log("[ArcheryShooter] OnDisable - unsubscribing gesture events", this); // ARCHERY_DEBUG_LOG
+        }
+
         mgr.OnDrawStart.RemoveListener(OnDrawStart);
         mgr.OnDrawing.RemoveListener(OnDrawing);
         mgr.OnDrawEnd.RemoveListener(OnDrawEnd);
@@ -64,7 +76,7 @@ public class ArcheryShooter : MonoBehaviour
     {
         if (logDebug)
         {
-            Debug.Log($"[ArcheryShooter] Draw Start at {data.startPosition}");
+            Debug.Log($"[ArcheryShooter] OnDrawStart - startPos={data.startPosition}", this); // ARCHERY_DEBUG_LOG
         }
     }
 
@@ -72,24 +84,40 @@ public class ArcheryShooter : MonoBehaviour
     {
         // 필요하면 여기서 조준 UI, 파워 게이지 등을 업데이트
         // 예: data.normalizedPower 사용
+        if (logDebug)
+        {
+            Debug.Log(
+                $"[ArcheryShooter] OnDrawing - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}",
+                this); // ARCHERY_DEBUG_LOG
+        }
     }
 
     private void OnDrawEnd(ArcheryGestureManager.GestureData data)
     {
         // 드로우가 끝났지만 발사가 아닐 수도 있음 (짧게 드래그 등)
+        if (logDebug)
+        {
+            Debug.Log(
+                $"[ArcheryShooter] OnDrawEnd - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}",
+                this); // ARCHERY_DEBUG_LOG
+        }
     }
 
     private void OnAimAdjust(ArcheryGestureManager.GestureData data)
     {
         // 두 손가락으로 조준을 미세 조정하는 용도로 사용할 수 있음
         // data.aimOffset을 이용해 카메라/활 회전 보정 가능
+        if (logDebug)
+        {
+            Debug.Log($"[ArcheryShooter] OnAimAdjust - aimOffset={data.aimOffset}", this); // ARCHERY_DEBUG_LOG
+        }
     }
 
     private void OnCancel()
     {
         if (logDebug)
         {
-            Debug.Log("[ArcheryShooter] Gesture Canceled");
+            Debug.Log("[ArcheryShooter] OnCancel - gesture canceled", this); // ARCHERY_DEBUG_LOG
         }
     }
 
@@ -98,7 +126,7 @@ public class ArcheryShooter : MonoBehaviour
         // 실제 화살 발사 시점
         if (arrowPrefab == null || arrowSpawnPoint == null)
         {
-            Debug.LogWarning("[ArcheryShooter] arrowPrefab 또는 arrowSpawnPoint가 설정되어 있지 않습니다.");
+            Debug.LogWarning("[ArcheryShooter] arrowPrefab 또는 arrowSpawnPoint가 설정되어 있지 않습니다.", this); // ARCHERY_DEBUG_LOG
             return;
         }
 
@@ -144,8 +172,22 @@ public class ArcheryShooter : MonoBehaviour
 
         Vector3 dir = rot * baseDir;
 
+        if (logDebug)
+        {
+            Debug.Log(
+                $"[ArcheryShooter] Calculated shot direction - dragDir={dragDir}, pitch={pitchDeg:F1}, yaw={yawDeg:F1}, baseDir={baseDir}",
+                this); // ARCHERY_DEBUG_LOG
+        }
+
         // 화살 생성 및 초기 회전 설정
         GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, Quaternion.LookRotation(dir));
+
+        if (logDebug)
+        {
+            Debug.Log(
+                $"[ArcheryShooter] Spawned arrow instance '{arrow.name}' at {arrowSpawnPoint.position} with dir={dir}",
+                this); // ARCHERY_DEBUG_LOG
+        }
 
         Rigidbody rb = arrow.GetComponent<Rigidbody>();
         if (rb != null)
@@ -153,11 +195,24 @@ public class ArcheryShooter : MonoBehaviour
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             rb.AddForce(dir * force, ForceMode.Impulse);
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    $"[ArcheryShooter] Applied force to arrow - force={force:F1}, velocity={rb.linearVelocity}, mass={rb.mass}",
+                    this); // ARCHERY_DEBUG_LOG
+            }
+        }
+        else if (logDebug)
+        {
+            Debug.Log("[ArcheryShooter] Spawned arrow has no Rigidbody component", this); // ARCHERY_DEBUG_LOG
         }
 
         if (logDebug)
         {
-            Debug.Log($"[ArcheryShooter] Shoot. power={maxForce:F2}, force={force:F1}, dir={dir}");
+            Debug.Log(
+                $"[ArcheryShooter] Shoot complete - gesturePower={data.normalizedPower:F2}, force={force:F1}, dir={dir}, pitch={pitchDeg:F1}, yaw={yawDeg:F1}",
+                this); // ARCHERY_DEBUG_LOG
         }
     }
     #endregion
