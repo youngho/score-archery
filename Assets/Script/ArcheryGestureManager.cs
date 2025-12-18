@@ -158,7 +158,9 @@ public class ArcheryGestureManager : MonoBehaviour
     /// </summary>
     private Vector3 previewCenterLocalOffset = Vector3.zero;
     private bool hasPreviewCenterOffset = false;
-    // 직전 프레임의 제스처 상태(디버깅/상태 전이 감지를 위해)
+    /// <summary>
+    /// 직전 프레임의 제스처 상태 (디버깅/상태 전이 감지를 위해)
+    /// </summary>
     private GestureState lastGestureState = GestureState.Idle;
     #endregion
 
@@ -588,8 +590,8 @@ public class ArcheryGestureManager : MonoBehaviour
         // 타임아웃 체크 등 추가 상태 관리
         if (currentState == GestureState.Drawing || currentState == GestureState.Aiming)
         {
-            float duration = Time.time - drawStartTime;
-            // 너무 오래 당기고 있으면 취소할 수도 있음 (옵션)
+            // 필요시 타임아웃 체크 로직 추가 가능
+            // float duration = Time.time - drawStartTime;
             // if (duration > maxDrawDuration) CancelGesture();
         }
     }
@@ -827,7 +829,7 @@ public class ArcheryGestureManager : MonoBehaviour
         Vector2 dragDir = dragVec.sqrMagnitude > 0.0001f ? dragVec.normalized : Vector2.zero;
 
         // 위로 드래그하면 조준 취소
-        // dragDir.y가 음수이면 위로 드래그하는 것
+        // dragDir.y가 양수이면 위로 드래그하는 것
         if (dragDir.y > -0.1f) // 약간의 임계값으로 위로 드래그 감지
         {
             if (logPreviewDebug)
@@ -841,45 +843,43 @@ public class ArcheryGestureManager : MonoBehaviour
 
         // Pitch (피치): 위/아래 각도 (수직 회전)
         // - 양수: 위로 향함 (아래로 드래그하면 화살이 위로 발사)
-        // - 0 또는 음수: 변화 없음 (위로 드래그하면 변화 없음)
-        // - 범위: 0 ~ +maxPitchAngle (위로 드래그는 무시)
-        float verticalAngleDeg = 0f; // 위/아래 각도 (Pitch)
+        // - 0: 변화 없음 (위로 드래그하면 변화 없음)
+        // - 범위: 0 ~ +maxPitchAngle
+        float verticalAngleDeg = 0f;
 
         // Yaw (요): 좌/우 각도 (수평 회전)
         // - 양수: 오른쪽으로 향함 (왼쪽으로 드래그하면 화살이 오른쪽으로 발사)
         // - 음수: 왼쪽으로 향함 (오른쪽으로 드래그하면 화살이 왼쪽으로 발사)
         // - 범위: -maxYawAngle ~ +maxYawAngle
-        float horizontalAngleDeg = 0f; // 좌/우 각도 (Yaw)
+        float horizontalAngleDeg = 0f;
 
         if (useGestureAngleForPitch)
         {
             // 아래로 드래그하면 위로 발사 (당기는 방향의 반대)
-            // dragDir.y가 양수(아래로 드래그) → verticalAngleDeg가 양수(위로 향함)
-            // dragDir.y가 음수(위로 드래그) → verticalAngleDeg가 0 (변화 없음)
+            // dragDir.y > 0 (아래로) → verticalAngleDeg > 0 (위로)
+            // dragDir.y < 0 (위로) → verticalAngleDeg = 0 (변화 없음)
             float rawAngle = dragDir.y * maxPitchAngle;
-            verticalAngleDeg = Mathf.Clamp(rawAngle, 0f, maxPitchAngle); // 위로 드래그는 무시 (최소값 0)
+            verticalAngleDeg = Mathf.Clamp(rawAngle, 0f, maxPitchAngle);
         }
 
         if (useGestureAngleForYaw)
         {
-            // 오른쪽으로 드래그하면 왼쪽으로 발사, 왼쪽으로 드래그하면 오른쪽으로 발사 (당기는 방향의 반대)
-            // dragDir.x가 양수(오른쪽으로 드래그) → horizontalAngleDeg가 음수(왼쪽으로 향함)
-            // dragDir.x가 음수(왼쪽으로 드래그) → horizontalAngleDeg가 양수(오른쪽으로 향함)
+            // 오른쪽으로 드래그하면 왼쪽으로 발사, 왼쪽으로 드래그하면 오른쪽으로 발사
+            // dragDir.x > 0 (오른쪽) → horizontalAngleDeg < 0 (왼쪽)
+            // dragDir.x < 0 (왼쪽) → horizontalAngleDeg > 0 (오른쪽)
             horizontalAngleDeg = Mathf.Clamp(-dragDir.x * maxYawAngle, -maxYawAngle, maxYawAngle);
         }
 
-        Quaternion rot = Quaternion.identity;
+        Quaternion rot;
         if (cam != null)
         {
-            // 회전 적용 순서:
-            // 1. Yaw (수평): Y축 기준으로 좌우 회전
-            // 2. Pitch (수직): 카메라의 오른쪽 축 기준으로 위아래 회전
+            // 회전 적용: Yaw (수평) → Pitch (수직)
             rot = Quaternion.AngleAxis(horizontalAngleDeg, Vector3.up) *
                   Quaternion.AngleAxis(verticalAngleDeg, cam.transform.right);
         }
         else
         {
-            // 카메라가 없으면 Euler 각도로 직접 설정 (X: Pitch, Y: Yaw, Z: Roll)
+            // 카메라가 없으면 Euler 각도로 설정 (X: Pitch, Y: Yaw, Z: Roll)
             rot = Quaternion.Euler(verticalAngleDeg, horizontalAngleDeg, 0f);
         }
 
@@ -939,8 +939,7 @@ public class ArcheryGestureManager : MonoBehaviour
                 this); // ARCHERY_DEBUG_LOG
         }
 
-        // 프리팹의 메쉬 중심을 계산해서, 이후에는 "메쉬 중심"이 arrowSpawnPoint를 기준으로
-        // 움직이도록 보정한다.
+        // 프리팹의 메쉬 중심을 계산하여, 메쉬 중심이 arrowSpawnPoint를 기준으로 움직이도록 보정
         var renderer = previewInstance.GetComponentInChildren<Renderer>();
         if (renderer != null)
         {
