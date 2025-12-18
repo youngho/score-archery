@@ -78,7 +78,7 @@ public class ArcheryGestureManager : MonoBehaviour
     public GestureEvent OnDrawEnd = new GestureEvent();        // 화살 당기기 종료
     public GestureEvent OnRelease = new GestureEvent();        // 화살 발사
     public GestureEvent OnAimAdjust = new GestureEvent();      // 조준 조정
-    public UnityEvent OnCancel = new UnityEvent();              // 제스처 취소
+    public UnityEvent OnCancel = new UnityEvent();             // 제스처 취소
     #endregion
 
     #region Inspector Settings
@@ -106,14 +106,11 @@ public class ArcheryGestureManager : MonoBehaviour
     [Tooltip("조준 미리보기 화살이 기준으로 삼을 위치/방향 (보통 활/카메라 앞)")]
     public Transform arrowSpawnPoint;
 
-    [Tooltip("조준 미리보기에 사용할 3D 화살 프리팹 (Rigidbody 없어도 됨)")]
-    public GameObject arrowPreviewPrefab;
-
     [Tooltip("실제 발사할 화살 프리팹 (Rigidbody 필수)")]
     public GameObject arrowPrefab;
 
     [Tooltip("최대 발사 힘")]
-    public float maxForce = 15f;
+    public float maxForce = 10f;
 
     [Header("프리뷰 스케일 설정")]
     [Tooltip("제일 약하게 당겼을 때의 화살 크기 배율")]
@@ -123,14 +120,6 @@ public class ArcheryGestureManager : MonoBehaviour
     public float maxScale = 1.5f;
 
     [Header("프리뷰 각도 설정")]
-    [Tooltip("제스처의 수직 방향을 위/아래 각도(Pitch)로 사용할지 여부\n" +
-             "Pitch: 위/아래 각도 (수직 회전). 아래로 당기면 화살이 위로 향함")]
-    public bool useGestureAngleForPitch = false;
-
-    [Tooltip("제스처의 수평 방향을 좌/우 각도(Yaw)로 사용할지 여부\n" +
-             "Yaw: 좌/우 각도 (수평 회전). 오른쪽으로 당기면 화살이 왼쪽으로 향함")]
-    public bool useGestureAngleForYaw = true;
-
     [Tooltip("위/아래로 조정 가능한 최대 각도 (Pitch: 수직 각도)\n" +
              "양수: 위로 향함, 음수: 아래로 향함")]
     public float maxPitchAngle = 89f;
@@ -642,20 +631,12 @@ public class ArcheryGestureManager : MonoBehaviour
         data.duration = Time.time - drawStartTime;
 
         // 피치/요 각도 계산
-        if (useGestureAngleForPitch)
-        {
-            // 아래로 드래그하면 위로 발사 (당기는 방향의 반대)
-            // direction.y가 양수(아래로 드래그) → pitchDeg가 양수(위로 향함)
-            float rawAngle = data.direction.y * maxPitchAngle;
-            data.pitch = Mathf.Clamp(rawAngle, 0f, maxPitchAngle); // 위로 드래그는 무시 (최소값 0)
-        }
+        // Pitch(수직): 아래로 드래그(y<0) -> 위로 발사(pitch>0)
+        data.pitch = Mathf.Clamp(data.direction.y * maxPitchAngle, 0f, maxPitchAngle);
 
-        if (useGestureAngleForYaw)
-        {
-            // 오른쪽으로 드래그하면 왼쪽으로 발사
-            // direction.x가 양수(오른쪽으로 드래그) → yawDeg가 음수(왼쪽으로 향함)
-            data.yaw = Mathf.Clamp(-data.direction.x * maxYawAngle, -maxYawAngle, maxYawAngle);
-        }
+        // 오른쪽으로 드래그하면 왼쪽으로 발사
+        // direction.x가 양수(오른쪽으로 드래그) → yawDeg가 음수(왼쪽으로 향함)
+        data.yaw = Mathf.Clamp(-data.direction.x * maxYawAngle, -maxYawAngle, maxYawAngle);
 
         // 조준 오프셋 계산 (두 손가락 사용 시)
         if (secondaryTouchId != -1 && activeTouches.ContainsKey(secondaryTouchId))
@@ -928,35 +909,14 @@ public class ArcheryGestureManager : MonoBehaviour
             HidePreview();
             return;
         }
-
-        // Pitch (피치): 위/아래 각도 (수직 회전)
-        // - 양수: 위로 향함 (아래로 드래그하면 화살이 위로 발사)
-        // - 0: 변화 없음 (위로 드래그하면 변화 없음)
-        // - 범위: 0 ~ +maxPitchAngle
         float verticalAngleDeg = 0f;
-
-        // Yaw (요): 좌/우 각도 (수평 회전)
-        // - 양수: 오른쪽으로 향함 (왼쪽으로 드래그하면 화살이 오른쪽으로 발사)
-        // - 음수: 왼쪽으로 향함 (오른쪽으로 드래그하면 화살이 왼쪽으로 발사)
-        // - 범위: -maxYawAngle ~ +maxYawAngle
         float horizontalAngleDeg = 0f;
 
-        if (useGestureAngleForPitch)
-        {
-            // 아래로 드래그하면 위로 발사 (당기는 방향의 반대)
-            // dragDir.y > 0 (아래로) → verticalAngleDeg > 0 (위로)
-            // dragDir.y < 0 (위로) → verticalAngleDeg = 0 (변화 없음)
-            float rawAngle = dragDir.y * maxPitchAngle;
-            verticalAngleDeg = Mathf.Clamp(rawAngle, 0f, maxPitchAngle);
-        }
-
-        if (useGestureAngleForYaw)
-        {
-            // 오른쪽으로 드래그하면 왼쪽으로 발사, 왼쪽으로 드래그하면 오른쪽으로 발사
-            // dragDir.x > 0 (오른쪽) → horizontalAngleDeg < 0 (왼쪽)
-            // dragDir.x < 0 (왼쪽) → horizontalAngleDeg > 0 (오른쪽)
-            horizontalAngleDeg = Mathf.Clamp(-dragDir.x * maxYawAngle, -maxYawAngle, maxYawAngle);
-        }
+        float rawAngle = dragDir.y * maxPitchAngle;
+        verticalAngleDeg = Mathf.Clamp(rawAngle, 0f, maxPitchAngle);
+       
+        horizontalAngleDeg = Mathf.Clamp(-dragDir.x * maxYawAngle, -maxYawAngle, maxYawAngle);
+        
 
         Quaternion rot;
         if (cam != null)
@@ -1010,13 +970,13 @@ public class ArcheryGestureManager : MonoBehaviour
             }
             return;
         }
-        if (arrowPreviewPrefab == null)
+        if (arrowPrefab == null)
         {
-            Debug.LogWarning("[ArcheryGestureManager] arrowPreviewPrefab 이 설정되어 있지 않습니다.");
+            Debug.LogWarning("[ArcheryGestureManager] arrowPrefab 이 설정되어 있지 않습니다.");
             return;
         }
 
-        previewInstance = Instantiate(arrowPreviewPrefab);
+        previewInstance = Instantiate(arrowPrefab);
         previewTransform = previewInstance.transform;
         baseLocalScale = previewTransform.localScale;
 

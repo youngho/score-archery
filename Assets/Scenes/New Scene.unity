@@ -119,60 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &124174600
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 124174602}
-  - component: {fileID: 124174601}
-  m_Layer: 0
-  m_Name: Shooter
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &124174601
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 124174600}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a6fa57f3c3214e0dad3cf7b5ffdd033, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ArcheryShooter
-  arrowSpawnPoint: {fileID: 1127955916}
-  arrowPrefab: {fileID: 1959729250425484, guid: 5187dfa4d8f19524e8bbf7c6894b7de7, type: 3}
-  minForce: 5
-  maxForce: 5
-  useGestureAngleForPitch: 1
-  useGestureAngleForYaw: 1
-  maxPitchAngle: 45
-  maxYawAngle: 45
-  logDebug: 0
---- !u!4 &124174602
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 124174600}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.00034, y: 0, z: -0.08087}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1127955916}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &180220186
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -314,7 +260,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 224521875}
-  - component: {fileID: 224521874}
+  - component: {fileID: 224521876}
   m_Layer: 0
   m_Name: GestureManager
   m_TagString: Untagged
@@ -322,7 +268,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &224521874
+--- !u!4 &224521875
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224521873}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.23588, y: 0, z: 4.23042}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1127955916}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &224521876
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -354,7 +316,6 @@ MonoBehaviour:
       m_Calls: []
   minDrawDistance: 50
   maxDrawDistance: 300
-  minReleaseVelocity: 100
   aimAdjustThreshold: 30
   cancelBorderSize: 100
   showDebugInfo: 0
@@ -362,29 +323,13 @@ MonoBehaviour:
   drawLineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   aimLineColor: {r: 0, g: 1, b: 1, a: 1}
   arrowSpawnPoint: {fileID: 1127955916}
-  arrowPreviewPrefab: {fileID: 1959729250425484, guid: 5187dfa4d8f19524e8bbf7c6894b7de7, type: 3}
+  arrowPrefab: {fileID: 1959729250425484, guid: 5187dfa4d8f19524e8bbf7c6894b7de7, type: 3}
+  maxForce: 10
   minScale: 0.5
   maxScale: 1.5
-  useGestureAngleForPitch: 0
-  useGestureAngleForYaw: 1
-  maxPitchAngle: 45
+  maxPitchAngle: 89
   maxYawAngle: 70
   logPreviewDebug: 1
---- !u!4 &224521875
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 224521873}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.23588, y: 0, z: 4.23042}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &446609753
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -642,11 +587,11 @@ Transform:
   m_GameObject: {fileID: 1127955915}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.00034, y: 1, z: -6.91913}
+  m_LocalPosition: {x: -0.23588, y: 1, z: -11.23042}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 124174602}
+  m_Father: {fileID: 224521875}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1206098643 stripped
 GameObject:
@@ -826,5 +771,4 @@ SceneRoots:
   - {fileID: 446609753}
   - {fileID: 180220186}
   - {fileID: 220564604}
-  - {fileID: 124174602}
   - {fileID: 224521875}
