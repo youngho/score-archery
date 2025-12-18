@@ -21,6 +21,8 @@ public class ArcheryArrow : MonoBehaviour
 
     private Rigidbody rb;
     private bool hasLoggedFirstFlight = false;
+    private Quaternion initialRotation; // 초기 회전 저장 (ShootArrow에서 설정한 회전)
+    private bool hasInitialRotation = false; // 초기 회전이 설정되었는지 여부
 
     private void Awake()
     {
@@ -40,9 +42,14 @@ public class ArcheryArrow : MonoBehaviour
             Destroy(gameObject, lifeTime);
         }
 
+        // Start에서 초기 회전 저장 (ShootArrow에서 설정한 회전을 보존)
+        // ShootArrow에서 이미 올바른 회전을 설정했으므로, 이를 초기 회전으로 저장
+        initialRotation = transform.rotation;
+        hasInitialRotation = true;
+
         if (logDebug)
         {
-            Debug.Log($"[ArcheryArrow] Start - lifeTime={lifeTime}", this); // ARCHERY_DEBUG_LOG
+            Debug.Log($"[ArcheryArrow] Start - lifeTime={lifeTime}, initialRotation={initialRotation.eulerAngles}", this); // ARCHERY_DEBUG_LOG
         }
     }
 
@@ -51,17 +58,28 @@ public class ArcheryArrow : MonoBehaviour
         if (rb == null) return;
 
         // 화살이 날아가는 방향으로 forward를 자동 정렬
+        // ShootArrow에서 설정한 초기 회전을 기준으로 속도 방향에 맞춰 회전
         if (rb.linearVelocity.sqrMagnitude > minVelocitySqrForRotate)
         {
             if (logDebug && !hasLoggedFirstFlight)
             {
                 hasLoggedFirstFlight = true;
                 Debug.Log(
-                    $"[ArcheryArrow] First flight - velocity={rb.linearVelocity}, speed={rb.linearVelocity.magnitude:F2}",
+                    $"[ArcheryArrow] First flight - velocity={rb.linearVelocity}, speed={rb.linearVelocity.magnitude:F2}, currentRotation={transform.rotation.eulerAngles}, initialRotation={(hasInitialRotation ? initialRotation.eulerAngles.ToString() : "not set")}",
                     this); // ARCHERY_DEBUG_LOG
             }
 
-            transform.rotation = Quaternion.LookRotation(rb.linearVelocity.normalized);
+            // 속도 방향으로 회전
+            // ShootArrow에서 이미 올바른 방향으로 회전을 설정했으므로,
+            // 속도 방향에 맞춰 회전하면 자연스럽게 화살이 날아가는 방향을 향함
+            Vector3 velocityDir = rb.linearVelocity.normalized;
+            transform.rotation = Quaternion.LookRotation(velocityDir);
+        }
+        else if (hasInitialRotation && !hasLoggedFirstFlight)
+        {
+            // 속도가 아직 충분하지 않으면 초기 회전 유지
+            // ShootArrow에서 설정한 회전을 보존
+            transform.rotation = initialRotation;
         }
     }
 

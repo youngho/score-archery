@@ -92,11 +92,11 @@ public class ArcheryGestureManager : MonoBehaviour
 
     [Header("화살 Aim 설정")]
     [Tooltip("최대 발사 힘")]
-    public float maxForce = 10f;
+    public float maxForce = 30f;
 
     [Tooltip("위/아래로 조정 가능한 최대 각도 (Pitch: 수직 각도)\n" +
              "양수: 위로 향함, 음수: 아래로 향함")]
-    public float maxPitchAngle = 89f;
+    public float maxPitchAngle = 80f;
 
     [Tooltip("좌/우로 조정 가능한 최대 각도 (Yaw: 수평 각도)\n" +
              "양수: 오른쪽으로 향함, 음수: 왼쪽으로 향함")]
@@ -626,12 +626,18 @@ public class ArcheryGestureManager : MonoBehaviour
         data.duration = Time.time - drawStartTime;
 
         // 피치/요 각도 계산
-        // Pitch(수직): 아래로 드래그(y<0) -> 위로 발사(pitch>0)
-        data.pitch = Mathf.Clamp(data.direction.y * maxPitchAngle, 0f, maxPitchAngle);
+        // 드래그 거리에 비례하여 각도 조정
+        float normalizedDistance = Mathf.Clamp01(data.distance / maxDrawDistance);
+        
+        // Pitch(수직): 아래로 드래그(y<0) -> 위로 발사(pitch>0), 위로 드래그(y>0) -> 아래로 발사(pitch<0)
+        // 드래그 방향과 거리에 따라 각도 조정
+        float rawPitch = data.direction.y * maxPitchAngle * normalizedDistance;
+        data.pitch = Mathf.Clamp(rawPitch, -maxPitchAngle, maxPitchAngle);
 
         // 오른쪽으로 드래그하면 왼쪽으로 발사
         // direction.x가 양수(오른쪽으로 드래그) → yawDeg가 음수(왼쪽으로 향함)
-        data.yaw = Mathf.Clamp(-data.direction.x * maxYawAngle, -maxYawAngle, maxYawAngle);
+        // 드래그 거리에 비례하여 각도 조정
+        data.yaw = Mathf.Clamp(-data.direction.x * maxYawAngle * normalizedDistance, -maxYawAngle, maxYawAngle);
 
         // 조준 오프셋 계산 (두 손가락 사용 시)
         if (secondaryTouchId != -1 && activeTouches.ContainsKey(secondaryTouchId))
@@ -726,16 +732,33 @@ public class ArcheryGestureManager : MonoBehaviour
             ? arrowSpawnPoint.forward
             : (cam != null ? cam.transform.forward : Vector3.forward);
 
-        // 월드 기준 회전 구성 (요는 세계 Y축, 피치는 카메라의 오른쪽 축 기준)
-        Quaternion rot = Quaternion.identity;
+        // 프리뷰와 동일한 방식으로 각도 계산
+        Vector2 dragVec = (data.currentPosition - data.startPosition);
+        Vector2 dragDir = dragVec.sqrMagnitude > 0.0001f ? dragVec.normalized : Vector2.zero;
+        float dragDistance = dragVec.magnitude;
+        
+        // 드래그 방향에 따라 각도 조정 (프리뷰와 동일한 로직)
+        float normalizedDistance = Mathf.Clamp01(dragDistance / maxDrawDistance);
+        
+        // 수직 각도: 드래그 방향과 거리에 따라 조정
+        float rawVerticalAngle = dragDir.y * maxPitchAngle * normalizedDistance;
+        float verticalAngleDeg = Mathf.Clamp(rawVerticalAngle, -maxPitchAngle, maxPitchAngle);
+       
+        // 수평 각도: 좌우 드래그에 따라 조정
+        float horizontalAngleDeg = Mathf.Clamp(-dragDir.x * maxYawAngle * normalizedDistance, -maxYawAngle, maxYawAngle);
+
+        // 월드 기준 회전 구성 (프리뷰와 동일한 방식)
+        Quaternion rot;
         if (cam != null)
         {
-            rot = Quaternion.AngleAxis(data.yaw, Vector3.up) *
-                  Quaternion.AngleAxis(data.pitch, cam.transform.right);
+            // 회전 적용: Yaw (수평) → Pitch (수직)
+            rot = Quaternion.AngleAxis(horizontalAngleDeg, Vector3.up) *
+                  Quaternion.AngleAxis(verticalAngleDeg, cam.transform.right);
         }
         else
         {
-            rot = Quaternion.Euler(data.pitch, data.yaw, 0f);
+            // 카메라가 없으면 Euler 각도로 설정 (X: Pitch, Y: Yaw, Z: Roll)
+            rot = Quaternion.Euler(verticalAngleDeg, horizontalAngleDeg, 0f);
         }
 
         Vector3 dir = rot * baseDir;
@@ -743,12 +766,20 @@ public class ArcheryGestureManager : MonoBehaviour
         if (showDebugLog)
         {
             Debug.Log(
-                $"[ArcheryGestureManager] Calculated shot direction - dragDir={data.direction}, pitch={data.pitch:F1}, yaw={data.yaw:F1}, baseDir={baseDir}",
+                $"[ArcheryGestureManager] Calculated shot direction - dragDir={dragDir}, verticalAngle(pitch)={verticalAngleDeg:F1}°, horizontalAngle(yaw)={horizontalAngleDeg:F1}°, baseDir={baseDir}",
                 this); // ARCHERY_DEBUG_LOG
         }
 
-        // 화살 생성 및 초기 회전 설정
-        GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, Quaternion.LookRotation(dir));
+        // 화살 생성 및 초기 회전 설정 (프리뷰와 동일한 회전 적용)
+        // 프리팹의 초기 회전(90도 X축)을 고려하여 회전 설정
+        Quaternion arrowRotation = Quaternion.LookRotation(dir, Vector3.up);
+        GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, arrowRotation);
+        
+        // 화살의 회전이 제대로 적용되었는지 확인
+        if (showDebugLog)
+        {
+            Debug.Log($"[ArcheryGestureManager] Arrow rotation set - rotation={arrowRotation.eulerAngles}, dir={dir}", this);
+        }
 
         if (showDebugLog)
         {
@@ -893,27 +924,24 @@ public class ArcheryGestureManager : MonoBehaviour
         // 아래로 드래그 → 위로 발사, 오른쪽으로 드래그 → 왼쪽으로 발사
         Vector2 dragVec = (data.currentPosition - data.startPosition);
         Vector2 dragDir = dragVec.sqrMagnitude > 0.0001f ? dragVec.normalized : Vector2.zero;
+        float dragDistance = dragVec.magnitude;
 
-        // 위로 드래그하면 조준 취소
-        // dragDir.y가 양수이면 위로 드래그하는 것
-        if (dragDir.y > -0.1f) // 약간의 임계값으로 위로 드래그 감지
-        {
-            if (showDebugLog)
-            {
-                Debug.Log("[ArcheryGestureManager] Upward drag detected - canceling gesture", this); // ARCHERY_DEBUG_LOG
-            }
-            CancelGesture();
-            HidePreview();
-            HideTrajectory();
-            return;
-        }
         float verticalAngleDeg = 0f;
         float horizontalAngleDeg = 0f;
 
-        float rawAngle = dragDir.y * maxPitchAngle;
-        verticalAngleDeg = Mathf.Clamp(rawAngle, 0f, maxPitchAngle);
+        // 드래그 방향에 따라 각도 조정
+        // 아래로 드래그(dragDir.y < 0) → 각도 증가 (위로 발사)
+        // 위로 드래그(dragDir.y > 0) → 각도 감소 (아래로 발사)
+        // 드래그 거리에 비례하여 각도 조정
+        float normalizedDistance = Mathf.Clamp01(dragDistance / maxDrawDistance);
+        
+        // 수직 각도: 드래그 방향과 거리에 따라 조정
+        // dragDir.y가 음수(아래로)면 양수 각도, 양수(위로)면 음수 각도
+        float rawVerticalAngle = dragDir.y * maxPitchAngle * normalizedDistance;
+        verticalAngleDeg = Mathf.Clamp(rawVerticalAngle, -maxPitchAngle, maxPitchAngle);
        
-        horizontalAngleDeg = Mathf.Clamp(-dragDir.x * maxYawAngle, -maxYawAngle, maxYawAngle);
+        // 수평 각도: 좌우 드래그에 따라 조정
+        horizontalAngleDeg = Mathf.Clamp(-dragDir.x * maxYawAngle * normalizedDistance, -maxYawAngle, maxYawAngle);
         
 
         Quaternion rot;

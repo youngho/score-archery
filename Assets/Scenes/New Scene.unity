@@ -277,7 +277,7 @@ Transform:
   m_GameObject: {fileID: 224521873}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.23588, y: 0, z: 4.23042}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -316,10 +316,10 @@ MonoBehaviour:
       m_Calls: []
   arrowSpawnPoint: {fileID: 1127955916}
   arrowPrefab: {fileID: 1959729250425484, guid: 5187dfa4d8f19524e8bbf7c6894b7de7, type: 3}
-  maxForce: 10
-  maxPitchAngle: 10
-  maxYawAngle: 10
-  minDrawDistance: 10
+  maxForce: 30
+  maxPitchAngle: 80
+  maxYawAngle: 70
+  minDrawDistance: 50
   maxDrawDistance: 300
   aimAdjustThreshold: 30
   cancelBorderSize: 100
@@ -583,7 +583,7 @@ Transform:
   m_GameObject: {fileID: 1127955915}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.23588, y: 1, z: -11.23042}
+  m_LocalPosition: {x: 0, y: 0, z: -5.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
