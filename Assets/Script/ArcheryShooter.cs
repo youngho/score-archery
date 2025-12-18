@@ -33,7 +33,7 @@ public class ArcheryShooter : MonoBehaviour
     public float maxYawAngle = 45f;
 
     [Header("디버그")]
-    public bool logDebug = true;
+    public bool logDebug = false;
 
     private void OnEnable()
     {

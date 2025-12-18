@@ -99,11 +99,41 @@ public class ArcheryGestureManager : MonoBehaviour
     public float cancelBorderSize = 100f;
 
     [Header("디버그")]
-    public bool showDebugInfo = true;
+    public bool showDebugInfo = false;
     [Tooltip("제스처 처리/이벤트 흐름을 Debug.Log로 출력할지 여부")]
-    public bool logDebugEvents = true;
+    public bool logDebugEvents = false;
     public Color drawLineColor = Color.yellow;
     public Color aimLineColor = Color.cyan;
+
+    [Header("3D 조준 프리뷰 설정")]
+    [Tooltip("조준 미리보기 화살이 기준으로 삼을 위치/방향 (보통 활/카메라 앞)")]
+    public Transform arrowSpawnPoint;
+
+    [Tooltip("조준 미리보기에 사용할 3D 화살 프리팹 (Rigidbody 없어도 됨)")]
+    public GameObject arrowPreviewPrefab;
+
+    [Header("프리뷰 스케일 설정")]
+    [Tooltip("제일 약하게 당겼을 때의 화살 크기 배율")]
+    public float minScale = 0.5f;
+
+    [Tooltip("최대로 당겼을 때의 화살 크기 배율")]
+    public float maxScale = 1.5f;
+
+    [Header("프리뷰 각도 설정")]
+    [Tooltip("제스처의 수직 방향을 피치 각도로 사용할지 여부")]
+    public bool useGestureAngleForPitch = false;
+
+    [Tooltip("제스처의 수평 방향을 요(yaw) 각도로 사용할지 여부")]
+    public bool useGestureAngleForYaw = true;
+
+    [Tooltip("위/아래로 조정 가능한 최대 피치 각도")]
+    public float maxPitchAngle = 45f;
+
+    [Tooltip("좌/우로 조정 가능한 최대 요(yaw) 각도")]
+    public float maxYawAngle = 70f;
+
+    [Tooltip("조준 프리뷰의 생성/갱신 과정을 로그로 출력할지 여부")]
+    public bool logPreviewDebug = true;
     #endregion
 
     #region Private Variables
@@ -114,6 +144,18 @@ public class ArcheryGestureManager : MonoBehaviour
     private int primaryTouchId = -1;
     private int secondaryTouchId = -1;
     private float drawStartTime;
+
+    // 3D 조준 프리뷰 관련
+    private GameObject previewInstance;
+    private Transform previewTransform;
+    private Vector3 baseLocalScale = Vector3.one;
+    /// <summary>
+    /// 프리팹 메쉬의 "시각적인 중심"이 로컬 피벗(Transform.position)에서 얼마나 떨어져 있는지 (로컬 좌표계 기준)
+    /// </summary>
+    private Vector3 previewCenterLocalOffset = Vector3.zero;
+    private bool hasPreviewCenterOffset = false;
+    // 직전 프레임의 제스처 상태(디버깅/상태 전이 감지를 위해)
+    private GestureState lastGestureState = GestureState.Idle;
     #endregion
 
     #region Enums
@@ -213,6 +255,15 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             Debug.Log("[ArcheryGestureManager] OnEnable - subscribed to sceneLoaded", this); // ARCHERY_DEBUG_LOG
         }
+
+        // 3D 조준 프리뷰 초기화
+        EnsurePreviewInstance();
+        HidePreview(); // 시작 시에는 항상 숨김
+
+        if (logPreviewDebug)
+        {
+            Debug.Log("[ArcheryGestureManager] OnEnable - initialized 3D preview system", this); // ARCHERY_DEBUG_LOG
+        }
     }
 
     private void OnDisable()
@@ -236,6 +287,9 @@ public class ArcheryGestureManager : MonoBehaviour
             {
                 Debug.Log("[ArcheryGestureManager] OnDisable - unsubscribed from sceneLoaded", this); // ARCHERY_DEBUG_LOG
             }
+
+            // 3D 조준 프리뷰 정리
+            HidePreview();
         }
     }
 
@@ -243,6 +297,7 @@ public class ArcheryGestureManager : MonoBehaviour
     {
         ProcessInput();
         UpdateGestureState();
+        UpdatePreviewByGesture(); // 3D 조준 프리뷰 갱신
     }
 
     private void OnGUI()
@@ -700,6 +755,197 @@ public class ArcheryGestureManager : MonoBehaviour
         GUIUtility.RotateAroundPivot(angle, guiStart);
         GUI.DrawTexture(new Rect(guiStart.x, guiStart.y, distance, 3), texture);
         GUIUtility.RotateAroundPivot(-angle, guiStart);
+    }
+    #endregion
+
+    #region 3D Aim Preview
+    /// <summary>
+    /// ArcheryGestureManager의 현재 상태를 매 프레임 조회해서
+    /// 조준 미리보기 화살의 표시/회전/스케일을 갱신한다.
+    /// (이벤트 방식 대신 "폴링 방식"으로 구현해서 버그를 줄임)
+    /// </summary>
+    private void UpdatePreviewByGesture()
+    {
+        if (arrowSpawnPoint == null)
+        {
+            return;
+        }
+
+        var state = GetCurrentState();
+        if (state != lastGestureState && logPreviewDebug)
+        {
+            Debug.Log(
+                $"[ArcheryGestureManager] GestureState changed {lastGestureState} -> {state}",
+                this); // ARCHERY_DEBUG_LOG
+        }
+        lastGestureState = state;
+
+        // Idle/Released 상태에서는 프리뷰를 숨긴다.
+        if (state != GestureState.Drawing &&
+            state != GestureState.Aiming)
+        {
+            HidePreview();
+            return;
+        }
+
+        // 현재 제스처 데이터 조회
+        var data = GetCurrentGestureData();
+
+        // 최소 드로우 거리 미만이면 "그냥 클릭"으로 간주하고 프리뷰를 숨긴다.
+        if (data.distance < minDrawDistance)
+        {
+            HidePreview();
+            return;
+        }
+
+        // 여기까지 왔으면 실제로 조준 중이므로 프리뷰를 보여줌
+        EnsurePreviewInstance();
+        if (previewInstance == null) return;
+
+        if (!previewInstance.activeSelf)
+        {
+            previewInstance.SetActive(true);
+
+            if (logPreviewDebug)
+            {
+                Debug.Log("[ArcheryGestureManager] Show preview (start drawing)", this); // ARCHERY_DEBUG_LOG
+            }
+        }
+
+        Camera cam = Camera.main;
+
+        // 기본 방향
+        Vector3 baseDir = arrowSpawnPoint.forward;
+
+        // 발사 방향 계산 (ArcheryShooter와 동일한 방식)
+        Vector2 dragVec = (data.startPosition - data.currentPosition);
+        Vector2 dragDir = dragVec.sqrMagnitude > 0.0001f ? dragVec.normalized : Vector2.zero;
+
+        float pitchDeg = 0f;
+        float yawDeg = 0f;
+
+        if (useGestureAngleForPitch)
+        {
+            pitchDeg = Mathf.Clamp(dragDir.y * maxPitchAngle, -maxPitchAngle, maxPitchAngle);
+        }
+
+        if (useGestureAngleForYaw)
+        {
+            yawDeg = Mathf.Clamp(-dragDir.x * maxYawAngle, -maxYawAngle, maxYawAngle);
+        }
+
+        Quaternion rot = Quaternion.identity;
+        if (cam != null)
+        {
+            rot = Quaternion.AngleAxis(yawDeg, Vector3.up) *
+                  Quaternion.AngleAxis(pitchDeg, cam.transform.right);
+        }
+        else
+        {
+            rot = Quaternion.Euler(pitchDeg, yawDeg, 0f);
+        }
+
+        Vector3 dir = rot * baseDir;
+
+        // 회전 먼저 적용
+        previewTransform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+
+        // 그 다음, 메쉬의 "시각적인 중심"이 spawnPoint 에 위치하도록 보정
+        if (hasPreviewCenterOffset)
+        {
+            previewTransform.position =
+                arrowSpawnPoint.position - previewTransform.rotation * previewCenterLocalOffset;
+        }
+        else
+        {
+            previewTransform.position = arrowSpawnPoint.position;
+        }
+
+        // 드로우 거리(파워)에 따라 스케일 보간
+        float t = Mathf.Clamp01(data.normalizedPower);
+        float scale = Mathf.Lerp(minScale, maxScale, t);
+        previewTransform.localScale = baseLocalScale * scale;
+
+        if (logPreviewDebug)
+        {
+            Debug.Log(
+                $"[ArcheryGestureManager] UpdatePreviewByGesture - state={state}, distance={data.distance:F1}, power={data.normalizedPower:F2}, dragDir={dragDir}, pitch={pitchDeg:F1}, yaw={yawDeg:F1}, pos={previewTransform.position}, scale={previewTransform.localScale}",
+                this); // ARCHERY_DEBUG_LOG
+        }
+    }
+
+    private void EnsurePreviewInstance()
+    {
+        if (previewInstance != null)
+        {
+            if (logPreviewDebug)
+            {
+                Debug.Log("[ArcheryGestureManager] EnsurePreviewInstance - already exists", this); // ARCHERY_DEBUG_LOG
+            }
+            return;
+        }
+        if (arrowPreviewPrefab == null)
+        {
+            Debug.LogWarning("[ArcheryGestureManager] arrowPreviewPrefab 이 설정되어 있지 않습니다.");
+            return;
+        }
+
+        previewInstance = Instantiate(arrowPreviewPrefab);
+        previewTransform = previewInstance.transform;
+        baseLocalScale = previewTransform.localScale;
+
+        if (logPreviewDebug)
+        {
+            Debug.Log(
+                $"[ArcheryGestureManager] EnsurePreviewInstance - instantiated preview, baseScale={baseLocalScale}",
+                this); // ARCHERY_DEBUG_LOG
+        }
+
+        // 프리팹의 메쉬 중심을 계산해서, 이후에는 "메쉬 중심"이 arrowSpawnPoint를 기준으로
+        // 움직이도록 보정한다.
+        var renderer = previewInstance.GetComponentInChildren<Renderer>();
+        if (renderer != null)
+        {
+            // bounds.center 는 월드 좌표이므로, 이를 프리뷰 Transform 로컬 좌표로 변환
+            Vector3 worldCenter = renderer.bounds.center;
+            Vector3 localCenter = previewTransform.InverseTransformPoint(worldCenter);
+
+            // 로컬 피벗(0,0,0)에서 메쉬 중심까지의 오프셋
+            previewCenterLocalOffset = localCenter;
+            hasPreviewCenterOffset = (previewCenterLocalOffset != Vector3.zero);
+
+            if (logPreviewDebug)
+            {
+                Debug.Log(
+                    $"[ArcheryGestureManager] Calculated preview center offset - localCenter={localCenter}, hasOffset={hasPreviewCenterOffset}",
+                    this); // ARCHERY_DEBUG_LOG
+            }
+        }
+        else
+        {
+            previewCenterLocalOffset = Vector3.zero;
+            hasPreviewCenterOffset = false;
+
+            if (logPreviewDebug)
+            {
+                Debug.Log("[ArcheryGestureManager] EnsurePreviewInstance - no Renderer found on preview", this); // ARCHERY_DEBUG_LOG
+            }
+        }
+
+        previewInstance.SetActive(false);
+    }
+
+    private void HidePreview()
+    {
+        if (previewInstance != null)
+        {
+            previewInstance.SetActive(false);
+
+            if (logPreviewDebug)
+            {
+                Debug.Log("[ArcheryGestureManager] HidePreview - preview disabled", this); // ARCHERY_DEBUG_LOG
+            }
+        }
     }
     #endregion
 }
