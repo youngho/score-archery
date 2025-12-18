@@ -109,6 +109,12 @@ public class ArcheryGestureManager : MonoBehaviour
     [Tooltip("조준 미리보기에 사용할 3D 화살 프리팹 (Rigidbody 없어도 됨)")]
     public GameObject arrowPreviewPrefab;
 
+    [Tooltip("실제 발사할 화살 프리팹 (Rigidbody 필수)")]
+    public GameObject arrowPrefab;
+
+    [Tooltip("최대 발사 힘")]
+    public float maxForce = 15f;
+
     [Header("프리뷰 스케일 설정")]
     [Tooltip("제일 약하게 당겼을 때의 화살 크기 배율")]
     public float minScale = 0.5f;
@@ -127,7 +133,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
     [Tooltip("위/아래로 조정 가능한 최대 각도 (Pitch: 수직 각도)\n" +
              "양수: 위로 향함, 음수: 아래로 향함")]
-    public float maxPitchAngle = 45f;
+    public float maxPitchAngle = 89f;
 
     [Tooltip("좌/우로 조정 가능한 최대 각도 (Yaw: 수평 각도)\n" +
              "양수: 오른쪽으로 향함, 음수: 왼쪽으로 향함")]
@@ -150,14 +156,10 @@ public class ArcheryGestureManager : MonoBehaviour
     private GameObject previewInstance;
     private Transform previewTransform;
     private Vector3 baseLocalScale = Vector3.one;
-    /// <summary>
-    /// 프리팹 메쉬의 "시각적인 중심"이 로컬 피벗(Transform.position)에서 얼마나 떨어져 있는지 (로컬 좌표계 기준)
-    /// </summary>
+    // 프리팹 메쉬의 "시각적인 중심"이 로컬 피벗(Transform.position)에서 얼마나 떨어져 있는지 (로컬 좌표계 기준)
     private Vector3 previewCenterLocalOffset = Vector3.zero;
     private bool hasPreviewCenterOffset = false;
-    /// <summary>
-    /// 직전 프레임의 제스처 상태 (디버깅/상태 전이 감지를 위해)
-    /// </summary>
+    // 직전 프레임의 제스처 상태 (디버깅/상태 전이 감지를 위해)
     private GestureState lastGestureState = GestureState.Idle;
     #endregion
 
@@ -181,6 +183,8 @@ public class ArcheryGestureManager : MonoBehaviour
         public float distance;              // 당긴 거리
         public float normalizedPower;       // 정규화된 파워 (0-1)
         public float angle;                 // 각도 (도)
+        public float pitch;                 // 위/아래 각도 (수직)
+        public float yaw;                   // 좌/우 각도 (수평)
         public float duration;              // 제스처 지속 시간
         public Vector2 velocity;            // 속도
         public Vector2 aimOffset;           // 조준 오프셋 (두 손가락 사용 시)
@@ -193,6 +197,8 @@ public class ArcheryGestureManager : MonoBehaviour
             distance = 0f;
             normalizedPower = 0f;
             angle = 0f;
+            pitch = 0f;
+            yaw = 0f;
             duration = 0f;
             velocity = Vector2.zero;
             aimOffset = Vector2.zero;
@@ -543,6 +549,7 @@ public class ArcheryGestureManager : MonoBehaviour
                     }
 
                     OnRelease?.Invoke(data);
+                    ShootArrow(data);
                 }
                 else
                 {
@@ -634,6 +641,22 @@ public class ArcheryGestureManager : MonoBehaviour
         data.angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
         data.duration = Time.time - drawStartTime;
 
+        // 피치/요 각도 계산
+        if (useGestureAngleForPitch)
+        {
+            // 아래로 드래그하면 위로 발사 (당기는 방향의 반대)
+            // direction.y가 양수(아래로 드래그) → pitchDeg가 양수(위로 향함)
+            float rawAngle = data.direction.y * maxPitchAngle;
+            data.pitch = Mathf.Clamp(rawAngle, 0f, maxPitchAngle); // 위로 드래그는 무시 (최소값 0)
+        }
+
+        if (useGestureAngleForYaw)
+        {
+            // 오른쪽으로 드래그하면 왼쪽으로 발사
+            // direction.x가 양수(오른쪽으로 드래그) → yawDeg가 음수(왼쪽으로 향함)
+            data.yaw = Mathf.Clamp(-data.direction.x * maxYawAngle, -maxYawAngle, maxYawAngle);
+        }
+
         // 조준 오프셋 계산 (두 손가락 사용 시)
         if (secondaryTouchId != -1 && activeTouches.ContainsKey(secondaryTouchId))
         {
@@ -708,6 +731,74 @@ public class ArcheryGestureManager : MonoBehaviour
     public GestureData GetCurrentGestureData()
     {
         return CreateGestureData();
+    }
+
+    private void ShootArrow(GestureData data)
+    {
+        // 실제 화살 발사 시점
+        if (arrowPrefab == null || arrowSpawnPoint == null)
+        {
+            Debug.LogWarning("[ArcheryGestureManager] arrowPrefab 또는 arrowSpawnPoint가 설정되어 있지 않습니다.", this); // ARCHERY_DEBUG_LOG
+            return;
+        }
+
+        float force = maxForce;
+
+        // 발사 기본 방향: spawnPoint가 있으면 그 forward, 없으면 카메라 forward
+        Camera cam = Camera.main;
+        Vector3 baseDir = arrowSpawnPoint != null
+            ? arrowSpawnPoint.forward
+            : (cam != null ? cam.transform.forward : Vector3.forward);
+
+        // 월드 기준 회전 구성 (요는 세계 Y축, 피치는 카메라의 오른쪽 축 기준)
+        Quaternion rot = Quaternion.identity;
+        if (cam != null)
+        {
+            rot = Quaternion.AngleAxis(data.yaw, Vector3.up) *
+                  Quaternion.AngleAxis(data.pitch, cam.transform.right);
+        }
+        else
+        {
+            rot = Quaternion.Euler(data.pitch, data.yaw, 0f);
+        }
+
+        Vector3 dir = rot * baseDir;
+
+        if (logDebugEvents)
+        {
+            Debug.Log(
+                $"[ArcheryGestureManager] Calculated shot direction - dragDir={data.direction}, pitch={data.pitch:F1}, yaw={data.yaw:F1}, baseDir={baseDir}",
+                this); // ARCHERY_DEBUG_LOG
+        }
+
+        // 화살 생성 및 초기 회전 설정
+        GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, Quaternion.LookRotation(dir));
+
+        if (logDebugEvents)
+        {
+            Debug.Log(
+                $"[ArcheryGestureManager] Spawned arrow instance '{arrow.name}' at {arrowSpawnPoint.position} with dir={dir}",
+                this); // ARCHERY_DEBUG_LOG
+        }
+
+        Rigidbody rb = arrow.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.AddForce(dir * force, ForceMode.Impulse);
+
+            if (logDebugEvents)
+            {
+                Debug.Log(
+                    $"[ArcheryGestureManager] Applied force to arrow - force={force:F1}, velocity={rb.linearVelocity}, mass={rb.mass}",
+                    this); // ARCHERY_DEBUG_LOG
+            }
+        }
+        else if (logDebugEvents)
+        {
+            Debug.Log("[ArcheryGestureManager] Spawned arrow has no Rigidbody component", this); // ARCHERY_DEBUG_LOG
+        }
     }
     #endregion
 
