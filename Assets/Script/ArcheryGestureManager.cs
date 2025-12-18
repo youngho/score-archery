@@ -120,16 +120,20 @@ public class ArcheryGestureManager : MonoBehaviour
     public float maxScale = 1.5f;
 
     [Header("프리뷰 각도 설정")]
-    [Tooltip("제스처의 수직 방향을 피치 각도로 사용할지 여부")]
+    [Tooltip("제스처의 수직 방향을 위/아래 각도(Pitch)로 사용할지 여부\n" +
+             "Pitch: 위/아래 각도 (수직 회전). 아래로 당기면 화살이 위로 향함")]
     public bool useGestureAngleForPitch = false;
 
-    [Tooltip("제스처의 수평 방향을 요(yaw) 각도로 사용할지 여부")]
+    [Tooltip("제스처의 수평 방향을 좌/우 각도(Yaw)로 사용할지 여부\n" +
+             "Yaw: 좌/우 각도 (수평 회전). 오른쪽으로 당기면 화살이 왼쪽으로 향함")]
     public bool useGestureAngleForYaw = true;
 
-    [Tooltip("위/아래로 조정 가능한 최대 피치 각도")]
+    [Tooltip("위/아래로 조정 가능한 최대 각도 (Pitch: 수직 각도)\n" +
+             "양수: 위로 향함, 음수: 아래로 향함")]
     public float maxPitchAngle = 45f;
 
-    [Tooltip("좌/우로 조정 가능한 최대 요(yaw) 각도")]
+    [Tooltip("좌/우로 조정 가능한 최대 각도 (Yaw: 수평 각도)\n" +
+             "양수: 오른쪽으로 향함, 음수: 왼쪽으로 향함")]
     public float maxYawAngle = 70f;
 
     [Tooltip("조준 프리뷰의 생성/갱신 과정을 로그로 출력할지 여부")]
@@ -817,32 +821,66 @@ public class ArcheryGestureManager : MonoBehaviour
         // 기본 방향
         Vector3 baseDir = arrowSpawnPoint.forward;
 
-        // 발사 방향 계산 (ArcheryShooter와 동일한 방식)
-        Vector2 dragVec = (data.startPosition - data.currentPosition);
+        // 발사 방향 계산: 드래그 방향의 반대로 발사 (활쏘기처럼 당기는 방향의 반대)
+        // 아래로 드래그 → 위로 발사, 오른쪽으로 드래그 → 왼쪽으로 발사
+        Vector2 dragVec = (data.currentPosition - data.startPosition);
         Vector2 dragDir = dragVec.sqrMagnitude > 0.0001f ? dragVec.normalized : Vector2.zero;
 
-        float pitchDeg = 0f;
-        float yawDeg = 0f;
+        // 위로 드래그하면 조준 취소
+        // dragDir.y가 음수이면 위로 드래그하는 것
+        if (dragDir.y > -0.1f) // 약간의 임계값으로 위로 드래그 감지
+        {
+            if (logPreviewDebug)
+            {
+                Debug.Log("[ArcheryGestureManager] Upward drag detected - canceling gesture", this); // ARCHERY_DEBUG_LOG
+            }
+            CancelGesture();
+            HidePreview();
+            return;
+        }
+
+        // Pitch (피치): 위/아래 각도 (수직 회전)
+        // - 양수: 위로 향함 (아래로 드래그하면 화살이 위로 발사)
+        // - 0 또는 음수: 변화 없음 (위로 드래그하면 변화 없음)
+        // - 범위: 0 ~ +maxPitchAngle (위로 드래그는 무시)
+        float verticalAngleDeg = 0f; // 위/아래 각도 (Pitch)
+
+        // Yaw (요): 좌/우 각도 (수평 회전)
+        // - 양수: 오른쪽으로 향함 (왼쪽으로 드래그하면 화살이 오른쪽으로 발사)
+        // - 음수: 왼쪽으로 향함 (오른쪽으로 드래그하면 화살이 왼쪽으로 발사)
+        // - 범위: -maxYawAngle ~ +maxYawAngle
+        float horizontalAngleDeg = 0f; // 좌/우 각도 (Yaw)
 
         if (useGestureAngleForPitch)
         {
-            pitchDeg = Mathf.Clamp(dragDir.y * maxPitchAngle, -maxPitchAngle, maxPitchAngle);
+            // 아래로 드래그하면 위로 발사 (당기는 방향의 반대)
+            // dragDir.y가 양수(아래로 드래그) → verticalAngleDeg가 양수(위로 향함)
+            // dragDir.y가 음수(위로 드래그) → verticalAngleDeg가 0 (변화 없음)
+            float rawAngle = dragDir.y * maxPitchAngle;
+            verticalAngleDeg = Mathf.Clamp(rawAngle, 0f, maxPitchAngle); // 위로 드래그는 무시 (최소값 0)
         }
 
         if (useGestureAngleForYaw)
         {
-            yawDeg = Mathf.Clamp(-dragDir.x * maxYawAngle, -maxYawAngle, maxYawAngle);
+            // 오른쪽으로 드래그하면 왼쪽으로 발사, 왼쪽으로 드래그하면 오른쪽으로 발사 (당기는 방향의 반대)
+            // dragDir.x가 양수(오른쪽으로 드래그) → horizontalAngleDeg가 음수(왼쪽으로 향함)
+            // dragDir.x가 음수(왼쪽으로 드래그) → horizontalAngleDeg가 양수(오른쪽으로 향함)
+            horizontalAngleDeg = Mathf.Clamp(-dragDir.x * maxYawAngle, -maxYawAngle, maxYawAngle);
         }
 
         Quaternion rot = Quaternion.identity;
         if (cam != null)
         {
-            rot = Quaternion.AngleAxis(yawDeg, Vector3.up) *
-                  Quaternion.AngleAxis(pitchDeg, cam.transform.right);
+            // 회전 적용 순서:
+            // 1. Yaw (수평): Y축 기준으로 좌우 회전
+            // 2. Pitch (수직): 카메라의 오른쪽 축 기준으로 위아래 회전
+            rot = Quaternion.AngleAxis(horizontalAngleDeg, Vector3.up) *
+                  Quaternion.AngleAxis(verticalAngleDeg, cam.transform.right);
         }
         else
         {
-            rot = Quaternion.Euler(pitchDeg, yawDeg, 0f);
+            // 카메라가 없으면 Euler 각도로 직접 설정 (X: Pitch, Y: Yaw, Z: Roll)
+            rot = Quaternion.Euler(verticalAngleDeg, horizontalAngleDeg, 0f);
         }
 
         Vector3 dir = rot * baseDir;
@@ -869,7 +907,7 @@ public class ArcheryGestureManager : MonoBehaviour
         if (logPreviewDebug)
         {
             Debug.Log(
-                $"[ArcheryGestureManager] UpdatePreviewByGesture - state={state}, distance={data.distance:F1}, power={data.normalizedPower:F2}, dragDir={dragDir}, pitch={pitchDeg:F1}, yaw={yawDeg:F1}, pos={previewTransform.position}, scale={previewTransform.localScale}",
+                $"[ArcheryGestureManager] UpdatePreviewByGesture - state={state}, distance={data.distance:F1}, power={data.normalizedPower:F2}, dragDir={dragDir}, verticalAngle(pitch)={verticalAngleDeg:F1}°, horizontalAngle(yaw)={horizontalAngleDeg:F1}°, pos={previewTransform.position}, scale={previewTransform.localScale}",
                 this); // ARCHERY_DEBUG_LOG
         }
     }

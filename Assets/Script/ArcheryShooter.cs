@@ -139,8 +139,9 @@ public class ArcheryShooter : MonoBehaviour
             ? arrowSpawnPoint.forward
             : (cam != null ? cam.transform.forward : Vector3.forward);
 
-        // 제스처 드래그 방향(시작 → 현재). 실제 발사 방향은 "당기는" 방향이므로 반대로 사용
-        Vector2 dragDir = (data.startPosition - data.currentPosition).normalized;
+        // 발사 방향 계산: 드래그 방향의 반대로 발사 (활쏘기처럼 당기는 방향의 반대)
+        // 아래로 드래그 → 위로 발사, 오른쪽으로 드래그 → 왼쪽으로 발사
+        Vector2 dragDir = (data.currentPosition - data.startPosition).normalized;
 
         // 피치/요 각도 계산
         float pitchDeg = 0f;
@@ -148,13 +149,18 @@ public class ArcheryShooter : MonoBehaviour
 
         if (useGestureAngleForPitch)
         {
-            // 아래로 더 많이 당길수록 각도가 위로 올라가도록 부호 조정
-            pitchDeg = Mathf.Clamp(dragDir.y * maxPitchAngle, -maxPitchAngle, maxPitchAngle);
+            // 아래로 드래그하면 위로 발사 (당기는 방향의 반대)
+            // dragDir.y가 양수(아래로 드래그) → pitchDeg가 양수(위로 향함)
+            // dragDir.y가 음수(위로 드래그) → pitchDeg가 0 (변화 없음)
+            float rawAngle = dragDir.y * maxPitchAngle;
+            pitchDeg = Mathf.Clamp(rawAngle, 0f, maxPitchAngle); // 위로 드래그는 무시 (최소값 0)
         }
 
         if (useGestureAngleForYaw)
         {
-            // 왼/오른쪽 드래그에 따라 좌우 회전
+            // 오른쪽으로 드래그하면 왼쪽으로 발사, 왼쪽으로 드래그하면 오른쪽으로 발사 (당기는 방향의 반대)
+            // dragDir.x가 양수(오른쪽으로 드래그) → yawDeg가 음수(왼쪽으로 향함)
+            // dragDir.x가 음수(왼쪽으로 드래그) → yawDeg가 양수(오른쪽으로 향함)
             yawDeg = Mathf.Clamp(-dragDir.x * maxYawAngle, -maxYawAngle, maxYawAngle);
         }
 
