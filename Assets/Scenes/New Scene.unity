@@ -314,22 +314,18 @@ MonoBehaviour:
   OnCancel:
     m_PersistentCalls:
       m_Calls: []
-  minDrawDistance: 50
+  arrowSpawnPoint: {fileID: 1127955916}
+  arrowPrefab: {fileID: 1959729250425484, guid: 5187dfa4d8f19524e8bbf7c6894b7de7, type: 3}
+  maxForce: 10
+  maxPitchAngle: 10
+  maxYawAngle: 10
+  minDrawDistance: 10
   maxDrawDistance: 300
   aimAdjustThreshold: 30
   cancelBorderSize: 100
-  showDebugInfo: 0
-  logDebugEvents: 0
+  showDebugLog: 0
   drawLineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   aimLineColor: {r: 0, g: 1, b: 1, a: 1}
-  arrowSpawnPoint: {fileID: 1127955916}
-  arrowPrefab: {fileID: 0}
-  maxForce: 10
-  minScale: 0.5
-  maxScale: 1.5
-  maxPitchAngle: 89
-  maxYawAngle: 70
-  logPreviewDebug: 1
 --- !u!1001 &446609753
 PrefabInstance:
   m_ObjectHideFlags: 0

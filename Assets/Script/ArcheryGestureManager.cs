@@ -140,6 +140,10 @@ public class ArcheryGestureManager : MonoBehaviour
     private bool hasPreviewCenterOffset = false;
     // 직전 프레임의 제스처 상태 (디버깅/상태 전이 감지를 위해)
     private GestureState lastGestureState = GestureState.Idle;
+    
+    // 궤적 시각화 관련
+    private GameObject trajectoryLineObject;
+    private LineRenderer trajectoryLineRenderer;
     #endregion
 
     #region Enums
@@ -276,8 +280,9 @@ public class ArcheryGestureManager : MonoBehaviour
                 Debug.Log("[ArcheryGestureManager] OnDisable - unsubscribed from sceneLoaded", this); // ARCHERY_DEBUG_LOG
             }
 
-            // 3D 조준 프리뷰 정리
-            HidePreview();
+        // 3D 조준 프리뷰 정리
+        HidePreview();
+        HideTrajectory();
         }
     }
 
@@ -850,6 +855,7 @@ public class ArcheryGestureManager : MonoBehaviour
             state != GestureState.Aiming)
         {
             HidePreview();
+            HideTrajectory();
             return;
         }
 
@@ -860,6 +866,7 @@ public class ArcheryGestureManager : MonoBehaviour
         if (data.distance < minDrawDistance)
         {
             HidePreview();
+            HideTrajectory();
             return;
         }
 
@@ -897,6 +904,7 @@ public class ArcheryGestureManager : MonoBehaviour
             }
             CancelGesture();
             HidePreview();
+            HideTrajectory();
             return;
         }
         float verticalAngleDeg = 0f;
@@ -942,6 +950,18 @@ public class ArcheryGestureManager : MonoBehaviour
             Debug.Log(
                 $"[ArcheryGestureManager] UpdatePreviewByGesture - state={state}, distance={data.distance:F1}, power={data.normalizedPower:F2}, dragDir={dragDir}, verticalAngle(pitch)={verticalAngleDeg:F1}°, horizontalAngle(yaw)={horizontalAngleDeg:F1}°, pos={previewTransform.position}",
                 this); // ARCHERY_DEBUG_LOG
+        }
+
+        // 화살 궤적 시각화 (게임에서 항상 표시)
+        if (arrowPrefab != null)
+        {
+            Rigidbody rb = arrowPrefab.GetComponent<Rigidbody>();
+            float mass = (rb != null) ? rb.mass : 1.0f;
+            // 힘은 거리에 비례하지 않고 maxForce라고 가정 (ShootArrow와 동일하게)
+            // 만약 ShootArrow에서 normalizedPower를 쓴다면 여기도 맞춰야 함.
+            // 현재 ShootArrow 코드는 "float force = maxForce;" 로 고정힘을 사용 중임.
+            Vector3 v0 = dir * (maxForce / mass);
+            DrawTrajectory(arrowSpawnPoint.position, v0);
         }
     }
 
@@ -1001,6 +1021,100 @@ public class ArcheryGestureManager : MonoBehaviour
         }
 
         previewInstance.SetActive(false);
+    }
+
+    private void DrawTrajectory(Vector3 startPos, Vector3 velocity)
+    {
+        // LineRenderer가 없으면 생성
+        if (trajectoryLineRenderer == null)
+        {
+            EnsureTrajectoryLineRenderer();
+        }
+
+        if (trajectoryLineRenderer == null)
+        {
+            return;
+        }
+
+        float timeStep = 0.05f;
+        float maxTime = 2.0f; // 2초간의 궤적 표시
+        Vector3 gravity = Physics.gravity;
+        
+        // 궤적 포인트들을 계산하여 리스트에 저장
+        List<Vector3> trajectoryPoints = new List<Vector3>();
+        trajectoryPoints.Add(startPos);
+
+        for (float t = timeStep; t <= maxTime; t += timeStep)
+        {
+            // p(t) = p0 + v0*t + 0.5*g*t^2
+            Vector3 pos = startPos + velocity * t + 0.5f * gravity * t * t;
+            trajectoryPoints.Add(pos);
+            
+            // 지면에 닿으면 중단
+            if (pos.y < startPos.y - 0.1f && velocity.y < 0)
+            {
+                break;
+            }
+        }
+
+        // LineRenderer에 포인트 설정
+        trajectoryLineRenderer.positionCount = trajectoryPoints.Count;
+        for (int i = 0; i < trajectoryPoints.Count; i++)
+        {
+            trajectoryLineRenderer.SetPosition(i, trajectoryPoints[i]);
+        }
+
+        // 궤적 표시
+        if (trajectoryLineObject != null)
+        {
+            trajectoryLineObject.SetActive(true);
+        }
+
+        if (showDebugLog)
+        {
+            Debug.Log($"[ArcheryGestureManager] DrawTrajectory - startPos: {startPos}, velocity: {velocity}, points: {trajectoryPoints.Count}", this);
+        }
+    }
+
+    private void EnsureTrajectoryLineRenderer()
+    {
+        if (trajectoryLineRenderer != null)
+        {
+            return;
+        }
+
+        // 궤적을 표시할 GameObject 생성
+        trajectoryLineObject = new GameObject("TrajectoryLine");
+        trajectoryLineObject.transform.SetParent(transform);
+        
+        // LineRenderer 컴포넌트 추가
+        trajectoryLineRenderer = trajectoryLineObject.AddComponent<LineRenderer>();
+        
+        // LineRenderer 설정
+        trajectoryLineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        trajectoryLineRenderer.startColor = Color.red;
+        trajectoryLineRenderer.endColor = Color.red;
+        trajectoryLineRenderer.startWidth = 0.05f;
+        trajectoryLineRenderer.endWidth = 0.02f;
+        trajectoryLineRenderer.useWorldSpace = true;
+        trajectoryLineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        trajectoryLineRenderer.receiveShadows = false;
+
+        // 초기에는 숨김
+        trajectoryLineObject.SetActive(false);
+
+        if (showDebugLog)
+        {
+            Debug.Log("[ArcheryGestureManager] EnsureTrajectoryLineRenderer - created LineRenderer", this);
+        }
+    }
+
+    private void HideTrajectory()
+    {
+        if (trajectoryLineObject != null)
+        {
+            trajectoryLineObject.SetActive(false);
+        }
     }
 
     private void HidePreview()
