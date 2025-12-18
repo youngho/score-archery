@@ -96,7 +96,6 @@ public class ArcheryGestureManager : MonoBehaviour
     public float cancelBorderSize = 100f;
 
     [Header("디버그")]
-    public bool showDebugInfo = false;
     [Tooltip("제스처 처리 및 조준 프리뷰 관련 로그를 출력할지 여부")]
     public bool showDebugLog = false;
     public Color drawLineColor = Color.yellow;
@@ -280,7 +279,7 @@ public class ArcheryGestureManager : MonoBehaviour
                 }
             }
 
-            if (logDebugEvents)
+            if (showDebugLog)
             {
                 Debug.Log("[ArcheryGestureManager] OnDisable - unsubscribed from sceneLoaded", this); // ARCHERY_DEBUG_LOG
             }
@@ -299,7 +298,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
     private void OnGUI()
     {
-        if (showDebugInfo)
+        if (showDebugLog)
         {
             DrawDebugInfo();
         }
@@ -311,7 +310,7 @@ public class ArcheryGestureManager : MonoBehaviour
         ResetGesture();
         activeTouches.Clear();
 
-        if (logDebugEvents)
+        if (showDebugLog)
         {
             Debug.Log($"[ArcheryGestureManager] OnSceneLoaded - scene='{scene.name}', state reset", this); // ARCHERY_DEBUG_LOG
         }
@@ -405,7 +404,7 @@ public class ArcheryGestureManager : MonoBehaviour
         if (IsNearScreenBorder(position))
             return;
 
-        if (logDebugEvents)
+        if (showDebugLog)
         {
             Debug.Log($"[ArcheryGestureManager] HandleTouchBegan - fingerId={fingerId}, pos={position}, state={currentState}",
                 this); // ARCHERY_DEBUG_LOG
@@ -425,7 +424,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
             GestureData data = CreateGestureData();
 
-            if (logDebugEvents)
+            if (showDebugLog)
             {
                 Debug.Log(
                     $"[ArcheryGestureManager] Begin Drawing - primaryId={primaryTouchId}, startPos={drawStartPosition}",
@@ -443,7 +442,7 @@ public class ArcheryGestureManager : MonoBehaviour
             secondaryTouchId = fingerId;
             currentState = GestureState.Aiming;
 
-            if (logDebugEvents)
+            if (showDebugLog)
             {
                 Debug.Log(
                     $"[ArcheryGestureManager] Enter Aiming mode - secondaryId={secondaryTouchId}, primaryId={primaryTouchId}",
@@ -482,7 +481,7 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             GestureData data = CreateGestureData();
 
-            if (logDebugEvents)
+            if (showDebugLog)
             {
                 Debug.Log(
                     $"[ArcheryGestureManager] OnAimAdjust Invoke - aimOffset={data.aimOffset}, distance={data.distance:F1}",
@@ -509,7 +508,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
         if (fingerId == primaryTouchId)
         {
-            if (logDebugEvents)
+            if (showDebugLog)
             {
                 Debug.Log(
                     $"[ArcheryGestureManager] HandleTouchEnded (primary) - fingerId={fingerId}, pos={position}, state={currentState}",
@@ -548,7 +547,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
             OnDrawEnd?.Invoke(data);
 
-            if (logDebugEvents)
+            if (showDebugLog)
             {
                 Debug.Log("[ArcheryGestureManager] OnDrawEnd Invoke - gesture finished", this); // ARCHERY_DEBUG_LOG
             }
@@ -596,7 +595,7 @@ public class ArcheryGestureManager : MonoBehaviour
         drawStartPosition = Vector2.zero;
         currentDrawPosition = Vector2.zero;
 
-        if (logDebugEvents)
+        if (showDebugLog)
         {
             Debug.Log("[ArcheryGestureManager] ResetGesture - state set to Idle, ids cleared", this); // ARCHERY_DEBUG_LOG
         }
@@ -604,7 +603,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
     private void CancelGesture()
     {
-        if (logDebugEvents)
+        if (showDebugLog)
         {
             Debug.Log("[ArcheryGestureManager] CancelGesture - invoking OnCancel and clearing touches", this); // ARCHERY_DEBUG_LOG
         }
@@ -846,7 +845,7 @@ public class ArcheryGestureManager : MonoBehaviour
         }
 
         var state = GetCurrentState();
-        if (state != lastGestureState && logPreviewDebug)
+        if (state != lastGestureState && showDebugLog)
         {
             Debug.Log(
                 $"[ArcheryGestureManager] GestureState changed {lastGestureState} -> {state}",
@@ -880,7 +879,7 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             previewInstance.SetActive(true);
 
-            if (logPreviewDebug)
+            if (showDebugLog)
             {
                 Debug.Log("[ArcheryGestureManager] Show preview (start drawing)", this); // ARCHERY_DEBUG_LOG
             }

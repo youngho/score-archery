@@ -323,7 +323,7 @@ MonoBehaviour:
   drawLineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   aimLineColor: {r: 0, g: 1, b: 1, a: 1}
   arrowSpawnPoint: {fileID: 1127955916}
-  arrowPrefab: {fileID: 1959729250425484, guid: 5187dfa4d8f19524e8bbf7c6894b7de7, type: 3}
+  arrowPrefab: {fileID: 0}
   maxForce: 10
   minScale: 0.5
   maxScale: 1.5
