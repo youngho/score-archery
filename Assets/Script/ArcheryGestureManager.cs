@@ -82,6 +82,26 @@ public class ArcheryGestureManager : MonoBehaviour
     #endregion
 
     #region Inspector Settings
+
+    [Header("3D 조준 프리뷰 설정")]
+    [Tooltip("조준 미리보기 화살이 기준으로 삼을 위치/방향 (보통 활/카메라 앞)")]
+    public Transform arrowSpawnPoint;
+
+    [Tooltip("실제 발사할 화살 프리팹 (Rigidbody 필수)")]
+    public GameObject arrowPrefab;
+
+    [Header("화살 Aim 설정")]
+    [Tooltip("최대 발사 힘")]
+    public float maxForce = 10f;
+
+    [Tooltip("위/아래로 조정 가능한 최대 각도 (Pitch: 수직 각도)\n" +
+             "양수: 위로 향함, 음수: 아래로 향함")]
+    public float maxPitchAngle = 89f;
+
+    [Tooltip("좌/우로 조정 가능한 최대 각도 (Yaw: 수평 각도)\n" +
+             "양수: 오른쪽으로 향함, 음수: 왼쪽으로 향함")]
+    public float maxYawAngle = 70f;
+
     [Header("제스처 설정")]
     [Tooltip("화살을 당기기 시작하는 최소 거리 (픽셀)")]
     public float minDrawDistance = 50f;
@@ -101,33 +121,6 @@ public class ArcheryGestureManager : MonoBehaviour
     public Color drawLineColor = Color.yellow;
     public Color aimLineColor = Color.cyan;
 
-    [Header("3D 조준 프리뷰 설정")]
-    [Tooltip("조준 미리보기 화살이 기준으로 삼을 위치/방향 (보통 활/카메라 앞)")]
-    public Transform arrowSpawnPoint;
-
-    [Tooltip("실제 발사할 화살 프리팹 (Rigidbody 필수)")]
-    public GameObject arrowPrefab;
-
-    [Tooltip("최대 발사 힘")]
-    public float maxForce = 10f;
-
-    [Header("프리뷰 스케일 설정")]
-    [Tooltip("제일 약하게 당겼을 때의 화살 크기 배율")]
-    public float minScale = 0.5f;
-
-    [Tooltip("최대로 당겼을 때의 화살 크기 배율")]
-    public float maxScale = 1.5f;
-
-    [Header("프리뷰 각도 설정")]
-    [Tooltip("위/아래로 조정 가능한 최대 각도 (Pitch: 수직 각도)\n" +
-             "양수: 위로 향함, 음수: 아래로 향함")]
-    public float maxPitchAngle = 89f;
-
-    [Tooltip("좌/우로 조정 가능한 최대 각도 (Yaw: 수평 각도)\n" +
-             "양수: 오른쪽으로 향함, 음수: 왼쪽으로 향함")]
-    public float maxYawAngle = 70f;
-
-
     #endregion
 
     #region Private Variables
@@ -142,7 +135,6 @@ public class ArcheryGestureManager : MonoBehaviour
     // 3D 조준 프리뷰 관련
     private GameObject previewInstance;
     private Transform previewTransform;
-    private Vector3 baseLocalScale = Vector3.one;
     // 프리팹 메쉬의 "시각적인 중심"이 로컬 피벗(Transform.position)에서 얼마나 떨어져 있는지 (로컬 좌표계 기준)
     private Vector3 previewCenterLocalOffset = Vector3.zero;
     private bool hasPreviewCenterOffset = false;
@@ -945,15 +937,10 @@ public class ArcheryGestureManager : MonoBehaviour
             previewTransform.position = arrowSpawnPoint.position;
         }
 
-        // 드로우 거리(파워)에 따라 스케일 보간
-        float t = Mathf.Clamp01(data.normalizedPower);
-        float scale = Mathf.Lerp(minScale, maxScale, t);
-        previewTransform.localScale = baseLocalScale * scale;
-
         if (showDebugLog)
         {
             Debug.Log(
-                $"[ArcheryGestureManager] UpdatePreviewByGesture - state={state}, distance={data.distance:F1}, power={data.normalizedPower:F2}, dragDir={dragDir}, verticalAngle(pitch)={verticalAngleDeg:F1}°, horizontalAngle(yaw)={horizontalAngleDeg:F1}°, pos={previewTransform.position}, scale={previewTransform.localScale}",
+                $"[ArcheryGestureManager] UpdatePreviewByGesture - state={state}, distance={data.distance:F1}, power={data.normalizedPower:F2}, dragDir={dragDir}, verticalAngle(pitch)={verticalAngleDeg:F1}°, horizontalAngle(yaw)={horizontalAngleDeg:F1}°, pos={previewTransform.position}",
                 this); // ARCHERY_DEBUG_LOG
         }
     }
@@ -976,12 +963,10 @@ public class ArcheryGestureManager : MonoBehaviour
 
         previewInstance = Instantiate(arrowPrefab);
         previewTransform = previewInstance.transform;
-        baseLocalScale = previewTransform.localScale;
-
         if (showDebugLog)
         {
             Debug.Log(
-                $"[ArcheryGestureManager] EnsurePreviewInstance - instantiated preview, baseScale={baseLocalScale}",
+                $"[ArcheryGestureManager] EnsurePreviewInstance - instantiated preview",
                 this); // ARCHERY_DEBUG_LOG
         }
 
