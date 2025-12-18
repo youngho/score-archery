@@ -89,9 +89,6 @@ public class ArcheryGestureManager : MonoBehaviour
     [Tooltip("최대로 당길 수 있는 거리 (픽셀)")]
     public float maxDrawDistance = 300f;
 
-    [Tooltip("발사로 인식되는 최소 속도 (픽셀/초)")]
-    public float minReleaseVelocity = 100f;
-
     [Tooltip("조준 조정으로 인식되는 두 번째 손가락 이동 거리")]
     public float aimAdjustThreshold = 30f;
 

@@ -13,10 +13,6 @@ public class ArcheryShooter : MonoBehaviour
     [Tooltip("발사할 화살 프리팹 (Rigidbody + ArcheryArrow 포함 권장)")]
     public GameObject arrowPrefab;
 
-    [Header("발사 파라미터")]
-    [Tooltip("최소 발사 힘")]
-    public float minForce = 5f;
-
     [Tooltip("최대 발사 힘")]
     public float maxForce = 15f;
 
@@ -130,7 +126,7 @@ public class ArcheryShooter : MonoBehaviour
             return;
         }
 
-        // 이 게임은 항상 최대 속도로 발사하므로, 파워는 고정 1로 간주
+        // 사용자의 요청대로 최소 발사 힘 없이, 오직 최대 발사 힘(maxForce)과 각도만으로 거리를 계산(발사)함
         float force = maxForce;
 
         // 발사 기본 방향: spawnPoint가 있으면 그 forward, 없으면 카메라 forward
