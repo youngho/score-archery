@@ -51,7 +51,7 @@ public class ArcheryGestureManager : MonoBehaviour
             _instance = this;
             DontDestroyOnLoad(gameObject);
 
-            if (logDebugEvents)
+            if (showDebugLog)
             {
                 Debug.Log("[ArcheryGestureManager] Awake - set as singleton instance", this); // ARCHERY_DEBUG_LOG
             }
@@ -59,7 +59,7 @@ public class ArcheryGestureManager : MonoBehaviour
         else if (_instance != this)
         {
             // 다른 씬에서 이미 생성된 매니저가 있다면, 중복 객체는 제거
-            if (logDebugEvents)
+            if (showDebugLog)
             {
                 Debug.Log("[ArcheryGestureManager] Awake - duplicate instance found, destroying this one", this); // ARCHERY_DEBUG_LOG
             }
@@ -97,8 +97,8 @@ public class ArcheryGestureManager : MonoBehaviour
 
     [Header("디버그")]
     public bool showDebugInfo = false;
-    [Tooltip("제스처 처리/이벤트 흐름을 Debug.Log로 출력할지 여부")]
-    public bool logDebugEvents = false;
+    [Tooltip("제스처 처리 및 조준 프리뷰 관련 로그를 출력할지 여부")]
+    public bool showDebugLog = false;
     public Color drawLineColor = Color.yellow;
     public Color aimLineColor = Color.cyan;
 
@@ -128,8 +128,7 @@ public class ArcheryGestureManager : MonoBehaviour
              "양수: 오른쪽으로 향함, 음수: 왼쪽으로 향함")]
     public float maxYawAngle = 70f;
 
-    [Tooltip("조준 프리뷰의 생성/갱신 과정을 로그로 출력할지 여부")]
-    public bool logPreviewDebug = true;
+
     #endregion
 
     #region Private Variables
@@ -240,7 +239,7 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             EnhancedTouchSupport.Enable();
 
-            if (logDebugEvents)
+            if (showDebugLog)
             {
                 Debug.Log("[ArcheryGestureManager] OnEnable - EnhancedTouch enabled", this); // ARCHERY_DEBUG_LOG
             }
@@ -249,7 +248,7 @@ public class ArcheryGestureManager : MonoBehaviour
         // 씬이 바뀔 때 제스처 상태를 초기화하기 위해 구독
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-        if (logDebugEvents)
+        if (showDebugLog)
         {
             Debug.Log("[ArcheryGestureManager] OnEnable - subscribed to sceneLoaded", this); // ARCHERY_DEBUG_LOG
         }
@@ -258,7 +257,7 @@ public class ArcheryGestureManager : MonoBehaviour
         EnsurePreviewInstance();
         HidePreview(); // 시작 시에는 항상 숨김
 
-        if (logPreviewDebug)
+        if (showDebugLog)
         {
             Debug.Log("[ArcheryGestureManager] OnEnable - initialized 3D preview system", this); // ARCHERY_DEBUG_LOG
         }
@@ -275,7 +274,7 @@ public class ArcheryGestureManager : MonoBehaviour
             {
                 EnhancedTouchSupport.Disable();
 
-                if (logDebugEvents)
+                if (showDebugLog)
                 {
                     Debug.Log("[ArcheryGestureManager] OnDisable - EnhancedTouch disabled", this); // ARCHERY_DEBUG_LOG
                 }
@@ -469,7 +468,7 @@ public class ArcheryGestureManager : MonoBehaviour
             // 최소 거리를 당겼는지 확인
             if (data.distance >= minDrawDistance)
             {
-                if (logDebugEvents)
+                if (showDebugLog)
                 {
                     Debug.Log(
                         $"[ArcheryGestureManager] OnDrawing Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}",
@@ -530,7 +529,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
                     currentState = GestureState.Released;
 
-                    if (logDebugEvents)
+                    if (showDebugLog)
                     {
                         Debug.Log(
                             $"[ArcheryGestureManager] OnRelease Invoke - distance={data.distance:F1}, velocity={velocity.magnitude:F1}",
@@ -564,7 +563,7 @@ public class ArcheryGestureManager : MonoBehaviour
             {
                 currentState = GestureState.Drawing;
 
-                if (logDebugEvents)
+                if (showDebugLog)
                 {
                     Debug.Log(
                         "[ArcheryGestureManager] Secondary touch ended - back to Drawing state",
@@ -745,7 +744,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
         Vector3 dir = rot * baseDir;
 
-        if (logDebugEvents)
+        if (showDebugLog)
         {
             Debug.Log(
                 $"[ArcheryGestureManager] Calculated shot direction - dragDir={data.direction}, pitch={data.pitch:F1}, yaw={data.yaw:F1}, baseDir={baseDir}",
@@ -755,7 +754,7 @@ public class ArcheryGestureManager : MonoBehaviour
         // 화살 생성 및 초기 회전 설정
         GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, Quaternion.LookRotation(dir));
 
-        if (logDebugEvents)
+        if (showDebugLog)
         {
             Debug.Log(
                 $"[ArcheryGestureManager] Spawned arrow instance '{arrow.name}' at {arrowSpawnPoint.position} with dir={dir}",
@@ -769,14 +768,14 @@ public class ArcheryGestureManager : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
             rb.AddForce(dir * force, ForceMode.Impulse);
 
-            if (logDebugEvents)
+            if (showDebugLog)
             {
                 Debug.Log(
                     $"[ArcheryGestureManager] Applied force to arrow - force={force:F1}, velocity={rb.linearVelocity}, mass={rb.mass}",
                     this); // ARCHERY_DEBUG_LOG
             }
         }
-        else if (logDebugEvents)
+        else if (showDebugLog)
         {
             Debug.Log("[ArcheryGestureManager] Spawned arrow has no Rigidbody component", this); // ARCHERY_DEBUG_LOG
         }
@@ -901,7 +900,7 @@ public class ArcheryGestureManager : MonoBehaviour
         // dragDir.y가 양수이면 위로 드래그하는 것
         if (dragDir.y > -0.1f) // 약간의 임계값으로 위로 드래그 감지
         {
-            if (logPreviewDebug)
+            if (showDebugLog)
             {
                 Debug.Log("[ArcheryGestureManager] Upward drag detected - canceling gesture", this); // ARCHERY_DEBUG_LOG
             }
@@ -952,7 +951,7 @@ public class ArcheryGestureManager : MonoBehaviour
         float scale = Mathf.Lerp(minScale, maxScale, t);
         previewTransform.localScale = baseLocalScale * scale;
 
-        if (logPreviewDebug)
+        if (showDebugLog)
         {
             Debug.Log(
                 $"[ArcheryGestureManager] UpdatePreviewByGesture - state={state}, distance={data.distance:F1}, power={data.normalizedPower:F2}, dragDir={dragDir}, verticalAngle(pitch)={verticalAngleDeg:F1}°, horizontalAngle(yaw)={horizontalAngleDeg:F1}°, pos={previewTransform.position}, scale={previewTransform.localScale}",
@@ -964,7 +963,7 @@ public class ArcheryGestureManager : MonoBehaviour
     {
         if (previewInstance != null)
         {
-            if (logPreviewDebug)
+            if (showDebugLog)
             {
                 Debug.Log("[ArcheryGestureManager] EnsurePreviewInstance - already exists", this); // ARCHERY_DEBUG_LOG
             }
@@ -980,7 +979,7 @@ public class ArcheryGestureManager : MonoBehaviour
         previewTransform = previewInstance.transform;
         baseLocalScale = previewTransform.localScale;
 
-        if (logPreviewDebug)
+        if (showDebugLog)
         {
             Debug.Log(
                 $"[ArcheryGestureManager] EnsurePreviewInstance - instantiated preview, baseScale={baseLocalScale}",
@@ -999,7 +998,7 @@ public class ArcheryGestureManager : MonoBehaviour
             previewCenterLocalOffset = localCenter;
             hasPreviewCenterOffset = (previewCenterLocalOffset != Vector3.zero);
 
-            if (logPreviewDebug)
+            if (showDebugLog)
             {
                 Debug.Log(
                     $"[ArcheryGestureManager] Calculated preview center offset - localCenter={localCenter}, hasOffset={hasPreviewCenterOffset}",
@@ -1011,7 +1010,7 @@ public class ArcheryGestureManager : MonoBehaviour
             previewCenterLocalOffset = Vector3.zero;
             hasPreviewCenterOffset = false;
 
-            if (logPreviewDebug)
+            if (showDebugLog)
             {
                 Debug.Log("[ArcheryGestureManager] EnsurePreviewInstance - no Renderer found on preview", this); // ARCHERY_DEBUG_LOG
             }
@@ -1026,7 +1025,7 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             previewInstance.SetActive(false);
 
-            if (logPreviewDebug)
+            if (showDebugLog)
             {
                 Debug.Log("[ArcheryGestureManager] HidePreview - preview disabled", this); // ARCHERY_DEBUG_LOG
             }
