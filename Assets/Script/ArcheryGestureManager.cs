@@ -51,18 +51,12 @@ public class ArcheryGestureManager : MonoBehaviour
             _instance = this;
             DontDestroyOnLoad(gameObject);
 
-            if (showDebugLog)
-            {
-                Debug.Log("[ArcheryGestureManager] Awake - set as singleton instance", this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug("[ArcheryGestureManager] Awake - set as singleton instance");
         }
         else if (_instance != this)
         {
             // 다른 씬에서 이미 생성된 매니저가 있다면, 중복 객체는 제거
-            if (showDebugLog)
-            {
-                Debug.Log("[ArcheryGestureManager] Awake - duplicate instance found, destroying this one", this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug("[ArcheryGestureManager] Awake - duplicate instance found, destroying this one");
 
             Destroy(gameObject);
         }
@@ -233,29 +227,17 @@ public class ArcheryGestureManager : MonoBehaviour
         if (!EnhancedTouchSupport.enabled)
         {
             EnhancedTouchSupport.Enable();
-
-            if (showDebugLog)
-            {
-                Debug.Log("[ArcheryGestureManager] OnEnable - EnhancedTouch enabled", this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug("[ArcheryGestureManager] OnEnable - EnhancedTouch enabled");
         }
 
         // 씬이 바뀔 때 제스처 상태를 초기화하기 위해 구독
         SceneManager.sceneLoaded += OnSceneLoaded;
-
-        if (showDebugLog)
-        {
-            Debug.Log("[ArcheryGestureManager] OnEnable - subscribed to sceneLoaded", this); // ARCHERY_DEBUG_LOG
-        }
+        LogDebug("[ArcheryGestureManager] OnEnable - subscribed to sceneLoaded");
 
         // 3D 조준 프리뷰 초기화
         EnsurePreviewInstance();
         HidePreview(); // 시작 시에는 항상 숨김
-
-        if (showDebugLog)
-        {
-            Debug.Log("[ArcheryGestureManager] OnEnable - initialized 3D preview system", this); // ARCHERY_DEBUG_LOG
-        }
+        LogDebug("[ArcheryGestureManager] OnEnable - initialized 3D preview system");
     }
 
     private void OnDisable()
@@ -268,17 +250,10 @@ public class ArcheryGestureManager : MonoBehaviour
             if (EnhancedTouchSupport.enabled)
             {
                 EnhancedTouchSupport.Disable();
-
-                if (showDebugLog)
-                {
-                    Debug.Log("[ArcheryGestureManager] OnDisable - EnhancedTouch disabled", this); // ARCHERY_DEBUG_LOG
-                }
+                LogDebug("[ArcheryGestureManager] OnDisable - EnhancedTouch disabled");
             }
 
-            if (showDebugLog)
-            {
-                Debug.Log("[ArcheryGestureManager] OnDisable - unsubscribed from sceneLoaded", this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug("[ArcheryGestureManager] OnDisable - unsubscribed from sceneLoaded");
 
         // 3D 조준 프리뷰 정리
         HidePreview();
@@ -307,10 +282,7 @@ public class ArcheryGestureManager : MonoBehaviour
         ResetGesture();
         activeTouches.Clear();
 
-        if (showDebugLog)
-        {
-            Debug.Log($"[ArcheryGestureManager] OnSceneLoaded - scene='{scene.name}', state reset", this); // ARCHERY_DEBUG_LOG
-        }
+        LogDebug($"[ArcheryGestureManager] OnSceneLoaded - scene='{scene.name}', state reset");
     }
     #endregion
 
@@ -401,11 +373,7 @@ public class ArcheryGestureManager : MonoBehaviour
         if (IsNearScreenBorder(position))
             return;
 
-        if (showDebugLog)
-        {
-            Debug.Log($"[ArcheryGestureManager] HandleTouchBegan - fingerId={fingerId}, pos={position}, state={currentState}",
-                this); // ARCHERY_DEBUG_LOG
-        }
+        LogDebug($"[ArcheryGestureManager] HandleTouchBegan - fingerId={fingerId}, pos={position}, state={currentState}");
 
         TouchInfo touchInfo = new TouchInfo(fingerId, position);
         activeTouches[fingerId] = touchInfo;
@@ -421,15 +389,8 @@ public class ArcheryGestureManager : MonoBehaviour
 
             GestureData data = CreateGestureData();
 
-            if (showDebugLog)
-            {
-                Debug.Log(
-                    $"[ArcheryGestureManager] Begin Drawing - primaryId={primaryTouchId}, startPos={drawStartPosition}",
-                    this); // ARCHERY_DEBUG_LOG
-                Debug.Log(
-                    $"[ArcheryGestureManager] OnDrawStart Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}",
-                    this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug($"[ArcheryGestureManager] Begin Drawing - primaryId={primaryTouchId}, startPos={drawStartPosition}");
+            LogDebug($"[ArcheryGestureManager] OnDrawStart Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}");
 
             OnDrawStart?.Invoke(data);
         }
@@ -439,12 +400,7 @@ public class ArcheryGestureManager : MonoBehaviour
             secondaryTouchId = fingerId;
             currentState = GestureState.Aiming;
 
-            if (showDebugLog)
-            {
-                Debug.Log(
-                    $"[ArcheryGestureManager] Enter Aiming mode - secondaryId={secondaryTouchId}, primaryId={primaryTouchId}",
-                    this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug($"[ArcheryGestureManager] Enter Aiming mode - secondaryId={secondaryTouchId}, primaryId={primaryTouchId}");
         }
     }
 
@@ -464,12 +420,7 @@ public class ArcheryGestureManager : MonoBehaviour
             // 최소 거리를 당겼는지 확인
             if (data.distance >= minDrawDistance)
             {
-                if (showDebugLog)
-                {
-                    Debug.Log(
-                        $"[ArcheryGestureManager] OnDrawing Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}",
-                        this); // ARCHERY_DEBUG_LOG
-                }
+                LogDebug($"[ArcheryGestureManager] OnDrawing Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}");
 
                 OnDrawing?.Invoke(data);
             }
@@ -478,12 +429,7 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             GestureData data = CreateGestureData();
 
-            if (showDebugLog)
-            {
-                Debug.Log(
-                    $"[ArcheryGestureManager] OnAimAdjust Invoke - aimOffset={data.aimOffset}, distance={data.distance:F1}",
-                    this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug($"[ArcheryGestureManager] OnAimAdjust Invoke - aimOffset={data.aimOffset}, distance={data.distance:F1}");
 
             OnAimAdjust?.Invoke(data);
         }
@@ -505,12 +451,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
         if (fingerId == primaryTouchId)
         {
-            if (showDebugLog)
-            {
-                Debug.Log(
-                    $"[ArcheryGestureManager] HandleTouchEnded (primary) - fingerId={fingerId}, pos={position}, state={currentState}",
-                    this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug($"[ArcheryGestureManager] HandleTouchEnded (primary) - fingerId={fingerId}, pos={position}, state={currentState}");
 
             // 주 터치가 끝남 - 화살 발사 또는 취소
             GestureData data = CreateGestureData();
@@ -525,12 +466,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
                     currentState = GestureState.Released;
 
-                    if (showDebugLog)
-                    {
-                        Debug.Log(
-                            $"[ArcheryGestureManager] OnRelease Invoke - distance={data.distance:F1}, velocity={velocity.magnitude:F1}",
-                            this); // ARCHERY_DEBUG_LOG
-                    }
+                    LogDebug($"[ArcheryGestureManager] OnRelease Invoke - distance={data.distance:F1}, velocity={velocity.magnitude:F1}");
 
                     OnRelease?.Invoke(data);
                     ShootArrow(data);
@@ -544,10 +480,7 @@ public class ArcheryGestureManager : MonoBehaviour
 
             OnDrawEnd?.Invoke(data);
 
-            if (showDebugLog)
-            {
-                Debug.Log("[ArcheryGestureManager] OnDrawEnd Invoke - gesture finished", this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug("[ArcheryGestureManager] OnDrawEnd Invoke - gesture finished");
 
             ResetGesture();
         }
@@ -559,12 +492,7 @@ public class ArcheryGestureManager : MonoBehaviour
             {
                 currentState = GestureState.Drawing;
 
-                if (showDebugLog)
-                {
-                    Debug.Log(
-                        "[ArcheryGestureManager] Secondary touch ended - back to Drawing state",
-                        this); // ARCHERY_DEBUG_LOG
-                }
+                LogDebug("[ArcheryGestureManager] Secondary touch ended - back to Drawing state");
             }
         }
 
@@ -592,18 +520,12 @@ public class ArcheryGestureManager : MonoBehaviour
         drawStartPosition = Vector2.zero;
         currentDrawPosition = Vector2.zero;
 
-        if (showDebugLog)
-        {
-            Debug.Log("[ArcheryGestureManager] ResetGesture - state set to Idle, ids cleared", this); // ARCHERY_DEBUG_LOG
-        }
+        LogDebug("[ArcheryGestureManager] ResetGesture - state set to Idle, ids cleared"); // ARCHERY_DEBUG_LOG
     }
 
     private void CancelGesture()
     {
-        if (showDebugLog)
-        {
-            Debug.Log("[ArcheryGestureManager] CancelGesture - invoking OnCancel and clearing touches", this); // ARCHERY_DEBUG_LOG
-        }
+        LogDebug("[ArcheryGestureManager] CancelGesture - invoking OnCancel and clearing touches");
 
         OnCancel?.Invoke();
         ResetGesture();
@@ -714,247 +636,6 @@ public class ArcheryGestureManager : MonoBehaviour
     {
         return CreateGestureData();
     }
-
-    /// <summary>
-    /// 사용자의 제스처 데이터를 기반으로 화살을 실제로 발사하는 함수
-    /// 
-    /// 이 함수는 다음 단계를 수행합니다:
-    /// 1. 필수 컴포넌트 검증 (arrowPrefab, arrowSpawnPoint)
-    /// 2. 화면 드래그 정보를 3D 공간의 발사 방향으로 변환
-    /// 3. 화살 프리팹을 인스턴스화하고 올바른 회전과 위치 설정
-    /// 4. Rigidbody에 물리 힘을 적용하여 화살을 발사
-    /// 
-    /// 주의: 이 함수는 OnRelease 이벤트에서 호출되며, 
-    /// 사용자가 화면에서 손가락을 떼는 순간 실행됩니다.
-    /// </summary>
-    /// <param name="data">사용자의 제스처 데이터 (드래그 시작점, 현재점, 거리, 방향 등)</param>
-    private void ShootArrow(GestureData data)
-    {
-        // ============================================
-        // 1단계: 필수 컴포넌트 검증
-        // ============================================
-        // arrowPrefab: 발사할 화살 프리팹 (Inspector에서 설정)
-        // arrowSpawnPoint: 화살이 생성될 위치와 기본 방향을 가진 Transform
-        // 둘 중 하나라도 없으면 화살을 발사할 수 없으므로 경고 후 종료
-        if (arrowPrefab == null || arrowSpawnPoint == null)
-        {
-            Debug.LogWarning("[ArcheryGestureManager] arrowPrefab 또는 arrowSpawnPoint가 설정되어 있지 않습니다.", this); // ARCHERY_DEBUG_LOG
-            return;
-        }
-
-        // ============================================
-        // 2단계: 발사 힘 설정
-        // ============================================
-        // maxForce: Inspector에서 설정한 최대 발사 힘 (기본값: 30)
-        // 현재는 드래그 거리와 관계없이 항상 최대 힘을 사용
-        // 향후 normalizedPower를 활용하여 거리에 비례한 힘을 적용할 수 있음
-        float force = maxForce;
-
-        // ============================================
-        // 3단계: 발사 기본 방향 결정
-        // ============================================
-        // 화살이 발사될 기본 방향을 결정합니다.
-        // 우선순위:
-        //   1. arrowSpawnPoint.forward (가장 정확한 방향)
-        //   2. 카메라의 forward (arrowSpawnPoint가 없을 경우)
-        //   3. Vector3.forward (Z축 양수 방향, 최후의 수단)
-        // 
-        // 이 기본 방향에 사용자의 드래그 제스처에 따른 회전이 추가로 적용됩니다.
-        Camera cam = Camera.main;
-        Vector3 baseDir = arrowSpawnPoint != null
-            ? arrowSpawnPoint.forward
-            : (cam != null ? cam.transform.forward : Vector3.forward);
-
-        // ============================================
-        // 4단계: 화면 드래그 정보를 3D 각도로 변환
-        // ============================================
-        // 사용자가 화면에서 드래그한 정보를 3D 공간의 발사 각도로 변환합니다.
-        // 이 과정은 프리뷰 화살과 동일한 로직을 사용하여 일관성을 유지합니다.
-        
-        // 4-1. 드래그 벡터 계산
-        // data.currentPosition: 사용자가 손가락을 떼는 시점의 화면 좌표
-        // data.startPosition: 사용자가 드래그를 시작한 화면 좌표
-        // dragVec: 화면 좌표계에서의 드래그 벡터 (픽셀 단위)
-        Vector2 dragVec = (data.currentPosition - data.startPosition);
-        
-        // 드래그 방향을 정규화 (단위 벡터로 변환)
-        // sqrMagnitude > 0.0001f: 매우 작은 이동은 무시 (0으로 나누기 방지 및 노이즈 제거)
-        Vector2 dragDir = dragVec.sqrMagnitude > 0.0001f ? dragVec.normalized : Vector2.zero;
-        float dragDistance = dragVec.magnitude; // 드래그한 총 거리 (픽셀)
-        
-        // 4-2. 드래그 거리를 정규화 (0.0 ~ 1.0 범위로 변환)
-        // maxDrawDistance: Inspector에서 설정한 최대 드래그 거리 (기본값: 300px)
-        // normalizedDistance: 드래그 거리를 최대 거리에 대한 비율로 변환
-        // 예: dragDistance=150px, maxDrawDistance=300px → normalizedDistance=0.5
-        // 이 값은 각도 계산에 사용되어, 짧게 당기면 작은 각도, 길게 당기면 큰 각도가 됩니다.
-        float normalizedDistance = Mathf.Clamp01(dragDistance / maxDrawDistance);
-        
-        // 4-3. 수직 각도 (Pitch) 계산
-        // dragDir.y 값의 의미:
-        //   - 음수: 아래로 드래그 (화면 좌표계에서 Y축은 위가 양수, 아래가 음수)
-        //   - 양수: 위로 드래그
-        // 
-        // rawVerticalAngle 계산:
-        //   - dragDir.y가 음수(아래로) → rawVerticalAngle이 음수 → 위로 발사
-        //   - dragDir.y가 양수(위로) → rawVerticalAngle이 양수 → 아래로 발사
-        // 
-        // normalizedDistance를 곱하여 드래그 거리에 비례한 각도 계산
-        // maxPitchAngle: Inspector에서 설정한 최대 수직 각도 (기본값: 80도)
-        float rawVerticalAngle = dragDir.y * maxPitchAngle * normalizedDistance;
-        float verticalAngleDeg = Mathf.Clamp(rawVerticalAngle, -maxPitchAngle, maxPitchAngle);
-       
-        // 4-4. 수평 각도 (Yaw) 계산
-        // dragDir.x 값의 의미:
-        //   - 양수: 오른쪽으로 드래그
-        //   - 음수: 왼쪽으로 드래그
-        // 
-        // horizontalAngleDeg 계산:
-        //   - dragDir.x가 양수(오른쪽) → horizontalAngleDeg가 음수 → 왼쪽으로 발사
-        //   - dragDir.x가 음수(왼쪽) → horizontalAngleDeg가 양수 → 오른쪽으로 발사
-        // 
-        // 부호가 반대인 이유: 활쏘기처럼 당기는 방향의 반대로 발사하는 것이 직관적
-        // maxYawAngle: Inspector에서 설정한 최대 수평 각도 (기본값: 70도)
-        float horizontalAngleDeg = Mathf.Clamp(-dragDir.x * maxYawAngle * normalizedDistance, -maxYawAngle, maxYawAngle);
-
-        // ============================================
-        // 5단계: 각도를 Quaternion 회전으로 변환
-        // ============================================
-        // 계산한 각도(verticalAngleDeg, horizontalAngleDeg)를 Quaternion으로 변환하여
-        // 3D 공간에서의 회전을 표현합니다.
-        Quaternion rot;
-        if (cam != null)
-        {
-            // 카메라가 있는 경우: 카메라의 right 벡터를 기준으로 Pitch 회전
-            // 회전 적용 순서: Yaw (수평) → Pitch (수직)
-            // 
-            // Quaternion.AngleAxis(각도, 축):
-            //   - horizontalAngleDeg: 수평 회전 각도 (Yaw, 좌우)
-            //   - Vector3.up: 수직 회전 축 (세계 Y축 기준, 좌우 회전)
-            //   - verticalAngleDeg: 수직 회전 각도 (Pitch, 위아래)
-            //   - cam.transform.right: 수평 회전 축 (카메라의 오른쪽 방향 기준, 위아래 회전)
-            //
-            // 두 회전을 곱하면: 먼저 Yaw 회전이 적용되고, 그 다음 Pitch 회전이 적용됩니다.
-            // 이 순서는 활쏘기 게임에서 직관적인 조준을 위해 중요합니다.
-            rot = Quaternion.AngleAxis(horizontalAngleDeg, Vector3.up) *
-                  Quaternion.AngleAxis(verticalAngleDeg, cam.transform.right);
-        }
-        else
-        {
-            // 카메라가 없는 경우: Euler 각도로 직접 변환
-            // Euler(x, y, z): X축(Pitch), Y축(Yaw), Z축(Roll) 순서로 회전
-            // 카메라가 없을 때는 간단하게 Euler 각도로 변환
-            rot = Quaternion.Euler(verticalAngleDeg, horizontalAngleDeg, 0f);
-        }
-
-        // ============================================
-        // 6단계: 최종 발사 방향 계산
-        // ============================================
-        // baseDir (arrowSpawnPoint.forward 또는 카메라 forward)에
-        // 계산한 회전(rot)을 적용하여 최종 발사 방향(dir)을 얻습니다.
-        // 이 방향이 화살이 날아갈 3D 공간의 방향 벡터입니다.
-        Vector3 dir = rot * baseDir;
-
-        // 디버그 로그: 계산된 발사 방향 정보 출력
-        if (showDebugLog)
-        {
-            Debug.Log(
-                $"[ArcheryGestureManager] Calculated shot direction - dragDir={dragDir}, verticalAngle(pitch)={verticalAngleDeg:F1}°, horizontalAngle(yaw)={horizontalAngleDeg:F1}°, baseDir={baseDir}",
-                this); // ARCHERY_DEBUG_LOG
-        }
-
-        // ============================================
-        // 7단계: 화살 프리팹 인스턴스화 및 회전 설정
-        // ============================================
-        // 화살 프리팹을 씬에 생성하고, 계산한 발사 방향으로 회전을 설정합니다.
-        // 
-        // Quaternion.LookRotation(방향, 위쪽):
-        //   - dir: 화살이 바라볼 방향 (forward 방향)
-        //   - Vector3.up: 위쪽 방향 (roll 회전 방지)
-        //
-        // 이 회전은 화살의 Transform.forward가 dir 방향을 향하도록 설정합니다.
-        // 프리팹의 초기 회전(90도 X축)은 프리팹 자체에 저장되어 있으므로,
-        // LookRotation으로 계산한 회전이 프리팹의 로컬 회전에 추가로 적용됩니다.
-        Quaternion arrowRotation = Quaternion.LookRotation(dir, Vector3.up);
-        
-        // 화살 인스턴스 생성: arrowSpawnPoint 위치에 arrowRotation 회전으로 생성
-        // Instantiate의 세 번째 매개변수(회전)가 화살의 Transform.rotation에 직접 설정됨
-        GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, arrowRotation);
-        
-        // 디버그 로그: 화살 회전 정보 출력
-        if (showDebugLog)
-        {
-            Debug.Log($"[ArcheryGestureManager] Arrow rotation set - rotation={arrowRotation.eulerAngles}, dir={dir}", this);
-        }
-
-        // 디버그 로그: 화살 생성 위치 정보 출력
-        if (showDebugLog)
-        {
-            Debug.Log(
-                $"[ArcheryGestureManager] Spawned arrow instance '{arrow.name}' at {arrowSpawnPoint.position} with dir={dir}",
-                this); // ARCHERY_DEBUG_LOG
-        }
-
-        // ============================================
-        // 8단계: 물리 힘 적용하여 화살 발사
-        // ============================================
-        // Rigidbody 컴포넌트를 찾아 물리 힘을 적용하여 화살을 실제로 날아가게 합니다.
-        Rigidbody rb = arrow.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            // 화살의 초기 속도를 0으로 설정 (이전 상태의 영향을 제거)
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            
-            // 발사 방향(dir)으로 힘을 적용
-            // ForceMode.Impulse: 즉시 속도를 변경하는 방식 (순간적인 힘)
-            // dir * force: 방향 벡터에 힘의 크기를 곱하여 최종 힘 벡터 생성
-            // 이 힘은 화살의 질량에 따라 가속도로 변환되어 화살을 날아가게 합니다.
-            rb.AddForce(dir * force, ForceMode.Impulse);
-
-            // 디버그 로그: 적용된 힘과 결과 속도 정보 출력
-            if (showDebugLog)
-            {
-                Debug.Log(
-                    $"[ArcheryGestureManager] Applied force to arrow - force={force:F1}, velocity={rb.linearVelocity}, mass={rb.mass}",
-                    this); // ARCHERY_DEBUG_LOG
-            }
-        }
-        else if (showDebugLog)
-        {
-            // Rigidbody가 없으면 물리 시뮬레이션이 작동하지 않으므로 경고
-            Debug.Log("[ArcheryGestureManager] Spawned arrow has no Rigidbody component", this); // ARCHERY_DEBUG_LOG
-        }
-        
-        // 함수 종료: 화살이 성공적으로 발사되었습니다.
-        // 이후 화살의 비행은 ArcheryArrow 스크립트와 Unity의 물리 엔진이 처리합니다.
-    }
-    #endregion
-
-    #region Debug Visualization
-    private void DrawDebugInfo()
-    {
-        // 화면에 디버그 정보 표시
-        GUIStyle style = new GUIStyle();
-        style.normal.textColor = Color.white;
-        style.fontSize = 16;
-
-        GUI.Label(new Rect(10, 10, 300, 30), $"State: {currentState}", style);
-        GUI.Label(new Rect(10, 40, 300, 30), $"Active Touches: {activeTouches.Count}", style);
-
-        if (currentState != GestureState.Idle)
-        {
-            GestureData data = CreateGestureData();
-            GUI.Label(new Rect(10, 70, 300, 30), $"Distance: {data.distance:F1}px", style);
-            GUI.Label(new Rect(10, 100, 300, 30), $"Power: {data.normalizedPower:F2}", style);
-            GUI.Label(new Rect(10, 130, 300, 30), $"Angle: {data.angle:F1}°", style);
-
-            // 조준 오프셋 표시
-            if (secondaryTouchId != -1)
-            {
-                GUI.Label(new Rect(10, 160, 300, 30), $"Aim Offset: {data.aimOffset}", style);
-            }
-        }
-    }
     #endregion
 
     #region 3D Aim Preview
@@ -971,11 +652,9 @@ public class ArcheryGestureManager : MonoBehaviour
         }
 
         var state = GetCurrentState();
-        if (state != lastGestureState && showDebugLog)
+        if (state != lastGestureState)
         {
-            Debug.Log(
-                $"[ArcheryGestureManager] GestureState changed {lastGestureState} -> {state}",
-                this); // ARCHERY_DEBUG_LOG
+            LogDebug($"[ArcheryGestureManager] GestureState changed {lastGestureState} -> {state}");
         }
         lastGestureState = state;
 
@@ -1006,11 +685,7 @@ public class ArcheryGestureManager : MonoBehaviour
         if (!previewInstance.activeSelf)
         {
             previewInstance.SetActive(true);
-
-            if (showDebugLog)
-            {
-                Debug.Log("[ArcheryGestureManager] Show preview (start drawing)", this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug("[ArcheryGestureManager] Show preview (start drawing)");
         }
 
         Camera cam = Camera.main;
@@ -1071,12 +746,7 @@ public class ArcheryGestureManager : MonoBehaviour
             previewTransform.position = arrowSpawnPoint.position;
         }
 
-        if (showDebugLog)
-        {
-            Debug.Log(
-                $"[ArcheryGestureManager] UpdatePreviewByGesture - state={state}, distance={data.distance:F1}, power={data.normalizedPower:F2}, dragDir={dragDir}, verticalAngle(pitch)={verticalAngleDeg:F1}°, horizontalAngle(yaw)={horizontalAngleDeg:F1}°, pos={previewTransform.position}",
-                this); // ARCHERY_DEBUG_LOG
-        }
+        LogDebug($"[ArcheryGestureManager] UpdatePreviewByGesture - state={state}, distance={data.distance:F1}, power={data.normalizedPower:F2}, dragDir={dragDir}, verticalAngle(pitch)={verticalAngleDeg:F1}°, horizontalAngle(yaw)={horizontalAngleDeg:F1}°, pos={previewTransform.position}");
 
         // 화살 궤적 시각화 (게임에서 항상 표시)
         if (arrowPrefab != null)
@@ -1093,261 +763,89 @@ public class ArcheryGestureManager : MonoBehaviour
 
     /// <summary>
     /// 조준 프리뷰 화살 인스턴스가 존재하는지 확인하고, 없으면 생성하는 함수
-    /// 
-    /// [사용 목적]
-    /// 이 함수는 "Lazy Initialization" 패턴을 사용하여 프리뷰 화살을 필요할 때만 생성합니다.
-    /// 화살 프리팹을 미리 생성해두고 재사용함으로써 성능을 최적화합니다.
-    /// 
-    /// [호출 시점]
-    /// 1. OnEnable(): 매니저가 활성화될 때 초기화를 위해 호출
-    ///    - 게임 시작 시 또는 씬 로드 시 프리뷰 시스템 준비
-    /// 
-    /// 2. UpdatePreviewByGesture(): 사용자가 화살을 당기기 시작할 때 호출
-    ///    - 실제로 조준 프리뷰가 필요할 때 인스턴스가 존재하는지 확인
-    ///    - 없으면 생성하고, 있으면 재사용
-    /// 
-    /// [주요 기능]
-    /// 1. 프리뷰 인스턴스 존재 여부 확인 (이미 있으면 재생성하지 않음)
-    /// 2. arrowPrefab을 복제하여 previewInstance 생성
-    /// 3. 화살의 메쉬 중심 오프셋 계산 (회전 중심 보정을 위해)
-    /// 4. 초기 상태는 비활성화 (SetActive(false))
-    /// 
-    /// [중심 오프셋 계산의 중요성]
-    /// 화살 프리팹의 피벗(pivot)이 화살의 끝에 있을 수 있어서,
-    /// 회전 시 끝을 기준으로 회전하게 됩니다. 이를 방지하기 위해
-    /// 메쉬의 시각적 중심을 계산하여, 나중에 위치를 보정할 때 사용합니다.
     /// </summary>
     private void EnsurePreviewInstance()
     {
-        // ============================================
-        // 1단계: 이미 프리뷰 인스턴스가 존재하는지 확인
-        // ============================================
-        // previewInstance는 클래스 멤버 변수로, 한 번 생성되면 계속 재사용됩니다.
-        // 이미 존재하면 새로 생성하지 않고 바로 반환 (성능 최적화)
         if (previewInstance != null)
         {
-            if (showDebugLog)
-            {
-                Debug.Log("[ArcheryGestureManager] EnsurePreviewInstance - already exists", this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug("[ArcheryGestureManager] EnsurePreviewInstance - already exists");
             return; // 이미 존재하므로 함수 종료
         }
         
-        // ============================================
-        // 2단계: arrowPrefab이 설정되어 있는지 확인
-        // ============================================
-        // arrowPrefab이 없으면 프리뷰를 생성할 수 없으므로 경고 후 종료
-        // 이는 Inspector에서 arrowPrefab을 설정하지 않았을 때 발생합니다.
         if (arrowPrefab == null)
         {
             Debug.LogWarning("[ArcheryGestureManager] arrowPrefab 이 설정되어 있지 않습니다.");
             return;
         }
 
-        // ============================================
-        // 3단계: 프리뷰 화살 인스턴스 생성
-        // ============================================
-        // arrowPrefab을 복제하여 previewInstance를 생성합니다.
-        // Instantiate(arrowPrefab): 위치와 회전을 지정하지 않으면 (0,0,0)에 생성
-        // 나중에 UpdatePreviewByGesture()에서 위치와 회전을 매 프레임 업데이트합니다.
         previewInstance = Instantiate(arrowPrefab);
         previewTransform = previewInstance.transform; // Transform 참조 저장 (성능 최적화)
         
-        if (showDebugLog)
-        {
-            Debug.Log(
-                $"[ArcheryGestureManager] EnsurePreviewInstance - instantiated preview",
-                this); // ARCHERY_DEBUG_LOG
-        }
+        LogDebug($"[ArcheryGestureManager] EnsurePreviewInstance - instantiated preview");
 
-        // ============================================
-        // 4단계: 화살의 메쉬 중심 오프셋 계산
-        // ============================================
-        // 화살이 회전할 때 중심을 기준으로 회전하도록 하기 위해,
-        // 프리팹의 피벗(Transform.position)에서 메쉬의 시각적 중심까지의 오프셋을 계산합니다.
-        // 
-        // 이 오프셋은 나중에 UpdatePreviewByGesture()에서 사용되어,
-        // 화살의 중심이 arrowSpawnPoint에 위치하도록 위치를 보정합니다.
         var renderer = previewInstance.GetComponentInChildren<Renderer>();
         if (renderer != null)
         {
-            // Renderer.bounds.center: 메쉬의 시각적 중심 (월드 좌표)
             Vector3 worldCenter = renderer.bounds.center;
-            
-            // InverseTransformPoint: 월드 좌표를 로컬 좌표로 변환
-            // previewTransform의 로컬 좌표계에서 메쉬 중심의 위치를 얻습니다.
             Vector3 localCenter = previewTransform.InverseTransformPoint(worldCenter);
-
-            // 로컬 피벗(0,0,0, 즉 Transform.position)에서 메쉬 중심까지의 오프셋
-            // 이 값은 나중에 위치 보정에 사용됩니다.
             previewCenterLocalOffset = localCenter;
             hasPreviewCenterOffset = (previewCenterLocalOffset != Vector3.zero);
 
-            if (showDebugLog)
-            {
-                Debug.Log(
-                    $"[ArcheryGestureManager] Calculated preview center offset - localCenter={localCenter}, hasOffset={hasPreviewCenterOffset}",
-                    this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug($"[ArcheryGestureManager] Calculated preview center offset - localCenter={localCenter}, hasOffset={hasPreviewCenterOffset}");
         }
         else
         {
-            // Renderer가 없으면 중심 오프셋을 계산할 수 없음
-            // 이 경우 오프셋 없이 사용 (피벗이 이미 중심에 있다고 가정)
             previewCenterLocalOffset = Vector3.zero;
             hasPreviewCenterOffset = false;
 
-            if (showDebugLog)
-            {
-                Debug.Log("[ArcheryGestureManager] EnsurePreviewInstance - no Renderer found on preview", this); // ARCHERY_DEBUG_LOG
-            }
+            LogDebug("[ArcheryGestureManager] EnsurePreviewInstance - no Renderer found on preview");
         }
 
-        // ============================================
-        // 5단계: 초기 상태는 비활성화
-        // ============================================
-        // 프리뷰 화살은 사용자가 화살을 당기기 시작할 때만 보여야 하므로,
-        // 생성 직후에는 비활성화 상태로 둡니다.
-        // UpdatePreviewByGesture()에서 필요할 때 SetActive(true)로 활성화합니다.
         previewInstance.SetActive(false);
-        
-        // 함수 종료: 프리뷰 인스턴스가 준비되었습니다.
-        // 이제 UpdatePreviewByGesture()에서 이 인스턴스를 사용하여
-        // 사용자의 조준 방향에 따라 위치와 회전을 업데이트할 수 있습니다.
     }
 
     /// <summary>
     /// 화살의 예상 궤적을 계산하고 LineRenderer로 시각화하는 함수
-    /// 
-    /// [사용 목적]
-    /// 사용자가 화살을 당기고 조준하는 동안, 실제로 발사했을 때 화살이 날아갈 경로를
-    /// 미리 보여줍니다. 이를 통해 사용자가 조준을 더 정확하게 할 수 있습니다.
-    /// 
-    /// [호출 시점]
-    /// UpdatePreviewByGesture()에서 매 프레임 호출됩니다.
-    /// 사용자가 화살을 당기는 동안 실시간으로 궤적이 업데이트됩니다.
-    /// 
-    /// [물리 시뮬레이션]
-    /// 이 함수는 물리 엔진의 중력과 초기 속도를 사용하여 포물선 운동을 계산합니다.
-    /// 실제 화살 발사와 동일한 물리 법칙을 적용하여 정확한 예측을 제공합니다.
-    /// 
-    /// [수식 설명]
-    /// 포물선 운동 공식: p(t) = p0 + v0*t + 0.5*g*t^2
-    ///   - p0: 초기 위치 (startPos)
-    ///   - v0: 초기 속도 (velocity)
-    ///   - g: 중력 가속도 (Physics.gravity)
-    ///   - t: 경과 시간
     /// </summary>
-    /// <param name="startPos">화살 발사 시작 위치 (arrowSpawnPoint.position)</param>
-    /// <param name="velocity">화살의 초기 속도 벡터 (방향 * (힘 / 질량))</param>
     private void DrawTrajectory(Vector3 startPos, Vector3 velocity)
     {
-        // ============================================
-        // 1단계: LineRenderer 준비
-        // ============================================
-        // 궤적을 그리기 위한 LineRenderer 컴포넌트가 필요합니다.
-        // 없으면 EnsureTrajectoryLineRenderer()에서 생성합니다.
-        // EnsureTrajectoryLineRenderer() 내부에서도 null 체크를 하므로,
-        // 여기서는 한 번만 호출하고 결과를 확인합니다.
         EnsureTrajectoryLineRenderer();
 
-        // 생성에 실패했거나 여전히 null이면 궤적을 그릴 수 없으므로 함수 종료
         if (trajectoryLineRenderer == null)
         {
             return;
         }
 
-        // ============================================
-        // 2단계: 궤적 계산 파라미터 설정
-        // ============================================
-        // timeStep: 시간 간격 (초 단위)
-        //   - 작을수록 더 정밀한 궤적이지만 계산 비용이 증가
-        //   - 0.05초 간격으로 계산하면 1초에 20개의 포인트 생성
         float timeStep = 0.05f;
-        
-        // maxTime: 궤적을 계산할 최대 시간 (초 단위)
-        //   - 2초 동안의 궤적을 계산 (대부분의 화살이 이 시간 내에 착지)
         float maxTime = 2.0f;
-        
-        // gravity: Unity의 물리 엔진에서 설정된 중력 가속도
-        //   - 기본값: (0, -9.81, 0) - Y축 아래 방향
-        //   - 실제 화살 발사 시 사용되는 중력과 동일하게 설정
         Vector3 gravity = Physics.gravity;
         
-        // ============================================
-        // 3단계: 궤적 포인트 계산
-        // ============================================
-        // 시간에 따라 화살의 위치를 계산하여 포인트 리스트를 생성합니다.
         List<Vector3> trajectoryPoints = new List<Vector3>();
         trajectoryPoints.Add(startPos); // 시작점 추가
 
-        // 시간이 0부터 maxTime까지 timeStep 간격으로 증가하면서 위치 계산
         for (float t = timeStep; t <= maxTime; t += timeStep)
         {
-            // 포물선 운동 공식 적용
-            // p(t) = p0 + v0*t + 0.5*g*t^2
-            //   - startPos: 초기 위치 (p0)
-            //   - velocity * t: 초기 속도로 이동한 거리 (v0*t)
-            //   - 0.5f * gravity * t * t: 중력으로 인한 낙하 거리 (0.5*g*t^2)
             Vector3 pos = startPos + velocity * t + 0.5f * gravity * t * t;
             trajectoryPoints.Add(pos);
             
-            // ============================================
-            // 4단계: 지면 충돌 감지 (조기 종료 최적화)
-            // ============================================
-            // 화살이 지면에 닿으면 더 이상 계산할 필요가 없으므로 루프를 종료합니다.
-            // 
-            // 조건 설명:
-            //   - pos.y < startPos.y - 0.1f: 현재 위치가 시작 위치보다 0.1m 이상 아래
-            //   - velocity.y < 0: 속도의 Y 성분이 음수 (아래로 떨어지는 중)
-            // 
-            // 두 조건을 모두 만족하면 화살이 지면에 충돌했다고 판단하여 계산 중단
-            // 이는 불필요한 계산을 줄여 성능을 최적화합니다.
             if (pos.y < startPos.y - 0.1f && velocity.y < 0)
             {
                 break;
             }
         }
 
-        // ============================================
-        // 5단계: LineRenderer에 포인트 설정
-        // ============================================
-        // 계산한 궤적 포인트들을 LineRenderer에 설정하여 시각화합니다.
-        
-        // positionCount: LineRenderer가 그릴 선분의 포인트 개수 설정
-        // 계산한 포인트 개수만큼 설정
         trajectoryLineRenderer.positionCount = trajectoryPoints.Count;
-        
-        // 각 포인트의 위치를 LineRenderer에 설정
-        // LineRenderer는 이 포인트들을 순서대로 연결하여 선을 그립니다.
         for (int i = 0; i < trajectoryPoints.Count; i++)
         {
             trajectoryLineRenderer.SetPosition(i, trajectoryPoints[i]);
         }
 
-        // ============================================
-        // 6단계: 궤적 표시 활성화
-        // ============================================
-        // 궤적을 그릴 GameObject를 활성화하여 화면에 표시합니다.
-        // trajectoryLineObject는 EnsureTrajectoryLineRenderer()에서 생성되며,
-        // LineRenderer 컴포넌트를 포함하고 있습니다.
         if (trajectoryLineObject != null)
         {
             trajectoryLineObject.SetActive(true);
         }
 
-        // ============================================
-        // 7단계: 디버그 로그 출력
-        // ============================================
-        // 디버그 모드가 활성화되어 있으면 궤적 계산 정보를 출력합니다.
-        // 개발 중 궤적이 올바르게 계산되는지 확인하는 데 유용합니다.
-        if (showDebugLog)
-        {
-            Debug.Log($"[ArcheryGestureManager] DrawTrajectory - startPos: {startPos}, velocity: {velocity}, points: {trajectoryPoints.Count}", this);
-        }
-        
-        // 함수 종료: 궤적이 성공적으로 계산되고 화면에 표시되었습니다.
-        // 사용자가 조준을 조정하면 다음 프레임에 다시 호출되어 업데이트됩니다.
+        LogDebug($"[ArcheryGestureManager] DrawTrajectory - startPos: {startPos}, velocity: {velocity}, points: {trajectoryPoints.Count}");
     }
 
     private void EnsureTrajectoryLineRenderer()
@@ -1377,10 +875,7 @@ public class ArcheryGestureManager : MonoBehaviour
         // 초기에는 숨김
         trajectoryLineObject.SetActive(false);
 
-        if (showDebugLog)
-        {
-            Debug.Log("[ArcheryGestureManager] EnsureTrajectoryLineRenderer - created LineRenderer", this);
-        }
+        LogDebug("[ArcheryGestureManager] EnsureTrajectoryLineRenderer - created LineRenderer");
     }
 
     private void HideTrajectory()
@@ -1396,11 +891,118 @@ public class ArcheryGestureManager : MonoBehaviour
         if (previewInstance != null)
         {
             previewInstance.SetActive(false);
+            LogDebug("[ArcheryGestureManager] HidePreview - preview disabled");
+        }
+    }
+    #endregion
 
-            if (showDebugLog)
+    #region Shooter
+    /// <summary>
+    /// 사용자의 제스처 데이터를 기반으로 화살을 실제로 발사하는 함수
+    /// </summary>
+    private void ShootArrow(GestureData data)
+    {
+        // 1단계: 필수 컴포넌트 검증
+        if (arrowPrefab == null || arrowSpawnPoint == null)
+        {
+            Debug.LogWarning("[ArcheryGestureManager] arrowPrefab 또는 arrowSpawnPoint가 설정되어 있지 않습니다.", this); // ARCHERY_DEBUG_LOG
+            return;
+        }
+
+        // 2단계: 발사 힘 설정
+        float force = maxForce;
+
+        // 3단계: 발사 기본 방향 결정
+        Camera cam = Camera.main;
+        Vector3 baseDir = arrowSpawnPoint != null
+            ? arrowSpawnPoint.forward
+            : (cam != null ? cam.transform.forward : Vector3.forward);
+
+        // 4단계: 화면 드래그 정보를 3D 각도로 변환
+        Vector2 dragVec = (data.currentPosition - data.startPosition);
+        Vector2 dragDir = dragVec.sqrMagnitude > 0.0001f ? dragVec.normalized : Vector2.zero;
+        float dragDistance = dragVec.magnitude;
+        
+        float normalizedDistance = Mathf.Clamp01(dragDistance / maxDrawDistance);
+        
+        float rawVerticalAngle = dragDir.y * maxPitchAngle * normalizedDistance;
+        float verticalAngleDeg = Mathf.Clamp(rawVerticalAngle, -maxPitchAngle, maxPitchAngle);
+       
+        float horizontalAngleDeg = Mathf.Clamp(-dragDir.x * maxYawAngle * normalizedDistance, -maxYawAngle, maxYawAngle);
+
+        // 5단계: 각도를 Quaternion 회전으로 변환
+        Quaternion rot;
+        if (cam != null)
+        {
+            rot = Quaternion.AngleAxis(horizontalAngleDeg, Vector3.up) *
+                  Quaternion.AngleAxis(verticalAngleDeg, cam.transform.right);
+        }
+        else
+        {
+            rot = Quaternion.Euler(verticalAngleDeg, horizontalAngleDeg, 0f);
+        }
+
+        // 6단계: 최종 발사 방향 계산
+        Vector3 dir = rot * baseDir;
+
+        LogDebug($"[ArcheryGestureManager] Calculated shot direction - dragDir={dragDir}, verticalAngle(pitch)={verticalAngleDeg:F1}°, horizontalAngle(yaw)={horizontalAngleDeg:F1}°, baseDir={baseDir}");
+
+        // 7단계: 화살 프리팹 인스턴스화 및 회전 설정
+        Quaternion arrowRotation = Quaternion.LookRotation(dir, Vector3.up);
+        GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, arrowRotation);
+        
+        LogDebug($"[ArcheryGestureManager] Arrow rotation set - rotation={arrowRotation.eulerAngles}, dir={dir}");
+        LogDebug($"[ArcheryGestureManager] Spawned arrow instance '{arrow.name}' at {arrowSpawnPoint.position} with dir={dir}");
+
+        // 8단계: 물리 힘 적용하여 화살 발사
+        Rigidbody rb = arrow.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            
+            rb.AddForce(dir * force, ForceMode.Impulse);
+
+            LogDebug($"[ArcheryGestureManager] Applied force to arrow - force={force:F1}, velocity={rb.linearVelocity}, mass={rb.mass}");
+        }
+        else
+        {
+            LogDebug("[ArcheryGestureManager] Spawned arrow has no Rigidbody component");
+        }
+    }
+    #endregion
+
+    #region Debug
+    private void DrawDebugInfo()
+    {
+        // 화면에 디버그 정보 표시
+        GUIStyle style = new GUIStyle();
+        style.normal.textColor = Color.white;
+        style.fontSize = 16;
+
+        GUI.Label(new Rect(10, 10, 300, 30), $"State: {currentState}", style);
+        GUI.Label(new Rect(10, 40, 300, 30), $"Active Touches: {activeTouches.Count}", style);
+
+        if (currentState != GestureState.Idle)
+        {
+            GestureData data = CreateGestureData();
+            GUI.Label(new Rect(10, 70, 300, 30), $"Distance: {data.distance:F1}px", style);
+            GUI.Label(new Rect(10, 100, 300, 30), $"Power: {data.normalizedPower:F2}", style);
+            GUI.Label(new Rect(10, 130, 300, 30), $"Angle: {data.angle:F1}°", style);
+
+            // 조준 오프셋 표시
+            if (secondaryTouchId != -1)
             {
-                Debug.Log("[ArcheryGestureManager] HidePreview - preview disabled", this); // ARCHERY_DEBUG_LOG
+                GUI.Label(new Rect(10, 160, 300, 30), $"Aim Offset: {data.aimOffset}", style);
             }
+        }
+    }
+
+    private void LogDebug(string message)
+    {
+        if (showDebugLog)
+        {
+            Debug.Log(message, this);
         }
     }
     #endregion
