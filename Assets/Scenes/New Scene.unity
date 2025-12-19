@@ -315,7 +315,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   arrowSpawnPoint: {fileID: 1127955916}
-  arrowPrefab: {fileID: 1959729250425484, guid: 5187dfa4d8f19524e8bbf7c6894b7de7, type: 3}
+  arrowPrefab: {fileID: 7859017393093090047, guid: 3be1fd22e406343fca97a7cef37aedfc, type: 3}
   maxForce: 30
   maxPitchAngle: 80
   maxYawAngle: 70
@@ -323,9 +323,6 @@ MonoBehaviour:
   maxDrawDistance: 300
   aimAdjustThreshold: 30
   cancelBorderSize: 100
-  showDebugLog: 1
-  drawLineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  aimLineColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!1001 &446609753
 PrefabInstance:
   m_ObjectHideFlags: 0
