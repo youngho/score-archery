@@ -28,7 +28,7 @@ public class ArcheryGestureManager : MonoBehaviour
             if (_instance == null)
             {
                 // 씬에 이미 존재하는지 먼저 검색
-                _instance = FindObjectOfType<ArcheryGestureManager>();
+                _instance = FindFirstObjectByType<ArcheryGestureManager>();
 
                 // 없다면 새 GameObject 생성
                 if (_instance == null)
