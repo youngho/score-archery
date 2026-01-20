@@ -28,6 +28,22 @@ public class UserAccountManagerScript : ScriptableObject
         public string createdAt;
     }
 
+    [Serializable]
+    public class ChangeNicknameRequest
+    {
+        public string nickname;
+    }
+
+    [Serializable]
+    public class ChangeNicknameResponse
+    {
+        public string publicId;
+        public string nickname;
+        // Add other fields if necessary based on API, but these are sufficient for updating local state
+    }
+
+    public static UserAccountManagerScript Instance { get; private set; }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void InitializeOnLoad()
     {
@@ -41,8 +57,11 @@ public class UserAccountManagerScript : ScriptableObject
             return;
         }
 
+        Instance = manager;
         manager.Initialize();
     }
+
+    public string Nickname => accountData != null ? accountData.nickname : PlayerPrefs.GetString(NicknameKey, "Player");
 
     public void Initialize()
     {
@@ -121,6 +140,56 @@ public class UserAccountManagerScript : ScriptableObject
                 }
                 
                 callback?.Invoke(true, "Success");
+            }
+        }
+    }
+
+    public IEnumerator ChangeNickname(string newNickname, Action<bool, string> callback)
+    {
+        string publicId = GetPublicId();
+        if (string.IsNullOrEmpty(publicId))
+        {
+            callback?.Invoke(false, "No Public ID found");
+            yield break;
+        }
+
+        string url = $"{ApiBaseUrl}/{publicId}/nickname";
+        ChangeNicknameRequest requestBody = new ChangeNicknameRequest
+        {
+            nickname = newNickname
+        };
+
+        string json = JsonUtility.ToJson(requestBody);
+
+        using (UnityWebRequest request = new UnityWebRequest(url, "PATCH"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"[UserAccountManagerScript] Change Nickname failed: {request.error}\n{request.downloadHandler.text}");
+                callback?.Invoke(false, request.error);
+            }
+            else
+            {
+                ChangeNicknameResponse response = JsonUtility.FromJson<ChangeNicknameResponse>(request.downloadHandler.text);
+                Debug.Log($"[UserAccountManagerScript] Nickname changed successfully: {response.nickname}");
+
+                // Update local storage and data asset
+                PlayerPrefs.SetString(NicknameKey, response.nickname);
+                PlayerPrefs.Save();
+
+                if (accountData != null)
+                {
+                    accountData.SetAccount(publicId, response.nickname);
+                }
+
+                callback?.Invoke(true, response.nickname);
             }
         }
     }
