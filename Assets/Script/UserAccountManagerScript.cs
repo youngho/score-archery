@@ -6,7 +6,7 @@ using System;
 [CreateAssetMenu(fileName = "UserAccountManagerScript", menuName = "Account/UserAccountManagerScript")]
 public class UserAccountManagerScript : ScriptableObject
 {
-    private const string UserIdKey = "UserAccountId";
+    private const string PublicIdKey = "UserAccountPublicId";
     private const string ManagerPath = "UserAccountManagerScript";
     private const string ApiBaseUrl = "http://localhost:8081/api/users"; // Adjust if necessary
 
@@ -23,7 +23,7 @@ public class UserAccountManagerScript : ScriptableObject
     [Serializable]
     public class UserResponse
     {
-        public long userId;
+        public long publicId;
         public string username;
         public string email;
         public string createdAt;
@@ -52,12 +52,12 @@ public class UserAccountManagerScript : ScriptableObject
 
     public static void CheckAndCreateAccount(UserAccountDataScript data)
     {
-        string existingId = PlayerPrefs.GetString(UserIdKey, string.Empty);
+        string existingId = PlayerPrefs.GetString(PublicIdKey, string.Empty);
         
         if (string.IsNullOrEmpty(existingId))
         {
             string newId = ToBase62(Guid.NewGuid());
-            PlayerPrefs.SetString(UserIdKey, newId);
+            PlayerPrefs.SetString(PublicIdKey, newId);
             PlayerPrefs.Save();
             
             if (data != null)
@@ -105,16 +105,16 @@ public class UserAccountManagerScript : ScriptableObject
             else
             {
                 UserResponse response = JsonUtility.FromJson<UserResponse>(request.downloadHandler.text);
-                string userIdStr = response.userId.ToString();
-                Debug.Log($"[UserAccountManagerScript] User registered successfully: {userIdStr}");
+                string publicIdStr = response.publicId.ToString();
+                Debug.Log($"[UserAccountManagerScript] User registered successfully: {publicIdStr}");
                 
                 // Update local storage and data asset
-                PlayerPrefs.SetString(UserIdKey, userIdStr);
+                PlayerPrefs.SetString(PublicIdKey, publicIdStr);
                 PlayerPrefs.Save();
                 
                 if (accountData != null)
                 {
-                    accountData.SetAccount(userIdStr, response.username, response.email);
+                    accountData.SetAccount(publicIdStr, response.username, response.email);
                 }
                 
                 callback?.Invoke(true, "Success");
@@ -122,9 +122,9 @@ public class UserAccountManagerScript : ScriptableObject
         }
     }
 
-    public string GetUserId()
+    public string GetPublicId()
     {
-        return PlayerPrefs.GetString(UserIdKey, string.Empty);
+        return PlayerPrefs.GetString(PublicIdKey, string.Empty);
     }
 
     private static string ToBase62(Guid guid)
