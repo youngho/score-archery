@@ -7,6 +7,7 @@ using System;
 public class UserAccountManagerScript : ScriptableObject
 {
     private const string PublicIdKey = "UserAccountPublicId";
+    private const string NicknameKey = "UserAccountNickname";
     private const string ManagerPath = "UserAccountManagerScript";
     private const string ApiBaseUrl = "http://localhost:8081/api/users"; // Adjust if necessary
 
@@ -51,27 +52,31 @@ public class UserAccountManagerScript : ScriptableObject
     public static void CheckAndCreateAccount(UserAccountDataScript data)
     {
         string existingId = PlayerPrefs.GetString(PublicIdKey, string.Empty);
+        string existingNickname = PlayerPrefs.GetString(NicknameKey, "Player");
         
         if (string.IsNullOrEmpty(existingId))
         {
             string newId = ToBase62(Guid.NewGuid());
+            string defaultNickname = "Player";
+            
             PlayerPrefs.SetString(PublicIdKey, newId);
+            PlayerPrefs.SetString(NicknameKey, defaultNickname);
             PlayerPrefs.Save();
             
             if (data != null)
             {
-                data.SetAccount(newId);
+                data.SetAccount(newId, defaultNickname);
             }
             
-            Debug.Log($"[UserAccountManagerScript] New local user account created: {newId}");
+            Debug.Log($"[UserAccountManagerScript] New local user account created: {newId}, Nickname: {defaultNickname}");
         }
         else
         {
             if (data != null)
             {
-                data.SetAccount(existingId);
+                data.SetAccount(existingId, existingNickname);
             }
-            Debug.Log($"[UserAccountManagerScript] Existing user account found: {existingId}");
+            Debug.Log($"[UserAccountManagerScript] Existing user account found: {existingId}, Nickname: {existingNickname}");
         }
     }
 
@@ -107,6 +112,7 @@ public class UserAccountManagerScript : ScriptableObject
                 
                 // Update local storage and data asset
                 PlayerPrefs.SetString(PublicIdKey, publicIdStr);
+                PlayerPrefs.SetString(NicknameKey, response.nickname);
                 PlayerPrefs.Save();
                 
                 if (accountData != null)
