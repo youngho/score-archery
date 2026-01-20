@@ -15,8 +15,7 @@ public class UserAccountManagerScript : ScriptableObject
     [Serializable]
     public class RegisterRequest
     {
-        public string username;
-        public string email;
+        public string nickname;
         public string password;
     }
 
@@ -24,8 +23,7 @@ public class UserAccountManagerScript : ScriptableObject
     public class UserResponse
     {
         public long publicId;
-        public string username;
-        public string email;
+        public string nickname;
         public string createdAt;
     }
 
@@ -77,12 +75,11 @@ public class UserAccountManagerScript : ScriptableObject
         }
     }
 
-    public IEnumerator Register(string username, string email, string password, Action<bool, string> callback)
+    public IEnumerator Register(string nickname, string password, Action<bool, string> callback)
     {
         RegisterRequest requestBody = new RegisterRequest
         {
-            username = username,
-            email = email,
+            nickname = nickname,
             password = password
         };
 
@@ -114,7 +111,7 @@ public class UserAccountManagerScript : ScriptableObject
                 
                 if (accountData != null)
                 {
-                    accountData.SetAccount(publicIdStr, response.username, response.email);
+                    accountData.SetAccount(publicIdStr, response.nickname);
                 }
                 
                 callback?.Invoke(true, "Success");

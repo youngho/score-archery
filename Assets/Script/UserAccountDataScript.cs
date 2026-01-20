@@ -4,25 +4,22 @@ using UnityEngine;
 public class UserAccountDataScript : ScriptableObject
 {
     public string publicId;
-    public string username;
-    public string email;
+    public string nickname;
     public string createdAt;
     
     public bool HasAccount => !string.IsNullOrEmpty(publicId);
 
-    public void SetAccount(string id, string name = "", string mail = "")
+    public void SetAccount(string id, string name = "")
     {
         publicId = id;
-        username = name;
-        email = mail;
+        nickname = name;
         createdAt = System.DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
     }
 
     public void Clear()
     {
         publicId = string.Empty;
-        username = string.Empty;
-        email = string.Empty;
+        nickname = string.Empty;
         createdAt = string.Empty;
     }
 }
