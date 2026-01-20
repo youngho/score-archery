@@ -347,7 +347,7 @@ GameObject:
   - component: {fileID: 614263987}
   - component: {fileID: 614263986}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -799,8 +799,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 614263985}
-  - {fileID: 1325114877}
   - {fileID: 2095812869}
+  - {fileID: 1325114877}
   m_Father: {fileID: 885874654}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -880,7 +880,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -707, y: 80}
   m_SizeDelta: {x: 164, y: 185}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1325114878
@@ -933,7 +933,7 @@ GameObject:
   - component: {fileID: 2095812871}
   - component: {fileID: 2095812870}
   m_Layer: 5
-  m_Name: Image
+  m_Name: StartUiPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
