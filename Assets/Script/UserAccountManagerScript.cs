@@ -56,7 +56,7 @@ public class UserAccountManagerScript : ScriptableObject
         
         if (string.IsNullOrEmpty(existingId))
         {
-            string newId = Guid.NewGuid().ToString();
+            string newId = ToBase62(Guid.NewGuid());
             PlayerPrefs.SetString(UserIdKey, newId);
             PlayerPrefs.Save();
             
@@ -125,5 +125,32 @@ public class UserAccountManagerScript : ScriptableObject
     public string GetUserId()
     {
         return PlayerPrefs.GetString(UserIdKey, string.Empty);
+    }
+
+    private static string ToBase62(Guid guid)
+    {
+        const string alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        byte[] bytes = guid.ToByteArray();
+
+        // Append a zero byte to ensure the BigInteger interprets the value as positive
+        byte[] posBytes = new byte[bytes.Length + 1];
+        Array.Copy(bytes, posBytes, bytes.Length);
+        posBytes[bytes.Length] = 0;
+
+        System.Numerics.BigInteger dividend = new System.Numerics.BigInteger(posBytes);
+        System.Text.StringBuilder builder = new System.Text.StringBuilder();
+
+        if (dividend == 0)
+        {
+            return "0";
+        }
+
+        while (dividend != 0)
+        {
+            dividend = System.Numerics.BigInteger.DivRem(dividend, 62, out System.Numerics.BigInteger remainder);
+            builder.Insert(0, alphabet[(int)remainder]);
+        }
+
+        return builder.ToString();
     }
 }
