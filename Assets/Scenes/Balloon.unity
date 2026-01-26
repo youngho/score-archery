@@ -154,6 +154,9 @@ MonoBehaviour:
   spawnDepth: 30
   minSpeed: 1.5
   maxSpeed: 3.5
+  minHorizontalSpeed: 5
+  maxHorizontalSpeed: 30
+  horizontalDamping: 0.8
   destroyHeight: 30
 --- !u!4 &526347782
 Transform:
