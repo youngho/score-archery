@@ -122,6 +122,9 @@ public class ArcheryGestureManager : MonoBehaviour
     [Tooltip("활을 당기기 시작할 때 재생할 효과음")]
     public AudioClip bowDrawStartSound;
 
+    [Tooltip("활을 놓아 화살을 발사할 때 재생할 효과음")]
+    public AudioClip bowReleaseSound;
+
     [Header("디버그")]
     [Tooltip("제스처 처리 및 조준 프리뷰 관련 로그를 출력할지 여부")]
     public bool showDebugLog = false;
@@ -486,6 +489,9 @@ public class ArcheryGestureManager : MonoBehaviour
                     currentState = GestureState.Released;
 
                     LogDebug($"[ArcheryGestureManager] OnRelease Invoke - distance={data.distance:F1}, velocity={velocity.magnitude:F1}");
+
+                    // 활 발사 효과음 재생
+                    PlayBowReleaseSound();
 
                     OnRelease?.Invoke(data);
                     ShootArrow(data);
@@ -935,6 +941,29 @@ public class ArcheryGestureManager : MonoBehaviour
             if (bowDrawStartSound == null)
             {
                 LogDebug("[ArcheryGestureManager] bowDrawStartSound is null, cannot play sound");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 활을 놓아 화살을 발사할 때 효과음을 재생합니다.
+    /// </summary>
+    private void PlayBowReleaseSound()
+    {
+        if (audioSource != null && bowReleaseSound != null)
+        {
+            audioSource.PlayOneShot(bowReleaseSound);
+            LogDebug("[ArcheryGestureManager] Playing bow release sound");
+        }
+        else
+        {
+            if (audioSource == null)
+            {
+                LogDebug("[ArcheryGestureManager] AudioSource is null, cannot play sound");
+            }
+            if (bowReleaseSound == null)
+            {
+                LogDebug("[ArcheryGestureManager] bowReleaseSound is null, cannot play sound");
             }
         }
     }
