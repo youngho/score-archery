@@ -51,7 +51,16 @@ public class ArcheryGestureManager : MonoBehaviour
             _instance = this;
             DontDestroyOnLoad(gameObject);
 
-            LogDebug("[ArcheryGestureManager] Awake - set as singleton instance");
+            // AudioSource 초기화
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+            }
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0f; // 2D sound
+
+            LogDebug("[ArcheryGestureManager] Awake - set as singleton instance, AudioSource initialized");
         }
         else if (_instance != this)
         {
@@ -109,6 +118,10 @@ public class ArcheryGestureManager : MonoBehaviour
     [Tooltip("제스처가 취소되는 경계 영역 (화면 가장자리)")]
     public float cancelBorderSize = 100f;
 
+    [Header("Audio Settings")]
+    [Tooltip("활을 당기기 시작할 때 재생할 효과음")]
+    public AudioClip bowDrawStartSound;
+
     [Header("디버그")]
     [Tooltip("제스처 처리 및 조준 프리뷰 관련 로그를 출력할지 여부")]
     public bool showDebugLog = false;
@@ -125,6 +138,9 @@ public class ArcheryGestureManager : MonoBehaviour
     private int primaryTouchId = -1;
     private int secondaryTouchId = -1;
     private float drawStartTime;
+
+    // Audio
+    private AudioSource audioSource;
 
     // 3D 조준 프리뷰 관련
     private GameObject previewInstance;
@@ -391,6 +407,9 @@ public class ArcheryGestureManager : MonoBehaviour
 
             LogDebug($"[ArcheryGestureManager] Begin Drawing - primaryId={primaryTouchId}, startPos={drawStartPosition}");
             LogDebug($"[ArcheryGestureManager] OnDrawStart Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}");
+
+            // 활 당기기 시작 효과음 재생
+            PlayBowDrawStartSound();
 
             OnDrawStart?.Invoke(data);
         }
@@ -892,6 +911,31 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             previewInstance.SetActive(false);
             LogDebug("[ArcheryGestureManager] HidePreview - preview disabled");
+        }
+    }
+    #endregion
+
+    #region Audio
+    /// <summary>
+    /// 활 당기기 시작 효과음을 재생합니다.
+    /// </summary>
+    private void PlayBowDrawStartSound()
+    {
+        if (audioSource != null && bowDrawStartSound != null)
+        {
+            audioSource.PlayOneShot(bowDrawStartSound);
+            LogDebug("[ArcheryGestureManager] Playing bow draw start sound");
+        }
+        else
+        {
+            if (audioSource == null)
+            {
+                LogDebug("[ArcheryGestureManager] AudioSource is null, cannot play sound");
+            }
+            if (bowDrawStartSound == null)
+            {
+                LogDebug("[ArcheryGestureManager] bowDrawStartSound is null, cannot play sound");
+            }
         }
     }
     #endregion
