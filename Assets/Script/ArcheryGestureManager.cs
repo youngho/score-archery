@@ -411,9 +411,6 @@ public class ArcheryGestureManager : MonoBehaviour
             LogDebug($"[ArcheryGestureManager] Begin Drawing - primaryId={primaryTouchId}, startPos={drawStartPosition}");
             LogDebug($"[ArcheryGestureManager] OnDrawStart Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}");
 
-            // 활 당기기 시작 효과음 재생
-            PlayBowDrawStartSound();
-
             OnDrawStart?.Invoke(data);
         }
         else if (currentState == GestureState.Drawing && secondaryTouchId == -1)
@@ -710,6 +707,10 @@ public class ArcheryGestureManager : MonoBehaviour
         if (!previewInstance.activeSelf)
         {
             previewInstance.SetActive(true);
+            
+            // 활 당기기 시작 효과음 재생 (프리뷰가 활성화될 때)
+            PlayBowDrawStartSound();
+            
             LogDebug("[ArcheryGestureManager] Show preview (start drawing)");
         }
 

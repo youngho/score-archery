@@ -176,6 +176,7 @@ MonoBehaviour:
   aimAdjustThreshold: 30
   cancelBorderSize: 100
   bowDrawStartSound: {fileID: 8300000, guid: f74637f94b6b84c33b5d612fb75acaad, type: 3}
+  bowReleaseSound: {fileID: 8300000, guid: 97527723d1d014afcb465bb141010346, type: 3}
   showDebugLog: 0
   drawLineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   aimLineColor: {r: 0, g: 1, b: 1, a: 1}
