@@ -40,4 +40,29 @@ public class BalloonBehavior : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // Detect if hit by an arrow
+        if (collision.gameObject.GetComponent<ArcheryArrow>() != null)
+        {
+            Pop();
+        }
+    }
+
+    private void Pop()
+    {
+        // Increment score
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.AddScore(1);
+        }
+
+        // Trigger pop effect (Scale down quickly then destroy)
+        // For a true "pop" effect, one would normally instantiate a particle system here.
+        // For now, we'll just destroy the object.
+        Destroy(gameObject);
+        
+        // Optional: Play sound effect here
+    }
 }
