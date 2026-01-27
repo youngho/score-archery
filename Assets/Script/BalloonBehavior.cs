@@ -84,16 +84,20 @@ public class BalloonBehavior : MonoBehaviour
 
         // 2. Add and configure ParticleSystem
         ParticleSystem ps = explosion.AddComponent<ParticleSystem>();
+        
+        // STOP the system before configuring main properties that require it to be stopped
+        ps.Stop(); 
+
         var main = ps.main;
         var emission = ps.emission;
         var shape = ps.shape;
         var renderer = ps.GetComponent<ParticleSystemRenderer>();
 
         // Main Module
+        main.duration = 1.0f;
         main.startLifetime = 1.0f; // Short duration
         main.startSpeed = new ParticleSystem.MinMaxCurve(5f, 15f); // Fast explosion
         main.startSize = new ParticleSystem.MinMaxCurve(0.1f, 0.3f); // Small fragments
-        main.duration = 1.0f;
         main.loop = false; // One-shot
         main.playOnAwake = false; // We will play manually after setup
 
