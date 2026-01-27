@@ -85,12 +85,28 @@ public class ArcheryArrow : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // 간단하게: 충돌 시 물리 멈추고 잠시 후 제거
+        // Check if we hit a balloon
+        BalloonBehavior balloon = collision.gameObject.GetComponent<BalloonBehavior>();
+        if (balloon != null)
+        {
+            // If hit a balloon, don't stop the arrow.
+            // The balloon will handle its own popping and destruction.
+            if (logDebug)
+            {
+                Debug.Log($"[ArcheryArrow] OnCollisionEnter - Hit balloon {collision.collider.name}, passing through.", this);
+            }
+            return;
+        }
+
+        // Not a balloon -> Hard object collision: stop and stick
         if (rb != null)
         {
             rb.isKinematic = true;
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
+
+            // Stick to the hit object
+            transform.SetParent(collision.transform);
         }
 
         // 충돌 직후 바로 사라지지 않도록 약간의 시간 후 제거
