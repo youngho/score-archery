@@ -34,6 +34,20 @@ public class ArcheryArrow : MonoBehaviour
         }
     }
 
+    [Header("Trail Effect")]
+    [Tooltip("화살 비행 시 궤적(Trail) 표시 여부")]
+    public bool showTrail = true;
+    [Tooltip("궤적 색상")]
+    public Color trailColor = Color.yellow;
+    [Tooltip("궤적 유지 시간")]
+    public float trailTime = 0.5f;
+    [Tooltip("궤적 시작 두께")]
+    public float trailStartWidth = 0.05f;
+    [Tooltip("궤적 끝 두께")]
+    public float trailEndWidth = 0.0f;
+    [Tooltip("사용할 궤적 머티리얼 (없으면 기본 Additive 쉐이더 사용)")]
+    public Material trailMaterial;
+
     private void Start()
     {
         // 일정 시간 후 자동 제거
@@ -47,10 +61,59 @@ public class ArcheryArrow : MonoBehaviour
         initialRotation = transform.rotation;
         hasInitialRotation = true;
 
+        if (showTrail)
+        {
+            SetupTrail();
+        }
+
         if (logDebug)
         {
-            Debug.Log($"[ArcheryArrow] Start - lifeTime={lifeTime}, initialRotation={initialRotation.eulerAngles}", this); // ARCHERY_DEBUG_LOG
+            Debug.Log($"[ArcheryArrow] Start - lifeTime={lifeTime}, initialRotation={initialRotation.eulerAngles}, showTrail={showTrail}", this); // ARCHERY_DEBUG_LOG
         }
+    }
+
+    private void SetupTrail()
+    {
+        TrailRenderer tr = GetComponent<TrailRenderer>();
+        if (tr == null)
+        {
+            tr = gameObject.AddComponent<TrailRenderer>();
+        }
+
+        tr.time = trailTime;
+        tr.startWidth = trailStartWidth;
+        tr.endWidth = trailEndWidth;
+        tr.minVertexDistance = 0.1f; // 부드러운 곡선을 위해
+
+        // 머티리얼 설정
+        if (trailMaterial != null)
+        {
+            tr.material = trailMaterial;
+        }
+        else
+        {
+            // 기본 머티리얼 생성 (Additive 쉐이더 사용으로 빛나는 효과)
+            Shader shader = Shader.Find("Mobile/Particles/Additive");
+            if (shader == null) shader = Shader.Find("Particles/Additive"); // Fallback
+            if (shader == null) shader = Shader.Find("Legacy Shaders/Particles/Additive"); // Double Fallback
+            
+            if (shader != null)
+            {
+                tr.material = new Material(shader);
+            }
+        }
+
+        // 그라디언트 설정 (투명하게 사라지도록)
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] { new GradientColorKey(trailColor, 0.0f), new GradientColorKey(trailColor, 1.0f) },
+            new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) }
+        );
+        tr.colorGradient = gradient;
+
+        // 그림자 끄기
+        tr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        tr.receiveShadows = false;
     }
 
     private void FixedUpdate()
