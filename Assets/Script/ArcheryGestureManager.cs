@@ -807,6 +807,20 @@ public class ArcheryGestureManager : MonoBehaviour
         previewInstance = Instantiate(arrowPrefab);
         previewTransform = previewInstance.transform; // Transform 참조 저장 (성능 최적화)
         
+        // 미리보기 화살에서는 trail 효과 비활성화
+        ArcheryArrow arrowComponent = previewInstance.GetComponent<ArcheryArrow>();
+        if (arrowComponent != null)
+        {
+            arrowComponent.showTrail = false;
+        }
+        
+        // 이미 생성된 TrailRenderer가 있다면 제거
+        TrailRenderer trailRenderer = previewInstance.GetComponent<TrailRenderer>();
+        if (trailRenderer != null)
+        {
+            Destroy(trailRenderer);
+        }
+        
         LogDebug($"[ArcheryGestureManager] EnsurePreviewInstance - instantiated preview");
 
         var renderer = previewInstance.GetComponentInChildren<Renderer>();
