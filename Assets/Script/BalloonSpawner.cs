@@ -51,10 +51,22 @@ public class BalloonSpawner : MonoBehaviour
         
         Vector3 spawnPos = _mainCamera.ViewportToWorldPoint(viewportPos);
 
+        // Check for overlap before spawning
+        if (Physics.CheckSphere(spawnPos, 1.0f)) // 1.0f is approx radius of balloon
+        {
+            // If overlapping, try slightly offsetting or skip
+            // Let's try one alternate position
+             spawnPos += new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+             
+             // Check again, if still overlapping, maybe skip this frame or just let physics resolve it (it will pop apart)
+             // Physics push-out is better than nothing.
+        }
+
         GameObject balloon = Instantiate(balloonPrefab, spawnPos, Quaternion.identity);
         
         // Randomize visual properties
-        balloon.transform.localScale = Vector3.one * Random.Range(0.8f, 1.2f);
+        float scale = Random.Range(1.6f, 2.4f);
+        balloon.transform.localScale = Vector3.one * scale;
         
         Renderer renderer = balloon.GetComponent<Renderer>();
         if (renderer != null)
