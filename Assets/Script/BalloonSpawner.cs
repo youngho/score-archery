@@ -51,18 +51,10 @@ public class BalloonSpawner : MonoBehaviour
         
         Vector3 spawnPos = _mainCamera.ViewportToWorldPoint(viewportPos);
 
-        // Check for overlap before spawning
-        if (Physics.CheckSphere(spawnPos, 1.0f)) // 1.0f is approx radius of balloon
-        {
-            // If overlapping, try slightly offsetting or skip
-            // Let's try one alternate position
-             spawnPos += new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-             
-             // Check again, if still overlapping, maybe skip this frame or just let physics resolve it (it will pop apart)
-             // Physics push-out is better than nothing.
-        }
+        // 기존 풍선들과 겹치는지 확인
+        Vector3 adjustedPos = FindNonOverlappingPosition(spawnPos, isLeft);
 
-        GameObject balloon = Instantiate(balloonPrefab, spawnPos, Quaternion.identity);
+        GameObject balloon = Instantiate(balloonPrefab, adjustedPos, Quaternion.identity);
         
         // Randomize visual properties
         float scale = Random.Range(1.6f, 2.4f);
@@ -89,5 +81,47 @@ public class BalloonSpawner : MonoBehaviour
         behavior.horizontalDamping = horizontalDamping;
 
         behavior.destroyHeight = destroyHeight;
+    }
+
+    /// <summary>
+    /// 기존 풍선들과 겹치지 않는 스폰 위치를 찾음
+    /// </summary>
+    private Vector3 FindNonOverlappingPosition(Vector3 originalPos, bool isLeft)
+    {
+        float checkRadius = 2.0f;  // 풍선 겹침 체크 반경
+        int maxAttempts = 5;       // 최대 시도 횟수
+        
+        Vector3 bestPos = originalPos;
+        
+        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            // 현재 위치에서 다른 풍선과 겹치는지 체크
+            Collider[] overlaps = Physics.OverlapSphere(bestPos, checkRadius);
+            
+            bool hasOverlap = false;
+            foreach (Collider col in overlaps)
+            {
+                if (col.GetComponent<BalloonBehavior>() != null)
+                {
+                    hasOverlap = true;
+                    break;
+                }
+            }
+            
+            // 겹치지 않으면 이 위치 사용
+            if (!hasOverlap)
+            {
+                return bestPos;
+            }
+            
+            // 겹치면 위치 조정 (Y축으로 아래로 이동하여 시간차 효과)
+            bestPos.y -= checkRadius * 0.8f;
+            
+            // X축으로도 약간 조정
+            float xOffset = Random.Range(0.5f, 1.5f);
+            bestPos.x += isLeft ? xOffset : -xOffset;
+        }
+        
+        return bestPos;
     }
 }
