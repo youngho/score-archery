@@ -53,6 +53,10 @@ MonoBehaviour:
   destroyHeight: 10
   driftAmount: 0.5
   driftSpeed: 1
+  popSounds:
+  - {fileID: 8300000, guid: 0a44f5acb30b6460480727147f2a035b, type: 3}
+  - {fileID: 8300000, guid: f3caf3f77708f4196b77530bf2075044, type: 3}
+  - {fileID: 8300000, guid: 47a5503324c7149bb9b1e94015f39b75, type: 3}
 --- !u!135 &-6696619304018998515
 SphereCollider:
   m_ObjectHideFlags: 0

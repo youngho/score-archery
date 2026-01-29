@@ -16,6 +16,10 @@ public class BalloonBehavior : MonoBehaviour
     public float separationForce = 8.0f;       // 점진적 밀어내기 힘
     public float hardPushMultiplier = 2.0f;    // 겹침 시 즉시 밀어내기 배율
 
+    [Header("Sound")]
+    [Tooltip("풍선이 터질 때 랜덤으로 재생할 효과음 (예: balloonpop1, 2, 3)")]
+    public AudioClip[] popSounds;
+
     private float _randomDriftOffset;
     private float _balloonRadius;              // 이 풍선의 반지름 (스케일 기반)
 
@@ -240,9 +244,15 @@ public class BalloonBehavior : MonoBehaviour
         ps.Play();
         Destroy(explosion, main.duration + main.startLifetime.constantMax); // Clean up after effect finishes
 
-        // 4. Destroy this balloon
+        // 4. 효과음 재생 (배열에 있으면 랜덤으로 하나 재생)
+        if (popSounds != null && popSounds.Length > 0)
+        {
+            AudioClip clip = popSounds[Random.Range(0, popSounds.Length)];
+            if (clip != null)
+                AudioSource.PlayClipAtPoint(clip, transform.position, 1.5f); // 볼륨 50% 증가 (1.5배)
+        }
+
+        // 5. Destroy this balloon
         Destroy(gameObject);
-        
-        // Optional: Play sound effect here
     }
 }
