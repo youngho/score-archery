@@ -201,22 +201,17 @@ public class BalloonBehavior : MonoBehaviour
         main.loop = false; // One-shot
         main.playOnAwake = false; // We will play manually after setup
 
-        // Color - Match the balloon's color
-        Renderer balloonRenderer = GetComponent<Renderer>();
-        if (balloonRenderer != null)
+        // Color - Dark red for burst particles
+        Color particleColor = Color.red;
+        main.startColor = particleColor;
+
+        Shader shader = Shader.Find("Particles/Standard Unlit");
+        if (shader == null) shader = Shader.Find("Mobile/Particles/Alpha Blended");
+        if (shader != null)
         {
-            main.startColor = balloonRenderer.material.color;
-            
-            // Set material to Default-Particle (or Additive if available for glow)
-            // Trying to find a standard particle material
-            Shader shader = Shader.Find("Particles/Standard Unlit");
-            if (shader == null) shader = Shader.Find("Mobile/Particles/Alpha Blended");
-            if (shader != null)
-            {
-                Material particleMat = new Material(shader);
-                particleMat.color = balloonRenderer.material.color; // tint
-                renderer.material = particleMat;
-            }
+            Material particleMat = new Material(shader);
+            particleMat.color = particleColor;
+            renderer.material = particleMat;
         }
 
         // Emission Module - Burst!
