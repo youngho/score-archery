@@ -26,6 +26,10 @@ public class StageResultBackgroundAnimator : MonoBehaviour
     [Tooltip("캔버스 기준 세로 범위 (시작 위치 계산용)")]
     public float referenceHeight = 1080f;
 
+    [Header("Sound")]
+    [Tooltip("위/아래 배경이 붙을 때 재생할 효과음 (StageResult-Background-close)")]
+    public AudioClip closeSound;
+
     private Vector2 _startPosUp, _startPosDown;
     private Vector2 _meetPosUp, _meetPosDown;
     private Vector2 _bouncePosUp, _bouncePosDown;
@@ -70,6 +74,10 @@ public class StageResultBackgroundAnimator : MonoBehaviour
         }
         panelUp.anchoredPosition = _meetPosUp;
         panelDown.anchoredPosition = _meetPosDown;
+        // 위/아래 배경이 붙을 때 효과음 재생
+        if (closeSound != null)
+            AudioSource.PlayClipAtPoint(closeSound, Camera.main != null ? Camera.main.transform.position : Vector3.zero, 1f);
+
 
         // 2. 튕김: 잠시 벌어졌다가
         t = 0f;
