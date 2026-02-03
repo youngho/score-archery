@@ -34,11 +34,20 @@ public class BalloonTimer : MonoBehaviour
         {
             _remainingSeconds = 0f;
             UpdateDisplay();
-            LoadMenuScene();
+            RecordScoreAndLoadMenu();
             return;
         }
 
         UpdateDisplay();
+    }
+
+    /// <summary>
+    /// API에 점수 기록 후 메뉴 씬 로드
+    /// </summary>
+    private void RecordScoreAndLoadMenu()
+    {
+        var recorder = GetComponent<StageScoreApiService>() ?? gameObject.AddComponent<StageScoreApiService>();
+        recorder.RecordCurrentStageAndThen(LoadMenuScene);
     }
 
     private void CreateTimerUI()

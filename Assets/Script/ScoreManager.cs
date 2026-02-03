@@ -10,6 +10,11 @@ public class ScoreManager : MonoBehaviour
 
     private int _currentScore = 0;
 
+    /// <summary>
+    /// 현재 점수 (스테이지 종료 시 API 기록용)
+    /// </summary>
+    public int CurrentScore => _currentScore;
+
     private void Awake()
     {
         if (Instance == null)
