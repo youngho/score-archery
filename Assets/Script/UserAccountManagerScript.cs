@@ -9,7 +9,7 @@ public class UserAccountManagerScript : ScriptableObject
     private const string PublicIdKey = "UserAccountPublicId";
     private const string NicknameKey = "UserAccountNickname";
     private const string ManagerPath = "UserAccountManagerScript";
-    private const string ApiBaseUrl = "http://localhost:8081/api/users"; // Adjust if necessary
+    private const string ApiBaseUrl = "http://158.179.161.203:8080/api/users"; // Adjust if necessary
 
     [SerializeField] private UserAccountDataScript accountData;
 
