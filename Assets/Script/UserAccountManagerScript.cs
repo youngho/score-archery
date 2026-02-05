@@ -9,8 +9,8 @@ public class UserAccountManagerScript : ScriptableObject
     private const string PublicIdKey = "UserAccountPublicId";
     private const string NicknameKey = "UserAccountNickname";
     private const string ManagerPath = "UserAccountManagerScript";
-    // private const string ApiBaseUrl = "http://158.179.161.203:8080/score/api/users"; // Adjust if necessary
-    private const string ApiBaseUrl = "http://localhost:8081/api/users"; // Adjust if necessary
+    private const string ApiBaseUrl = "http://158.179.161.203:8080/score/api/users"; // Adjust if necessary
+    // private const string ApiBaseUrl = "http://localhost:8081/api/users"; // Adjust if necessary
 
     [SerializeField] private UserAccountDataScript accountData;
 
@@ -18,13 +18,13 @@ public class UserAccountManagerScript : ScriptableObject
     public class RegisterRequest
     {
         public string nickname;
-        public string password;
+        public string publicId;
     }
 
     [Serializable]
     public class UserResponse
     {
-        public long publicId;
+        public string publicId;
         public string nickname;
         public string createdAt;
     }
@@ -62,9 +62,10 @@ public class UserAccountManagerScript : ScriptableObject
 
         Instance = manager;
         manager.Initialize();
+        
     }
 
-    public string Nickname => accountData != null ? accountData.nickname : PlayerPrefs.GetString(NicknameKey, "Player");
+    public string Nickname => accountData != null ? accountData.nickname : PlayerPrefs.GetString(NicknameKey);
 
     public void Initialize()
     {
@@ -75,50 +76,73 @@ public class UserAccountManagerScript : ScriptableObject
             _coroutineRunner = runnerGo.AddComponent<CoroutineRunner>();
         }
 
+        // 1) PlayerPrefs에서 저장된 사용자 정보 로드
+        LoadUserInfoFromPlayerPrefs();
+
         _coroutineRunner.StartCoroutine(AutoLoginOrRegister());
     }
 
+    /// <summary>
+    /// PlayerPrefs에 저장된 사용자 정보(publicId, nickname)를 불러와 메모리/accountData에 반영합니다.
+    /// </summary>
+    private void LoadUserInfoFromPlayerPrefs()
+    {
+        string publicId = PlayerPrefs.GetString(PublicIdKey, string.Empty);
+        string nickname = PlayerPrefs.GetString(NicknameKey, string.Empty);
+
+        if (!string.IsNullOrEmpty(publicId))
+        {
+            if (accountData != null)
+                accountData.SetAccount(publicId, nickname);
+            Debug.Log($"[UserAccountManagerScript] Loaded user from PlayerPrefs: {publicId} ({nickname})");
+        }
+    }
+
+    /// <summary>
+    /// 1) 저장된 사용자 정보로 로그인 시도 → 2) 실패 시 새로 등록 → 3) 성공 시 사용자 정보를 PlayerPrefs에 저장
+    /// </summary>
     private IEnumerator AutoLoginOrRegister()
     {
         string existingId = PlayerPrefs.GetString(PublicIdKey, string.Empty);
-        
+
+        // 저장된 ID가 있으면 로그인 시도
         if (!string.IsNullOrEmpty(existingId))
         {
             Debug.Log($"[UserAccountManagerScript] Found existing Public ID: {existingId}. Attempting Login...");
             bool loginSuccess = false;
-            yield return Login(existingId, (success, message) => 
+            yield return Login(existingId, (success, message) =>
             {
                 loginSuccess = success;
                 if (!success)
-                {
                     Debug.LogWarning($"[UserAccountManagerScript] Login failed: {message}. Proceeding to Register new account.");
-                }
             });
 
             if (loginSuccess)
             {
-                yield break; // Login successful, stop here
+                // 로그인 성공 시 서버에서 받은 정보로 PlayerPrefs 갱신 (UpdateLocalAccount에서 이미 저장됨)
+                yield break;
             }
         }
 
-        // If no ID or Login failed, Register
+        // ID 없음 또는 로그인 실패 → 새 사용자 등록
         Debug.Log("[UserAccountManagerScript] No valid account (or login failed). Registering new user...");
-        
-        // Generate random nickname for initial registration
         string defaultNickname = "Player_" + UnityEngine.Random.Range(1000, 9999);
-        string defaultPassword = Guid.NewGuid().ToString(); // Simple password generation
+        string publicId = ToBase62(Guid.NewGuid());
 
-        yield return Register(defaultNickname, defaultPassword, (success, msg) => 
+        yield return Register(defaultNickname, publicId, (success, msg) =>
         {
-             if (success)
-             {
-                 Debug.Log($"[UserAccountManagerScript] Auto-registration successful. Nickname: {defaultNickname}");
-             }
-             else
-             {
-                 Debug.LogError($"[UserAccountManagerScript] Auto-registration failed: {msg}");
-             }
+            if (success)
+            {
+                Debug.Log($"[UserAccountManagerScript] Auto-registration successful. Nickname: {defaultNickname}");
+                UpdateLocalAccount(publicId, defaultNickname);
+            }
+            else
+            {
+                Debug.LogError($"[UserAccountManagerScript] Auto-registration failed: {msg}");
+            }
         });
+
+        // 등록 성공 시 Register() 내부에서 UpdateLocalAccount()로 이미 PlayerPrefs에 저장됨
     }
 
     public IEnumerator Login(string publicId, Action<bool, string> callback)
@@ -141,7 +165,7 @@ public class UserAccountManagerScript : ScriptableObject
                     Debug.Log($"[UserAccountManagerScript] Login successful for: {response.nickname} ({response.publicId})");
                     
                     // Update local state
-                    UpdateLocalAccount(response.publicId.ToString(), response.nickname);
+                    UpdateLocalAccount(response.publicId, response.nickname);
                     
                     callback?.Invoke(true, "Success");
                 }
@@ -154,24 +178,25 @@ public class UserAccountManagerScript : ScriptableObject
         }
     }
 
+    /// <summary>
+    /// 로그인/등록 성공 시 사용자 정보를 PlayerPrefs에 저장하고 accountData를 갱신합니다.
+    /// </summary>
     private void UpdateLocalAccount(string publicId, string nickname)
     {
         PlayerPrefs.SetString(PublicIdKey, publicId);
         PlayerPrefs.SetString(NicknameKey, nickname);
         PlayerPrefs.Save();
-        
+
         if (accountData != null)
-        {
             accountData.SetAccount(publicId, nickname);
-        }
     }
 
-    public IEnumerator Register(string nickname, string password, Action<bool, string> callback)
+    public IEnumerator Register(string nickname, string publicId, Action<bool, string> callback)
     {
         RegisterRequest requestBody = new RegisterRequest
         {
             nickname = nickname,
-            password = password
+            publicId = publicId
         };
 
         string json = JsonUtility.ToJson(requestBody);
@@ -249,6 +274,33 @@ public class UserAccountManagerScript : ScriptableObject
     public string GetPublicId()
     {
         return PlayerPrefs.GetString(PublicIdKey, string.Empty);
+    }
+
+    private static string ToBase62(Guid guid)
+    {
+        const string alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        byte[] bytes = guid.ToByteArray();
+
+        // Append a zero byte to ensure the BigInteger interprets the value as positive
+        byte[] posBytes = new byte[bytes.Length + 1];
+        Array.Copy(bytes, posBytes, bytes.Length);
+        posBytes[bytes.Length] = 0;
+
+        System.Numerics.BigInteger dividend = new System.Numerics.BigInteger(posBytes);
+        System.Text.StringBuilder builder = new System.Text.StringBuilder();
+
+        if (dividend == 0)
+        {
+            return "0";
+        }
+
+        while (dividend != 0)
+        {
+            dividend = System.Numerics.BigInteger.DivRem(dividend, 62, out System.Numerics.BigInteger remainder);
+            builder.Insert(0, alphabet[(int)remainder]);
+        }
+
+        return builder.ToString();
     }
 
 
