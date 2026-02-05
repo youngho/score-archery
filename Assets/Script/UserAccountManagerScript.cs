@@ -9,7 +9,8 @@ public class UserAccountManagerScript : ScriptableObject
     private const string PublicIdKey = "UserAccountPublicId";
     private const string NicknameKey = "UserAccountNickname";
     private const string ManagerPath = "UserAccountManagerScript";
-    private const string ApiBaseUrl = "http://158.179.161.203:8080/api/users"; // Adjust if necessary
+    // private const string ApiBaseUrl = "http://158.179.161.203:8080/score/api/users"; // Adjust if necessary
+    private const string ApiBaseUrl = "http://localhost:8081/api/users"; // Adjust if necessary
 
     [SerializeField] private UserAccountDataScript accountData;
 
@@ -42,7 +43,10 @@ public class UserAccountManagerScript : ScriptableObject
         // Add other fields if necessary based on API, but these are sufficient for updating local state
     }
 
+    private class CoroutineRunner : MonoBehaviour { }
+
     public static UserAccountManagerScript Instance { get; private set; }
+    private CoroutineRunner _coroutineRunner;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void InitializeOnLoad()
@@ -52,8 +56,7 @@ public class UserAccountManagerScript : ScriptableObject
         UserAccountManagerScript manager = Resources.Load<UserAccountManagerScript>(ManagerPath);
         if (manager == null)
         {
-            Debug.LogWarning("[UserAccountManagerScript] Manager asset not found in Resources. Creating account via PlayerPrefs fallback.");
-            CheckAndCreateAccount(null);
+            Debug.LogWarning("[UserAccountManagerScript] Manager asset not found in Resources.");
             return;
         }
 
@@ -65,37 +68,101 @@ public class UserAccountManagerScript : ScriptableObject
 
     public void Initialize()
     {
-        CheckAndCreateAccount(accountData);
+        if (_coroutineRunner == null)
+        {
+            GameObject runnerGo = new GameObject("UserAccountCoroutineRunner");
+            GameObject.DontDestroyOnLoad(runnerGo);
+            _coroutineRunner = runnerGo.AddComponent<CoroutineRunner>();
+        }
+
+        _coroutineRunner.StartCoroutine(AutoLoginOrRegister());
     }
 
-    public static void CheckAndCreateAccount(UserAccountDataScript data)
+    private IEnumerator AutoLoginOrRegister()
     {
         string existingId = PlayerPrefs.GetString(PublicIdKey, string.Empty);
-        string existingNickname = PlayerPrefs.GetString(NicknameKey, "Player");
         
-        if (string.IsNullOrEmpty(existingId))
+        if (!string.IsNullOrEmpty(existingId))
         {
-            string newId = ToBase62(Guid.NewGuid());
-            string defaultNickname = "Player";
-            
-            PlayerPrefs.SetString(PublicIdKey, newId);
-            PlayerPrefs.SetString(NicknameKey, defaultNickname);
-            PlayerPrefs.Save();
-            
-            if (data != null)
+            Debug.Log($"[UserAccountManagerScript] Found existing Public ID: {existingId}. Attempting Login...");
+            bool loginSuccess = false;
+            yield return Login(existingId, (success, message) => 
             {
-                data.SetAccount(newId, defaultNickname);
+                loginSuccess = success;
+                if (!success)
+                {
+                    Debug.LogWarning($"[UserAccountManagerScript] Login failed: {message}. Proceeding to Register new account.");
+                }
+            });
+
+            if (loginSuccess)
+            {
+                yield break; // Login successful, stop here
             }
-            
-            Debug.Log($"[UserAccountManagerScript] New local user account created: {newId}, Nickname: {defaultNickname}");
         }
-        else
+
+        // If no ID or Login failed, Register
+        Debug.Log("[UserAccountManagerScript] No valid account (or login failed). Registering new user...");
+        
+        // Generate random nickname for initial registration
+        string defaultNickname = "Player_" + UnityEngine.Random.Range(1000, 9999);
+        string defaultPassword = Guid.NewGuid().ToString(); // Simple password generation
+
+        yield return Register(defaultNickname, defaultPassword, (success, msg) => 
         {
-            if (data != null)
+             if (success)
+             {
+                 Debug.Log($"[UserAccountManagerScript] Auto-registration successful. Nickname: {defaultNickname}");
+             }
+             else
+             {
+                 Debug.LogError($"[UserAccountManagerScript] Auto-registration failed: {msg}");
+             }
+        });
+    }
+
+    public IEnumerator Login(string publicId, Action<bool, string> callback)
+    {
+        string url = $"{ApiBaseUrl}/{publicId}";
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                data.SetAccount(existingId, existingNickname);
+                 // Could be 404 if user deleted, or network error
+                 callback?.Invoke(false, request.error);
             }
-            Debug.Log($"[UserAccountManagerScript] Existing user account found: {existingId}, Nickname: {existingNickname}");
+            else
+            {
+                try 
+                {
+                    UserResponse response = JsonUtility.FromJson<UserResponse>(request.downloadHandler.text);
+                    Debug.Log($"[UserAccountManagerScript] Login successful for: {response.nickname} ({response.publicId})");
+                    
+                    // Update local state
+                    UpdateLocalAccount(response.publicId.ToString(), response.nickname);
+                    
+                    callback?.Invoke(true, "Success");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[UserAccountManagerScript] Failed to parse login response: {e.Message}");
+                    callback?.Invoke(false, "Parse Error");
+                }
+            }
+        }
+    }
+
+    private void UpdateLocalAccount(string publicId, string nickname)
+    {
+        PlayerPrefs.SetString(PublicIdKey, publicId);
+        PlayerPrefs.SetString(NicknameKey, nickname);
+        PlayerPrefs.Save();
+        
+        if (accountData != null)
+        {
+            accountData.SetAccount(publicId, nickname);
         }
     }
 
@@ -129,15 +196,7 @@ public class UserAccountManagerScript : ScriptableObject
                 string publicIdStr = response.publicId.ToString();
                 Debug.Log($"[UserAccountManagerScript] User registered successfully: {publicIdStr}");
                 
-                // Update local storage and data asset
-                PlayerPrefs.SetString(PublicIdKey, publicIdStr);
-                PlayerPrefs.SetString(NicknameKey, response.nickname);
-                PlayerPrefs.Save();
-                
-                if (accountData != null)
-                {
-                    accountData.SetAccount(publicIdStr, response.nickname);
-                }
+                UpdateLocalAccount(publicIdStr, response.nickname);
                 
                 callback?.Invoke(true, "Success");
             }
@@ -180,14 +239,7 @@ public class UserAccountManagerScript : ScriptableObject
                 ChangeNicknameResponse response = JsonUtility.FromJson<ChangeNicknameResponse>(request.downloadHandler.text);
                 Debug.Log($"[UserAccountManagerScript] Nickname changed successfully: {response.nickname}");
 
-                // Update local storage and data asset
-                PlayerPrefs.SetString(NicknameKey, response.nickname);
-                PlayerPrefs.Save();
-
-                if (accountData != null)
-                {
-                    accountData.SetAccount(publicId, response.nickname);
-                }
+                UpdateLocalAccount(publicId, response.nickname);
 
                 callback?.Invoke(true, response.nickname);
             }
@@ -199,30 +251,5 @@ public class UserAccountManagerScript : ScriptableObject
         return PlayerPrefs.GetString(PublicIdKey, string.Empty);
     }
 
-    private static string ToBase62(Guid guid)
-    {
-        const string alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        byte[] bytes = guid.ToByteArray();
 
-        // Append a zero byte to ensure the BigInteger interprets the value as positive
-        byte[] posBytes = new byte[bytes.Length + 1];
-        Array.Copy(bytes, posBytes, bytes.Length);
-        posBytes[bytes.Length] = 0;
-
-        System.Numerics.BigInteger dividend = new System.Numerics.BigInteger(posBytes);
-        System.Text.StringBuilder builder = new System.Text.StringBuilder();
-
-        if (dividend == 0)
-        {
-            return "0";
-        }
-
-        while (dividend != 0)
-        {
-            dividend = System.Numerics.BigInteger.DivRem(dividend, 62, out System.Numerics.BigInteger remainder);
-            builder.Insert(0, alphabet[(int)remainder]);
-        }
-
-        return builder.ToString();
-    }
 }
