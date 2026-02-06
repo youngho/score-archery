@@ -28,4 +28,14 @@ public class NicknameDisplay : MonoBehaviour
              Debug.LogWarning("UserAccountManagerScript Instance is null or Text component missing.");
         }
     }
+
+    /// <summary>
+    /// 닉네임 변경 후 StartPanel 표시를 갱신할 때 호출합니다.
+    /// </summary>
+    public void RefreshNickname()
+    {
+        if (nicknameText == null)
+            nicknameText = GetComponent<TextMeshProUGUI>();
+        UpdateNickname();
+    }
 }

@@ -91,6 +91,13 @@ public class NicknamePopupController : MonoBehaviour
         }
     }
 
+    private void RefreshStartPanelNickname()
+    {
+        NicknameDisplay display = FindFirstObjectByType<NicknameDisplay>();
+        if (display != null)
+            display.RefreshNickname();
+    }
+
     private void OnConfirmNicknameChange()
     {
         if (nicknameInputField == null || string.IsNullOrEmpty(nicknameInputField.text))
@@ -119,6 +126,7 @@ public class NicknamePopupController : MonoBehaviour
             if (success)
             {
                 Debug.Log($"[NicknamePopupController] Nickname changed to: {message}");
+                RefreshStartPanelNickname();
                 HidePopup();
             }
             else
