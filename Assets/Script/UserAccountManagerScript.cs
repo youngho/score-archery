@@ -251,6 +251,7 @@ public class UserAccountManagerScript : ScriptableObject
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
+            //request.timeout = 5; // Set 5 seconds timeout
 
             yield return request.SendWebRequest();
 
