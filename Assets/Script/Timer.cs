@@ -18,27 +18,6 @@ public class Timer : MonoBehaviour
     [Range(0, 59)]
     public int seconds;
     
-    public enum CountMethod
-    {
-        CountDown,
-        CountUp
-    };
-    
-    public enum SeperatorType
-    {
-        Colon,
-        Bullet,
-        Slash
-    };
-    public enum OutputType
-    {
-        None,
-        StandardText,
-        TMPro,
-        HorizontalSlider,
-        Dial
-    };
-
     [Tooltip("If checked, runs the timer on play")]
     public bool startAtRuntime = true;
 
@@ -49,11 +28,6 @@ public class Timer : MonoBehaviour
 
     [Space]
     
-    [Tooltip("Select to count up or down")]
-    public CountMethod countMethod;
-
-    [Tooltip("Select the output type")]
-    public OutputType outputType;
     public Text standardText;
     public TextMeshProUGUI textMeshProText;
     public Slider standardSlider;
@@ -92,34 +66,20 @@ public class Timer : MonoBehaviour
         {
             dialSlider = GetComponent<Image>();
         }
+        
         if(dialSlider)
         {
             _originalColor = dialSlider.color;
+            dialSlider.fillAmount = 1f;
         }
+
         if(standardSlider)
         {
             standardSlider.maxValue = ReturnTotalSeconds();
-            if(countMethod == CountMethod.CountDown)
-            {
-                standardSlider.value = standardSlider.maxValue;
-            }
-            else
-            {
-                standardSlider.value = standardSlider.minValue;
-            }
-        }
-        if(dialSlider)
-        {
-            if (countMethod == CountMethod.CountDown)
-            {
-                dialSlider.fillAmount = 1f;
-            }
-            else
-            {
-                dialSlider.fillAmount = 0f;
-            }
+            standardSlider.value = standardSlider.maxValue;
         }
     }
+
     void Start()
     {
         if(startAtRuntime)
@@ -128,57 +88,30 @@ public class Timer : MonoBehaviour
         }
         else
         {
-            if(countMethod == CountMethod.CountDown)
+            float total = ReturnTotalSeconds();
+            if(standardText)
             {
-                if(standardText)
-                {
-                    standardText.text = DisplayFormattedTime(ReturnTotalSeconds());
-                }
-                if(textMeshProText)
-                {
-                    textMeshProText.text = DisplayFormattedTime(ReturnTotalSeconds());
-                }
+                standardText.text = DisplayFormattedTime(total);
             }
-            else
+            if(textMeshProText)
             {
-                if (standardText)
-                {
-                    standardText.text = DisplayFormattedTime(0);
-                }
-                if (textMeshProText)
-                {
-                    textMeshProText.text = DisplayFormattedTime(0);
-                }
+                textMeshProText.text = DisplayFormattedTime(total);
             }
         }
     }
+
     void Update()
     {
         if(timerRunning)
         {
-            if(countMethod == CountMethod.CountDown)
+            CountDown();
+            if(standardSlider)
             {
-                CountDown();
-                if(standardSlider)
-                {
-                    StandardSliderDown();
-                }
-                if(dialSlider)
-                {
-                    DialSliderDown();
-                }
+                StandardSliderDown();
             }
-            else
+            if(dialSlider)
             {
-                CountUp();
-                if (standardSlider)
-                {
-                    StandardSliderUp();
-                }
-                if(dialSlider)
-                {
-                    DialSliderUp();
-                }
+                DialSliderDown();
             }
         }
     }
@@ -192,7 +125,7 @@ public class Timer : MonoBehaviour
         {
             timeRemaining -= Time.deltaTime;
             
-            if (timeRemaining <= 5.0 && countMethod == CountMethod.CountDown)
+            if (timeRemaining <= 5.0)
             {
                 if (dialSlider)
                 {
@@ -218,22 +151,6 @@ public class Timer : MonoBehaviour
         }
     }
 
-    private void CountUp()
-    {
-        if (timeRemaining < ReturnTotalSeconds())
-        {
-            timeRemaining += Time.deltaTime;
-            DisplayInTextObject();
-        }
-        else
-        {
-            //Timer has ended from counting upwards
-            onTimerEnd.Invoke();
-            timeRemaining = ReturnTotalSeconds();
-            DisplayInTextObject();
-            timerRunning = false;
-        }
-    }
     private void StandardSliderDown()
     {
         if(standardSlider.value > standardSlider.minValue)
@@ -241,23 +158,17 @@ public class Timer : MonoBehaviour
             standardSlider.value -= Time.deltaTime;
         }
     }
-    private void StandardSliderUp()
-    {
-        if (standardSlider.value < standardSlider.maxValue)
-        {
-            standardSlider.value += Time.deltaTime;
-        }
-    }
+
     private void DialSliderDown()
     {
-        float timeRangeClamped = Mathf.InverseLerp(ReturnTotalSeconds(), 0, (float)timeRemaining);
-        dialSlider.fillAmount = Mathf.Lerp(1, 0, timeRangeClamped);
+        float total = ReturnTotalSeconds();
+        if (total > 0)
+        {
+            float timeRangeClamped = Mathf.InverseLerp(total, 0, (float)timeRemaining);
+            dialSlider.fillAmount = Mathf.Lerp(1, 0, timeRangeClamped);
+        }
     }
-    private void DialSliderUp()
-    {
-        float timeRangeClamped = Mathf.InverseLerp(0, ReturnTotalSeconds(), (float)timeRemaining);
-        dialSlider.fillAmount = Mathf.Lerp(0, 1, timeRangeClamped);
-    }
+
     private void DisplayInTextObject()
     {
         if (standardText)
@@ -274,30 +185,16 @@ public class Timer : MonoBehaviour
     {
         return timeRemaining;
     }
+
     public void StartTimer()
     {
         if (!timerRunning && !timerPaused)
         {
             ResetTimer();
             timerRunning = true;
-            if (countMethod == CountMethod.CountDown)
-            {
-                ConvertToTotalSeconds(hours, minutes, seconds);
-            }
-            else
-            {
-                StartTimerCustom(0);
-            }
         }
     }
-    private void StartTimerCustom(double timeToSet)
-    {
-        if(!timerRunning && !timerPaused)
-        {
-            timeRemaining = timeToSet;
-            timerRunning = true;
-        }
-    }
+
     public void StopTimer()
     {
         timerRunning = false;
@@ -307,38 +204,17 @@ public class Timer : MonoBehaviour
     private void ResetTimer()
     {
         timerPaused = false;
-        
-        if (countMethod == CountMethod.CountDown)
+        timeRemaining = ReturnTotalSeconds();
+        DisplayInTextObject();
+
+        if(standardSlider)
         {
-            timeRemaining = ReturnTotalSeconds();
-            DisplayInTextObject();
-            if(standardSlider)
-            {
-                standardSlider.maxValue = ReturnTotalSeconds();
-                standardSlider.value = standardSlider.maxValue;
-            }
-            if(dialSlider)
-            {
-                dialSlider.fillAmount = 1f;
-            }
+            standardSlider.maxValue = (float)timeRemaining;
+            standardSlider.value = standardSlider.maxValue;
         }
-        else
+        if(dialSlider)
         {
-            timeRemaining = 0;
-            DisplayInTextObject();
-            if (standardSlider)
-            {
-                standardSlider.maxValue = ReturnTotalSeconds();
-                standardSlider.value = standardSlider.minValue;
-            }
-            if (dialSlider)
-            {
-                dialSlider.fillAmount = 0f;
-            }
-        }
-        
-        if (dialSlider)
-        {
+            dialSlider.fillAmount = 1f;
             dialSlider.color = _originalColor;
         }
         _hasPlayedWarningSound = false;
@@ -353,27 +229,17 @@ public class Timer : MonoBehaviour
         return totalTimeSet;
     }
    
-    public double ConvertToTotalSeconds(float hours, float minutes, float seconds)
-    {
-        timeRemaining = hours * 60 * 60;
-        timeRemaining += minutes * 60;
-        timeRemaining += seconds;
-
-        DisplayFormattedTime(timeRemaining);
-        return timeRemaining;
-    }
     public string DisplayFormattedTime(double remainingSeconds)
     {
         string convertedNumber;
-        float hours, minutes, seconds;
-        RemainingSecondsToHHMMSSMMM(remainingSeconds, out hours, out minutes, out seconds);
+        float h, m, s;
+        RemainingSecondsToHHMMSSMMM(remainingSeconds, out h, out m, out s);
 
         string HoursFormat()
         {
             if (hoursDisplay)
             {
-                string hoursFormatted;
-                hoursFormatted = string.Format("{0:00}", hours);
+                string hoursFormatted = string.Format("{0:00}", h);
                 if (minutesDisplay || secondsDisplay)
                     hoursFormatted += ":";
                 return hoursFormatted;
@@ -384,8 +250,7 @@ public class Timer : MonoBehaviour
         {
             if (minutesDisplay)
             {
-                string minutesFormatted;
-                minutesFormatted = string.Format("{0:00}", minutes);
+                string minutesFormatted = string.Format("{0:00}", m);
                 if (secondsDisplay)
                     minutesFormatted += ":";
                 return minutesFormatted;
@@ -396,27 +261,24 @@ public class Timer : MonoBehaviour
         {
             if (secondsDisplay)
             {
-                string secondsFormatted; 
-                secondsFormatted = string.Format("{0:00}", seconds);              
-                return secondsFormatted;
+                return string.Format("{0:00}", s);
             }
             return null;
         }
         
-
         convertedNumber = HoursFormat() + MinutesFormat() + SecondsFormat();
-
         return convertedNumber;
     }
 
     private static void RemainingSecondsToHHMMSSMMM(double totalSeconds, out float hours, out float minutes, out float seconds)
     {
-        hours = Mathf.FloorToInt((float)totalSeconds / 60 / 60);
-        minutes = Mathf.FloorToInt(((float)totalSeconds / 60) - ((float)hours * 60));
-        seconds = Mathf.FloorToInt((float)totalSeconds - ((float)hours * 60 * 60) - ((float)minutes * 60));
+        hours = Mathf.FloorToInt((float)totalSeconds / 3600);
+        minutes = Mathf.FloorToInt(((float)totalSeconds % 3600) / 60);
+        seconds = Mathf.FloorToInt((float)totalSeconds % 60);
     }
+
     private void OnValidate()
     {
-        timeRemaining = ConvertToTotalSeconds(hours, minutes, seconds);
+        timeRemaining = ReturnTotalSeconds();
     }
 }

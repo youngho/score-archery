@@ -884,13 +884,13 @@ MonoBehaviour:
   hoursDisplay: 0
   minutesDisplay: 0
   secondsDisplay: 1
-  countMethod: 0
-  outputType: 1
   standardText: {fileID: 642712699}
   textMeshProText: {fileID: 0}
   standardSlider: {fileID: 0}
   dialSlider: {fileID: 792417631}
   timeRemaining: 9
+  warningColor: {r: 1, g: 0, b: 0, a: 1}
+  countDownSound: {fileID: 8300000, guid: 70014389074e9495db8a8142399628ce, type: 3}
 --- !u!224 &931674204
 RectTransform:
   m_ObjectHideFlags: 0
