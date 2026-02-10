@@ -244,8 +244,8 @@ MonoBehaviour:
   minDrawDistance: 50
   maxDrawDistance: 300
   aimAdjustThreshold: 30
-  cancelBorderSize: 120
-  bowDrawStartSound: {fileID: 8300000, guid: f74637f94b6b84c33b5d612fb75acaad, type: 3}
+  cancelBorderSize: 140
+  bowDrawStartSound: {fileID: 0}
   bowReleaseSound: {fileID: 8300000, guid: 97527723d1d014afcb465bb141010346, type: 3}
   showDebugLog: 0
   drawLineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
@@ -542,7 +542,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -400, y: 938}
+  m_AnchoredPosition: {x: -400, y: 879.3}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &220000024
@@ -599,8 +599,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
@@ -744,8 +744,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
@@ -889,21 +889,11 @@ MonoBehaviour:
   onTimerEnd:
     m_PersistentCalls:
       m_Calls: []
-  hours: 0
-  minutes: 0
-  seconds: 30
   startAtRuntime: 1
-  hoursDisplay: 0
-  minutesDisplay: 1
-  secondsDisplay: 1
-  standardText: {fileID: 0}
-  textMeshProText: {fileID: 642712702}
-  standardSlider: {fileID: 0}
   dialSlider: {fileID: 792417631}
-  timeRemaining: 30
   warningColor: {r: 1, g: 0, b: 0, a: 1}
-  countDownSound: {fileID: 0}
-  startSeconds: 9
+  countDownSound: {fileID: 8300000, guid: 70014389074e9495db8a8142399628ce, type: 3}
+  startSeconds: 60
   menuSceneName: 00StartUI
   _timerText: {fileID: 642712702}
 --- !u!224 &931674204
@@ -925,7 +915,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -124.47296, y: 777.5271}
+  m_AnchoredPosition: {x: -124.47296, y: 726.9}
   m_SizeDelta: {x: 433.8918, y: 433.8918}
   m_Pivot: {x: 0, y: 0}
 --- !u!1001 &1069148407
@@ -983,6 +973,10 @@ PrefabInstance:
     - target: {fileID: 2088352481340939160, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
       propertyPath: seconds
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 2088352481340939160, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
+      propertyPath: startSeconds
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 2088352481340939160, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
       propertyPath: timeRemaining
@@ -1086,7 +1080,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8882726665517792976, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 777.5271
+      value: 726.9
       objectReference: {fileID: 0}
     - target: {fileID: 8882726665517792976, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

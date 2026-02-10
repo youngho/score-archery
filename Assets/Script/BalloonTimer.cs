@@ -10,15 +10,9 @@ using UnityEngine.SceneManagement;
 public class Timer : MonoBehaviour
 {
     public UnityEvent onTimerEnd;
-
-    [Range(0, 59)]
-    public int seconds;
     
     [Tooltip("If checked, runs the timer on play")]
     public bool startAtRuntime = true;
-
-    [Tooltip("Select what to display")]
-    public bool secondsDisplay = true;
 
     [Space]
     
@@ -26,7 +20,6 @@ public class Timer : MonoBehaviour
 
     bool timerRunning = false;
     bool timerPaused = false;
-    public double timeRemaining;
     
     [Header("Warning Settings")]
     public Color warningColor = Color.red;
@@ -62,103 +55,39 @@ public class Timer : MonoBehaviour
 
     void Start()
     {
-        _remainingSeconds = startSeconds;
-        UpdateDisplay();
+        ResetTimer();
 
         if(startAtRuntime)
         {
             StartTimer();
         }
-        else
-        {
-            float total = ReturnTotalSeconds();
-        }
     }
 
     void Update()
     {
+        if (!timerRunning) return;
         if (_remainingSeconds <= 0f) return;
 
         _remainingSeconds -= Time.deltaTime;
         if (_remainingSeconds <= 0f)
         {
             _remainingSeconds = 0f;
-            UpdateDisplay();
-            RecordScoreAndLoadMenu();
+            HandleTimerEnd();
             return;
         }
 
-        UpdateDisplay();
-
-        if(timerRunning)
-        {
-            CountDown();
-            if(dialSlider)
-            {
-                DialSliderDown();
-            }
-        }
-    }
-
-    private void CountDown()
-    {
-        /*If you choose to edit this back to 0 for 100% accuracy,
-        1 frame at the end of the timer will display maximum numbers as it takes time to switch to the else statement
-        which sets the time remaining to 0. This is accurate up to 20 milliseconds or 0.02 of a second.*/  
-        if (timeRemaining > 0.02)
-        {
-            timeRemaining -= Time.deltaTime;
-            
-            if (timeRemaining <= 5.0)
-            {
-                if (dialSlider)
-                {
-                    dialSlider.color = warningColor;
-                }
-                
-                if (!_hasPlayedWarningSound && countDownSound != null)
-                {
-                    AudioSource.PlayClipAtPoint(countDownSound, Camera.main ? Camera.main.transform.position : transform.position);
-                    _hasPlayedWarningSound = true;
-                }
-            }
-            
-            DisplayInTextObject();
-        }
-        else
-        {
-            //Timer has ended from counting downwards
-            timeRemaining = 0;
-            timerRunning = false;
-            onTimerEnd.Invoke();
-            DisplayInTextObject();
-        }
-    }
-
-    private void DialSliderDown()
-    {
-        float total = ReturnTotalSeconds();
-        if (total > 0)
-        {
-            float timeRangeClamped = Mathf.InverseLerp(total, 0, (float)timeRemaining);
-            dialSlider.fillAmount = Mathf.Lerp(1, 0, timeRangeClamped);
-        }
-    }
-
-    private void DisplayInTextObject()
-    {
+        UpdateVisuals();
     }
 
     public double GetRemainingSeconds()
     {
-        return timeRemaining;
+        return _remainingSeconds;
     }
 
     public void StartTimer()
     {
         if (!timerRunning && !timerPaused)
         {
-            ResetTimer();
             timerRunning = true;
         }
     }
@@ -172,8 +101,8 @@ public class Timer : MonoBehaviour
     private void ResetTimer()
     {
         timerPaused = false;
-        timeRemaining = ReturnTotalSeconds();
-        DisplayInTextObject();
+        _remainingSeconds = startSeconds;
+        UpdateVisuals();
         if(dialSlider)
         {
             dialSlider.fillAmount = 1f;
@@ -181,32 +110,43 @@ public class Timer : MonoBehaviour
         }
         _hasPlayedWarningSound = false;
     }
-
-    public float ReturnTotalSeconds()
+    
+    private void UpdateVisuals()
     {
-        return seconds;
-    }
-   
-    public string DisplayFormattedTime(double remainingSeconds)
-    {
-        string convertedNumber;
-        float s = Mathf.FloorToInt((float)remainingSeconds % 60);
-
-        if (secondsDisplay)
-        {
-            convertedNumber = string.Format("{0:00}", s);
-        }
-        else
-        {
-            convertedNumber = string.Empty;
-        }
-
-        return convertedNumber;
+        UpdateDisplay();
+        UpdateDialAndWarning();
     }
 
-    private void OnValidate()
+    private void UpdateDialAndWarning()
     {
-        timeRemaining = ReturnTotalSeconds();
+        if (!dialSlider) return;
+
+        // 경고 색 및 사운드
+        if (_remainingSeconds <= 5.0f)
+        {
+            dialSlider.color = warningColor;
+
+            if (!_hasPlayedWarningSound && countDownSound != null)
+            {
+                AudioSource.PlayClipAtPoint(countDownSound, Camera.main ? Camera.main.transform.position : transform.position);
+                _hasPlayedWarningSound = true;
+            }
+        }
+
+        // 채우기 양 (0~1)
+        if (startSeconds > 0)
+        {
+            float timeRangeClamped = Mathf.InverseLerp(startSeconds, 0, _remainingSeconds);
+            dialSlider.fillAmount = Mathf.Lerp(1, 0, timeRangeClamped);
+        }
+    }
+
+    private void HandleTimerEnd()
+    {
+        UpdateVisuals();
+        timerRunning = false;
+        onTimerEnd.Invoke();
+        RecordScoreAndLoadMenu();
     }
 
     /// <summary>
