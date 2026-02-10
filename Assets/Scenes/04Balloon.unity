@@ -893,8 +893,7 @@ MonoBehaviour:
   dialSlider: {fileID: 792417631}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
   countDownSound: {fileID: 8300000, guid: 70014389074e9495db8a8142399628ce, type: 3}
-  startSeconds: 60
-  menuSceneName: 99StageResult
+  startSeconds: 10
   _timerText: {fileID: 642712702}
 --- !u!224 &931674204
 RectTransform:
@@ -976,11 +975,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2088352481340939160, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
       propertyPath: startSeconds
-      value: 60
-      objectReference: {fileID: 0}
-    - target: {fileID: 2088352481340939160, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
-      propertyPath: menuSceneName
-      value: 99StageResult
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2088352481340939160, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
       propertyPath: timeRemaining

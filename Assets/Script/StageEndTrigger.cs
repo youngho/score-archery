@@ -43,10 +43,6 @@ public class StageEndTrigger : MonoBehaviour
         while (!done) yield return null;
 
         if (!string.IsNullOrEmpty(nextSceneName))
-        {
-            if (nextSceneName == "99StageResult")
-                StageResultData.LastScore = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
-            SceneManager.LoadScene(nextSceneName, LoadSceneMode.Single);
-        }
+            StageResultService.RequestShowResult((int)score);
     }
 }

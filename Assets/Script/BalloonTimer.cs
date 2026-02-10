@@ -31,9 +31,6 @@ public class Timer : MonoBehaviour
     [Tooltip("시작 초 (9 → 0 카운트다운)")]
     public int startSeconds = 9;
 
-    [Tooltip("0이 되면 로드할 씬 이름 (상위 메뉴)")]
-    public string menuSceneName = "00StartUI";
-
     [SerializeField] private TextMeshProUGUI _timerText;
 
     private float _remainingSeconds;
@@ -166,9 +163,7 @@ public class Timer : MonoBehaviour
 
     private void LoadMenuScene()
     {
-        if (string.IsNullOrEmpty(menuSceneName)) return;
-        if (menuSceneName == "99StageResult")
-            StageResultData.LastScore = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
-        SceneManager.LoadScene(menuSceneName, LoadSceneMode.Single);
+        int score = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
+        StageResultService.RequestShowResult(score);
     }
 }
