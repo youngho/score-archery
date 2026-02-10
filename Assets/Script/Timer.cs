@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
-
+using UnityEngine.SceneManagement;
 
 public class Timer : MonoBehaviour
 {
@@ -43,6 +43,16 @@ public class Timer : MonoBehaviour
     private Color _originalColor;
     private bool _hasPlayedWarningSound = false;
     
+    [Header("Timer Settings")]
+    [Tooltip("시작 초 (9 → 0 카운트다운)")]
+    public int startSeconds = 9;
+
+    [Tooltip("0이 되면 로드할 씬 이름 (상위 메뉴)")]
+    public string menuSceneName = "00StartUI";
+
+    [SerializeField] private TextMeshProUGUI _timerText;
+
+    private float _remainingSeconds;
 
     private void Awake()
     {
@@ -82,6 +92,9 @@ public class Timer : MonoBehaviour
 
     void Start()
     {
+        _remainingSeconds = startSeconds;
+        UpdateDisplay();
+
         if(startAtRuntime)
         {
             StartTimer();
@@ -102,6 +115,19 @@ public class Timer : MonoBehaviour
 
     void Update()
     {
+        if (_remainingSeconds <= 0f) return;
+
+        _remainingSeconds -= Time.deltaTime;
+        if (_remainingSeconds <= 0f)
+        {
+            _remainingSeconds = 0f;
+            UpdateDisplay();
+            RecordScoreAndLoadMenu();
+            return;
+        }
+
+        UpdateDisplay();
+
         if(timerRunning)
         {
             CountDown();
@@ -280,5 +306,26 @@ public class Timer : MonoBehaviour
     private void OnValidate()
     {
         timeRemaining = ReturnTotalSeconds();
+    }
+
+    /// <summary>
+    /// API에 점수 기록 후 메뉴 씬 로드
+    /// </summary>
+    private void RecordScoreAndLoadMenu()
+    {
+        var recorder = GetComponent<StageScoreApiService>() ?? gameObject.AddComponent<StageScoreApiService>();
+        recorder.RecordCurrentStageAndThen(LoadMenuScene);
+    }
+
+    private void UpdateDisplay()
+    {
+        if (_timerText != null)
+            _timerText.text = Mathf.CeilToInt(_remainingSeconds).ToString();
+    }
+
+    private void LoadMenuScene()
+    {
+        if (string.IsNullOrEmpty(menuSceneName)) return;
+        SceneManager.LoadScene(menuSceneName, LoadSceneMode.Single);
     }
 }
