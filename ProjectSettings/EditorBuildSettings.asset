@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/04Balloon.unity
     guid: 594da9eac4a488a479b252ff922516d9
+  - enabled: 1
+    path: Assets/Scenes/99StageResult.unity
+    guid: c6aef75ce69b04589974f0edcc981073
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05

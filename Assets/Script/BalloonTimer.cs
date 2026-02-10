@@ -167,6 +167,8 @@ public class Timer : MonoBehaviour
     private void LoadMenuScene()
     {
         if (string.IsNullOrEmpty(menuSceneName)) return;
+        if (menuSceneName == "99StageResult")
+            StageResultData.LastScore = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
         SceneManager.LoadScene(menuSceneName, LoadSceneMode.Single);
     }
 }
