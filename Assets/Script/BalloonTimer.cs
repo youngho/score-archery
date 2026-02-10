@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,10 +11,6 @@ public class Timer : MonoBehaviour
 {
     public UnityEvent onTimerEnd;
 
-    [Range(0, 23)]
-    public int hours;
-    [Range(0, 59)]
-    public int minutes;
     [Range(0, 59)]
     public int seconds;
     
@@ -22,8 +18,6 @@ public class Timer : MonoBehaviour
     public bool startAtRuntime = true;
 
     [Tooltip("Select what to display")]
-    public bool hoursDisplay = false;
-    public bool minutesDisplay = true;
     public bool secondsDisplay = true;
 
     [Space]
@@ -248,59 +242,24 @@ public class Timer : MonoBehaviour
 
     public float ReturnTotalSeconds()
     {
-        float totalTimeSet;
-        totalTimeSet = hours * 60 * 60;
-        totalTimeSet += minutes * 60;
-        totalTimeSet += seconds;
-        return totalTimeSet;
+        return seconds;
     }
    
     public string DisplayFormattedTime(double remainingSeconds)
     {
         string convertedNumber;
-        float h, m, s;
-        RemainingSecondsToHHMMSSMMM(remainingSeconds, out h, out m, out s);
+        float s = Mathf.FloorToInt((float)remainingSeconds % 60);
 
-        string HoursFormat()
+        if (secondsDisplay)
         {
-            if (hoursDisplay)
-            {
-                string hoursFormatted = string.Format("{0:00}", h);
-                if (minutesDisplay || secondsDisplay)
-                    hoursFormatted += ":";
-                return hoursFormatted;
-            }
-            return null;
+            convertedNumber = string.Format("{0:00}", s);
         }
-        string MinutesFormat()
+        else
         {
-            if (minutesDisplay)
-            {
-                string minutesFormatted = string.Format("{0:00}", m);
-                if (secondsDisplay)
-                    minutesFormatted += ":";
-                return minutesFormatted;
-            }
-            return null;
+            convertedNumber = string.Empty;
         }
-        string SecondsFormat()
-        {
-            if (secondsDisplay)
-            {
-                return string.Format("{0:00}", s);
-            }
-            return null;
-        }
-        
-        convertedNumber = HoursFormat() + MinutesFormat() + SecondsFormat();
+
         return convertedNumber;
-    }
-
-    private static void RemainingSecondsToHHMMSSMMM(double totalSeconds, out float hours, out float minutes, out float seconds)
-    {
-        hours = Mathf.FloorToInt((float)totalSeconds / 3600);
-        minutes = Mathf.FloorToInt(((float)totalSeconds % 3600) / 60);
-        seconds = Mathf.FloorToInt((float)totalSeconds % 60);
     }
 
     private void OnValidate()

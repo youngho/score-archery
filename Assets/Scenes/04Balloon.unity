@@ -710,7 +710,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 11
+  m_text: 99
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 10bd55940f4b9443aac35ccb090add20, type: 2}
   m_sharedMaterial: {fileID: -5471662254444240602, guid: 10bd55940f4b9443aac35ccb090add20, type: 2}
@@ -891,18 +891,21 @@ MonoBehaviour:
       m_Calls: []
   hours: 0
   minutes: 0
-  seconds: 0
+  seconds: 30
   startAtRuntime: 1
   hoursDisplay: 0
   minutesDisplay: 1
   secondsDisplay: 1
   standardText: {fileID: 0}
-  textMeshProText: {fileID: 0}
+  textMeshProText: {fileID: 642712702}
   standardSlider: {fileID: 0}
-  dialSlider: {fileID: 0}
-  timeRemaining: 0
+  dialSlider: {fileID: 792417631}
+  timeRemaining: 30
   warningColor: {r: 1, g: 0, b: 0, a: 1}
   countDownSound: {fileID: 0}
+  startSeconds: 9
+  menuSceneName: 00StartUI
+  _timerText: {fileID: 642712702}
 --- !u!224 &931674204
 RectTransform:
   m_ObjectHideFlags: 0
@@ -979,11 +982,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2088352481340939160, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
       propertyPath: seconds
-      value: 0
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 2088352481340939160, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
       propertyPath: timeRemaining
-      value: 0
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 2088352481340939160, guid: feb02cee4119b9e46ad4c354ffb94d96, type: 3}
       propertyPath: minutesDisplay
