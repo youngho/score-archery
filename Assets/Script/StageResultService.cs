@@ -17,13 +17,11 @@ public static class StageResultService
 
     /// <summary>
     /// 결과 화면(99StageResult)을 표시. 점수 기록은 호출측에서 완료한 뒤 호출.
-    /// 확인 버튼 클릭 시 00StartUI로 이동.
+    /// 화면이 어두어지는 트랜지션 후 로드되며, 확인 버튼 클릭 시 00StartUI로 이동.
     /// </summary>
     /// <param name="score">표시할 점수</param>
     public static void RequestShowResult(int score)
     {
-        StageResultData.LastScore = score;
-        StageResultData.ReturnSceneName = ReturnSceneName;
-        SceneManager.LoadScene(ResultSceneName, LoadSceneMode.Single);
+        SceneTransitionFader.FadeToBlackAndLoad(score, ResultSceneName, ReturnSceneName, 0.6f);
     }
 }
