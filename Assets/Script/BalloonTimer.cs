@@ -22,9 +22,6 @@ public class Timer : MonoBehaviour
 
     [Space]
     
-    public Text standardText;
-    public TextMeshProUGUI textMeshProText;
-    public Slider standardSlider;
     public Image dialSlider;
 
     bool timerRunning = false;
@@ -50,21 +47,6 @@ public class Timer : MonoBehaviour
 
     private void Awake()
     {
-        if(!standardText)
-        if(GetComponent<Text>())
-        {
-            standardText = GetComponent<Text>();
-        }
-        if(!textMeshProText)
-        if(GetComponent<TextMeshProUGUI>())
-        {
-            textMeshProText = GetComponent<TextMeshProUGUI>();
-        }
-        if(!standardSlider)
-        if(GetComponent<Slider>())
-        {
-            standardSlider = GetComponent<Slider>();
-        }
         if(!dialSlider)
         if(GetComponent<Image>())
         {
@@ -75,12 +57,6 @@ public class Timer : MonoBehaviour
         {
             _originalColor = dialSlider.color;
             dialSlider.fillAmount = 1f;
-        }
-
-        if(standardSlider)
-        {
-            standardSlider.maxValue = ReturnTotalSeconds();
-            standardSlider.value = standardSlider.maxValue;
         }
     }
 
@@ -96,14 +72,6 @@ public class Timer : MonoBehaviour
         else
         {
             float total = ReturnTotalSeconds();
-            if(standardText)
-            {
-                standardText.text = DisplayFormattedTime(total);
-            }
-            if(textMeshProText)
-            {
-                textMeshProText.text = DisplayFormattedTime(total);
-            }
         }
     }
 
@@ -125,10 +93,6 @@ public class Timer : MonoBehaviour
         if(timerRunning)
         {
             CountDown();
-            if(standardSlider)
-            {
-                StandardSliderDown();
-            }
             if(dialSlider)
             {
                 DialSliderDown();
@@ -171,14 +135,6 @@ public class Timer : MonoBehaviour
         }
     }
 
-    private void StandardSliderDown()
-    {
-        if(standardSlider.value > standardSlider.minValue)
-        {
-            standardSlider.value -= Time.deltaTime;
-        }
-    }
-
     private void DialSliderDown()
     {
         float total = ReturnTotalSeconds();
@@ -191,14 +147,6 @@ public class Timer : MonoBehaviour
 
     private void DisplayInTextObject()
     {
-        if (standardText)
-        {
-            standardText.text = DisplayFormattedTime(timeRemaining);
-        }
-        if (textMeshProText)
-        {
-            textMeshProText.text = DisplayFormattedTime(timeRemaining);
-        }
     }
 
     public double GetRemainingSeconds()
@@ -226,12 +174,6 @@ public class Timer : MonoBehaviour
         timerPaused = false;
         timeRemaining = ReturnTotalSeconds();
         DisplayInTextObject();
-
-        if(standardSlider)
-        {
-            standardSlider.maxValue = (float)timeRemaining;
-            standardSlider.value = standardSlider.maxValue;
-        }
         if(dialSlider)
         {
             dialSlider.fillAmount = 1f;
