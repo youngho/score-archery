@@ -18,15 +18,23 @@ public class BalloonSpawner : MonoBehaviour
 
     private float _nextSpawnTime;
     private Camera _mainCamera;
+    private bool _isSpawning = false;
 
     void Start()
     {
         _mainCamera = Camera.main;
+    }
+
+    public void StartSpawning()
+    {
+        _isSpawning = true;
         ScheduleNextSpawn();
     }
 
     void Update()
     {
+        if (!_isSpawning) return;
+
         if (Time.time >= _nextSpawnTime)
         {
             SpawnBalloon();
