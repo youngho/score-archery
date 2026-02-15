@@ -20,8 +20,18 @@ public static class StageResultService
     /// 화면이 어두어지는 트랜지션 후 로드되며, 확인 버튼 클릭 시 00StartUI로 이동.
     /// </summary>
     /// <param name="score">표시할 점수</param>
+    /// <param name="totalArrows">총 발사 화살 수</param>
+    /// <param name="totalHits">총 명중 수</param>
+    public static void RequestShowResult(int score, int totalArrows, int totalHits)
+    {
+        SceneTransitionFader.FadeToBlackAndLoad(score, totalArrows, totalHits, ResultSceneName, ReturnSceneName, 0.6f);
+    }
+
+    /// <summary>
+    /// 하위 호환성을 위한 기존 RequestShowResult
+    /// </summary>
     public static void RequestShowResult(int score)
     {
-        SceneTransitionFader.FadeToBlackAndLoad(score, ResultSceneName, ReturnSceneName, 0.6f);
+        RequestShowResult(score, 0, 0);
     }
 }

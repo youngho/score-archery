@@ -11,19 +11,44 @@ public class StageResultScoreDisplay : MonoBehaviour
     [Tooltip("표시할 TextMeshProUGUI (비어 있으면 'ScoreText' 이름으로 검색)")]
     public TextMeshProUGUI scoreText;
 
+    [Tooltip("총 발사 수 표시할 텍스트 (비어 있으면 'ArrowCountText' 검색)")]
+    public TextMeshProUGUI arrowCountText;
+
+    [Tooltip("명중률 표시할 텍스트 (비어 있으면 'AccuracyText' 검색)")]
+    public TextMeshProUGUI accuracyText;
+
     [Tooltip("확인/계속 버튼 (비어 있으면 'ContinueButton' 검색 또는 런타임 생성)")]
     public Button continueButton;
 
     private void Start()
     {
+        // 점수 표시
         if (scoreText == null)
-        {
-            var go = GameObject.Find("ScoreText");
-            if (go != null)
-                scoreText = go.GetComponent<TextMeshProUGUI>();
-        }
+            scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
+        
         if (scoreText != null)
             scoreText.text = $"{StageResultData.LastScore}";
+
+        // 총 발사 수 표시
+        if (arrowCountText == null)
+            arrowCountText = GameObject.Find("ArrowCountText")?.GetComponent<TextMeshProUGUI>();
+        
+        if (arrowCountText != null)
+            arrowCountText.text = $"발사 수: {StageResultData.TotalArrowsShot}";
+
+        // 명중률 계산 및 표시
+        if (accuracyText == null)
+            accuracyText = GameObject.Find("AccuracyText")?.GetComponent<TextMeshProUGUI>();
+        
+        if (accuracyText != null)
+        {
+            float accuracy = 0f;
+            if (StageResultData.TotalArrowsShot > 0)
+            {
+                accuracy = (float)StageResultData.TotalHits / StageResultData.TotalArrowsShot * 100f;
+            }
+            accuracyText.text = $"명중률: {accuracy:F1}%";
+        }
 
         if (continueButton == null)
             continueButton = GameObject.Find("ContinueButton")?.GetComponent<Button>();

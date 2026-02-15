@@ -46,23 +46,31 @@ public class SceneTransitionFader : MonoBehaviour
     }
 
     /// <summary>
-    /// 화면을 어둡게 만든 뒤 지정 씬 로드
+    /// 화면을 어둡게 만든 뒤 지정 씬 로드 (확장 버전)
     /// </summary>
-    public static void FadeToBlackAndLoad(int score, string sceneToLoad, string returnSceneName, float duration = 0.6f)
+    public static void FadeToBlackAndLoad(int score, int totalArrows, int totalHits, string sceneToLoad, string returnSceneName, float duration = 0.6f)
     {
         if (_instance != null)
         {
-            _instance.StartCoroutine(_instance.FadeAndLoadCoroutine(score, sceneToLoad, returnSceneName, duration));
+            _instance.StartCoroutine(_instance.FadeAndLoadCoroutine(score, totalArrows, totalHits, sceneToLoad, returnSceneName, duration));
             return;
         }
 
         var go = new GameObject("SceneTransitionFader");
         var fader = go.AddComponent<SceneTransitionFader>();
         fader.fadeDuration = duration;
-        fader.StartCoroutine(fader.FadeAndLoadCoroutine(score, sceneToLoad, returnSceneName, duration));
+        fader.StartCoroutine(fader.FadeAndLoadCoroutine(score, totalArrows, totalHits, sceneToLoad, returnSceneName, duration));
     }
 
-    private IEnumerator FadeAndLoadCoroutine(int score, string sceneToLoad, string returnSceneName, float duration)
+    /// <summary>
+    /// 하위 호환성을 위한 기존 FadeToBlackAndLoad
+    /// </summary>
+    public static void FadeToBlackAndLoad(int score, string sceneToLoad, string returnSceneName, float duration = 0.6f)
+    {
+        FadeToBlackAndLoad(score, 0, 0, sceneToLoad, returnSceneName, duration);
+    }
+
+    private IEnumerator FadeAndLoadCoroutine(int score, int totalArrows, int totalHits, string sceneToLoad, string returnSceneName, float duration)
     {
         if (_overlay == null) yield break;
 
@@ -78,6 +86,8 @@ public class SceneTransitionFader : MonoBehaviour
         _overlay.color = new Color(0, 0, 0, 1);
 
         StageResultData.LastScore = score;
+        StageResultData.TotalArrowsShot = totalArrows;
+        StageResultData.TotalHits = totalHits;
         StageResultData.ReturnSceneName = returnSceneName;
         SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Single);
     }

@@ -492,6 +492,12 @@ public class ArcheryGestureManager : MonoBehaviour
 
                     OnRelease?.Invoke(data);
                     ShootArrow(data);
+
+                    // 화살 발사 카운트 증가
+                    if (ScoreManager.Instance != null)
+                    {
+                        ScoreManager.Instance.OnArrowShot();
+                    }
                 }
                 else
                 {

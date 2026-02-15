@@ -12,6 +12,16 @@ public static class StageResultData
     public static int LastScore { get; set; }
 
     /// <summary>
+    /// 결과 씬에 전달할 총 발사 화살 수
+    /// </summary>
+    public static int TotalArrowsShot { get; set; }
+
+    /// <summary>
+    /// 결과 씬에 전달할 총 명중 수
+    /// </summary>
+    public static int TotalHits { get; set; }
+
+    /// <summary>
     /// 결과 확인 후 이동할 씬 이름 (예: 00StartUI, 다음 스테이지 등)
     /// </summary>
     public static string ReturnSceneName { get; set; } = "00StartUI";

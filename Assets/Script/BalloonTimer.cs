@@ -164,6 +164,9 @@ public class Timer : MonoBehaviour
     private void LoadMenuScene()
     {
         int score = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
-        StageResultService.RequestShowResult(score);
+        int arrows = ScoreManager.Instance != null ? ScoreManager.Instance.TotalArrowsShot : 0;
+        int hits = ScoreManager.Instance != null ? ScoreManager.Instance.TotalHits : 0;
+        
+        StageResultService.RequestShowResult(score, arrows, hits);
     }
 }
