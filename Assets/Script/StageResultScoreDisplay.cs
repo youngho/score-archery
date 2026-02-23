@@ -22,6 +22,24 @@ public class StageResultScoreDisplay : MonoBehaviour
 
     private void Start()
     {
+        // UI 조작을 위한 EventSystem 확인 및 생성
+        if (FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
+        {
+            var eventSystem = new GameObject("EventSystem");
+            eventSystem.AddComponent<UnityEngine.EventSystems.EventSystem>();
+
+            // 새로운 Input System 패키지가 있는지 확인하여 적절한 모듈 추가
+            System.Type inputModuleType = System.Type.GetType("UnityEngine.InputSystem.UI.InputSystemUIInputModule, Unity.InputSystem");
+            if (inputModuleType != null)
+            {
+                eventSystem.AddComponent(inputModuleType);
+            }
+            else
+            {
+                eventSystem.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            }
+        }
+
         // 점수 표시
         if (scoreText == null)
             scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
@@ -34,7 +52,7 @@ public class StageResultScoreDisplay : MonoBehaviour
             arrowCountText = GameObject.Find("ArrowCountText")?.GetComponent<TextMeshProUGUI>();
         
         if (arrowCountText != null)
-            arrowCountText.text = $"발사 수: {StageResultData.TotalArrowsShot}";
+            arrowCountText.text = $"Shooting : {StageResultData.TotalArrowsShot}";
 
         // 명중률 계산 및 표시
         if (accuracyText == null)
@@ -47,7 +65,7 @@ public class StageResultScoreDisplay : MonoBehaviour
             {
                 accuracy = (float)StageResultData.TotalHits / StageResultData.TotalArrowsShot * 100f;
             }
-            accuracyText.text = $"명중률: {accuracy:F1}%";
+            accuracyText.text = $"Accuracy : {accuracy:F1}%";
         }
 
         if (continueButton == null)
@@ -87,7 +105,7 @@ public class StageResultScoreDisplay : MonoBehaviour
         textRect.offsetMin = Vector2.zero;
         textRect.offsetMax = Vector2.zero;
         var tmp = textGo.AddComponent<TextMeshProUGUI>();
-        tmp.text = "계속";
+        tmp.text = "Continue";
         tmp.fontSize = 36;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = Color.white;
