@@ -9,7 +9,7 @@ using System;
 /// </summary>
 public class StageScoreApiService : MonoBehaviour
 {
-    private const string ApiBaseUrl = "http://158.179.161.203:8080/api/stages";
+    private const string ApiBaseUrl = "http://158.179.161.203:8080/score/api/stages";
 
     [Serializable]
     private class RecordRequest
