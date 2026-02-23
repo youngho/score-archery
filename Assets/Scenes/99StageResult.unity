@@ -176,7 +176,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBA85\uC911\uB960: 0.0%"
+  m_text: ' Accuracy : 0.0%'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3bd7c2e8a2bed4f98a6b0e1227f166a2, type: 2}
   m_sharedMaterial: {fileID: -8386503167023533775, guid: 3bd7c2e8a2bed4f98a6b0e1227f166a2, type: 2}
@@ -908,7 +908,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBC1C\uC0AC \uC218: 0"
+  m_text: 'Shooting : 0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3bd7c2e8a2bed4f98a6b0e1227f166a2, type: 2}
   m_sharedMaterial: {fileID: -8386503167023533775, guid: 3bd7c2e8a2bed4f98a6b0e1227f166a2, type: 2}
