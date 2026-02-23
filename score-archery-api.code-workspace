@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../score-archery-web/score-archery-api"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "automatic",
+		"java.configuration.updateBuildConfiguration": "interactive"
+	}
+}
