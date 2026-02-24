@@ -39,7 +39,14 @@ public class StageResultScoreDisplay : MonoBehaviour
                 eventSystem.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
             }
         }
+    }
 
+    /// <summary>
+    /// Canvas가 활성화된 후 호출. 점수/발사수/명중률 표시 및 버튼 이벤트 등록.
+    /// StageResultBackgroundAnimator에서 canvasToReveal 활성화 후 호출됨.
+    /// </summary>
+    public void SetupDisplay()
+    {
         // 점수 표시
         if (scoreText == null)
             scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();

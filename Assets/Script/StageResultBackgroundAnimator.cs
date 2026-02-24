@@ -111,5 +111,10 @@ public class StageResultBackgroundAnimator : MonoBehaviour
         // 애니메이션 종료 후 캔버스 표시
         if (canvasToReveal != null)
             canvasToReveal.SetActive(true);
+
+        // 캔버스 활성화 후 점수 표시 세팅
+        var scoreDisplay = FindObjectOfType<StageResultScoreDisplay>();
+        if (scoreDisplay != null)
+            scoreDisplay.SetupDisplay();
     }
 }
