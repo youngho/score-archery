@@ -11,6 +11,9 @@ public class StageResultBackgroundAnimator : MonoBehaviour
     public RectTransform panelUp;
     public RectTransform panelDown;
 
+    [Tooltip("애니메이션이 끝난 뒤 활성화할 Canvas (StageResultScoreCanvas)")]
+    public GameObject canvasToReveal;
+
     [Header("Timing")]
     [Tooltip("중앙으로 접근하는 시간")]
     public float approachDuration = 0.5f;
@@ -104,5 +107,9 @@ public class StageResultBackgroundAnimator : MonoBehaviour
         }
         panelUp.anchoredPosition = _meetPosUp;
         panelDown.anchoredPosition = _meetPosDown;
+
+        // 애니메이션 종료 후 캔버스 표시
+        if (canvasToReveal != null)
+            canvasToReveal.SetActive(true);
     }
 }
