@@ -11583,7 +11583,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RubberDuckSpawner
   spawnPoint: {fileID: 1373059967}
-  duckPrefab: {fileID: 2298714924016363311, guid: 59c1bc999b6c6469f9c47c8a2d49b219, type: 3}
+  duckPrefab: {fileID: 623785154503181225, guid: a725261a9393d4dc89951f2ad18388b7, type: 3}
   spawnInterval: 3
   spawnRangeX: 4
   spawnZ: -25
