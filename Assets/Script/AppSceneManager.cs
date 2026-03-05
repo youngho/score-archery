@@ -8,22 +8,22 @@ using UnityEngine.SceneManagement;
 public class AppSceneManager : MonoBehaviour
 {
     private Button balloonSceneBtn;
+    private Button rubberDuckBtn;
 
     private void Awake()
     {
         // Find the BalloonScene button by its hierarchy path in 00StartUI
         GameObject balloonBtnGo = GameObject.Find("StartUiPanel/StageButtonsContainer/BalloonScene");
+        GameObject rubberDuckBtnGo = GameObject.Find("StartUiPanel/StageButtonsContainer/RubberDuckScene");
+        
         if (balloonBtnGo != null)
         {
             balloonSceneBtn = balloonBtnGo.GetComponent<Button>();
-            if (balloonSceneBtn == null)
-            {
-                Debug.LogWarning("[AppSceneManager] BalloonScene GameObject found but Button component is missing.");
-            }
+         
         }
-        else
+        if (rubberDuckBtnGo != null)
         {
-            Debug.LogWarning("[AppSceneManager] BalloonScene button not found at path: StartUiPanel/StageButtonsContainer/BalloonScene");
+            rubberDuckBtn = rubberDuckBtnGo.GetComponent<Button>();
         }
     }
 
@@ -33,13 +33,23 @@ public class AppSceneManager : MonoBehaviour
         {
             balloonSceneBtn.onClick.AddListener(OnBalloonSceneClick);
         }
+        if (rubberDuckBtn != null)
+        {
+            rubberDuckBtn.onClick.AddListener(OnRubberDuckSceneClick);
+     
+        }
     }
 
     private void OnBalloonSceneClick()
     {
-        Debug.Log("[AppSceneManager] Loading 04Balloon scene...");
         SceneManager.LoadScene("04Balloon");
     }
+
+    private void OnRubberDuckSceneClick()
+    {
+        SceneManager.LoadScene("05RubberDuck");
+    }
+
 
     private void OnDestroy()
     {
