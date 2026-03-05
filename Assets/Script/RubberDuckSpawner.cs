@@ -3,12 +3,10 @@ using UnityEngine;
 public class RubberDuckSpawner : MonoBehaviour
 {
     [Header("Spawn Settings")]
-        public Transform spawnPoint;
-public GameObject duckPrefab;
-    public float spawnInterval = 3.0f;
+    public Transform spawnPoint;
+    public GameObject duckPrefab;
+    public float spawnInterval = 2.0f;
     public float spawnRangeX = 4.0f;
-    public float spawnZ = -10.0f;
-    public float waterLevel = -0.3f;
 
     private float _nextSpawnTime;
 
@@ -42,18 +40,9 @@ public GameObject duckPrefab;
         Vector3 spawnPos;
         Quaternion spawnRot;
 
-        if (spawnPoint != null)
-        {
-            float randomX = Random.Range(-spawnRangeX, spawnRangeX);
-            spawnPos = spawnPoint.position + spawnPoint.right * randomX;
-            spawnRot = spawnPoint.rotation;
-        }
-        else
-        {
-            float randomX = Random.Range(-spawnRangeX, spawnRangeX);
-            spawnPos = new Vector3(randomX, waterLevel, spawnZ);
-            spawnRot = Quaternion.Euler(0, 180, 0); // Default facing
-        }
+        float randomX = Random.Range(-spawnRangeX, spawnRangeX);
+        spawnPos = spawnPoint.position + spawnPoint.right * randomX;
+        spawnRot = spawnPoint.rotation;
         
         Instantiate(duckPrefab, spawnPos, spawnRot);
     }
