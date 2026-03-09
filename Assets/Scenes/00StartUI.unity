@@ -844,7 +844,7 @@ GameObject:
   - component: {fileID: 184947756}
   - component: {fileID: 184947755}
   m_Layer: 0
-  m_Name: RubberDuckButton (6)
+  m_Name: WhiteTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -866,7 +866,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 137.60239, y: -722.4292}
+  m_AnchoredPosition: {x: 133.8, y: -714}
   m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &184947755
@@ -955,7 +955,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e68d04cb14e6a411fb53a839f75cf00a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 740d8546befac4f7181ea571b13c581d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1520,7 +1520,7 @@ GameObject:
   - component: {fileID: 392668445}
   - component: {fileID: 392668447}
   m_Layer: 5
-  m_Name: Stage Button Outline (8)
+  m_Name: WatermelonScene
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5374,7 +5374,7 @@ GameObject:
   - component: {fileID: 1395243241}
   - component: {fileID: 1395243240}
   m_Layer: 0
-  m_Name: RubberDuckButton (10)
+  m_Name: Temp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5517,7 +5517,7 @@ GameObject:
   - component: {fileID: 1448632055}
   - component: {fileID: 1448632054}
   m_Layer: 0
-  m_Name: RubberDuckButton (8)
+  m_Name: Watermelon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5539,8 +5539,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 505.10242, y: -722.4292}
-  m_SizeDelta: {x: 120, y: 120}
+  m_AnchoredPosition: {x: 500.7, y: -719.97}
+  m_SizeDelta: {x: 97.7912, y: 96.342}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1448632054
 Animator:
@@ -5628,7 +5628,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e68d04cb14e6a411fb53a839f75cf00a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ff3552ccc603943d9bdafec68821d27f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5733,7 +5733,7 @@ GameObject:
   - component: {fileID: 1508987677}
   - component: {fileID: 1508987679}
   m_Layer: 5
-  m_Name: Stage Button Outline (11)
+  m_Name: SnowmanScene
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5960,7 +5960,7 @@ GameObject:
   - component: {fileID: 1815029761}
   - component: {fileID: 1815029760}
   m_Layer: 0
-  m_Name: RubberDuckButton (9)
+  m_Name: Star
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5982,8 +5982,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 137.60239, y: -920.5542}
-  m_SizeDelta: {x: 120, y: 120}
+  m_AnchoredPosition: {x: 133.8, y: -916}
+  m_SizeDelta: {x: 148.8, y: 137.9782}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1815029760
 Animator:
@@ -6071,7 +6071,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e68d04cb14e6a411fb53a839f75cf00a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 622aa6972651940e68ca1d2c72aafee2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6222,7 +6222,7 @@ GameObject:
   - component: {fileID: 1857024790}
   - component: {fileID: 1857024792}
   m_Layer: 5
-  m_Name: Stage Button Outline (6)
+  m_Name: WhiteTargetScene
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6343,7 +6343,7 @@ GameObject:
   - component: {fileID: 1860542738}
   - component: {fileID: 1860542737}
   m_Layer: 0
-  m_Name: RubberDuckButton (11)
+  m_Name: Snowman
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6365,8 +6365,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 505.10242, y: -920.5542}
-  m_SizeDelta: {x: 120, y: 120}
+  m_AnchoredPosition: {x: 502, y: -917.94}
+  m_SizeDelta: {x: 136.88, y: 141.85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1860542737
 Animator:
@@ -6454,7 +6454,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e68d04cb14e6a411fb53a839f75cf00a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6f101413a2fb24b4ababfd529f0f51cf, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6606,7 +6606,7 @@ GameObject:
   - component: {fileID: 2087941072}
   - component: {fileID: 2087941074}
   m_Layer: 5
-  m_Name: Stage Button Outline (9)
+  m_Name: StarScene
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
