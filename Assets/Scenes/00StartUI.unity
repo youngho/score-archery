@@ -443,7 +443,7 @@ GameObject:
   - component: {fileID: 161812494}
   - component: {fileID: 161812496}
   m_Layer: 5
-  m_Name: LeafScene
+  m_Name: 02Leaf
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -986,7 +986,7 @@ GameObject:
   - component: {fileID: 219720766}
   - component: {fileID: 219720768}
   m_Layer: 5
-  m_Name: AppleOneShotScene
+  m_Name: 06AppleOneShot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1520,7 +1520,7 @@ GameObject:
   - component: {fileID: 392668445}
   - component: {fileID: 392668447}
   m_Layer: 5
-  m_Name: WatermelonScene
+  m_Name: 09Watermelon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2127,7 +2127,7 @@ GameObject:
   - component: {fileID: 473881050}
   - component: {fileID: 473881052}
   m_Layer: 5
-  m_Name: MenTargetScene
+  m_Name: 03MenTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2857,7 +2857,7 @@ GameObject:
   - component: {fileID: 599798624}
   - component: {fileID: 599798626}
   m_Layer: 5
-  m_Name: ScarecrowScene
+  m_Name: 01Scarecrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4007,7 +4007,7 @@ GameObject:
   - component: {fileID: 1035640613}
   - component: {fileID: 1035640615}
   m_Layer: 5
-  m_Name: RubberDuckScene
+  m_Name: 05RubberDuck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4426,7 +4426,7 @@ GameObject:
   - component: {fileID: 1155351913}
   - component: {fileID: 1155351915}
   m_Layer: 5
-  m_Name: CoconutScene
+  m_Name: 08Coconut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4711,7 +4711,7 @@ GameObject:
   - component: {fileID: 1324123808}
   - component: {fileID: 1324123810}
   m_Layer: 5
-  m_Name: Stage Button Outline (10)
+  m_Name: 11Candle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4831,7 +4831,7 @@ GameObject:
   - component: {fileID: 1325114878}
   - component: {fileID: 1325114880}
   m_Layer: 5
-  m_Name: BalloonScene
+  m_Name: 04Balloon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5374,7 +5374,7 @@ GameObject:
   - component: {fileID: 1395243241}
   - component: {fileID: 1395243240}
   m_Layer: 0
-  m_Name: Temp
+  m_Name: Candle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5733,7 +5733,7 @@ GameObject:
   - component: {fileID: 1508987677}
   - component: {fileID: 1508987679}
   m_Layer: 5
-  m_Name: SnowmanScene
+  m_Name: 12Snowman
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6222,7 +6222,7 @@ GameObject:
   - component: {fileID: 1857024790}
   - component: {fileID: 1857024792}
   m_Layer: 5
-  m_Name: WhiteTargetScene
+  m_Name: 07Container
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6606,7 +6606,7 @@ GameObject:
   - component: {fileID: 2087941072}
   - component: {fileID: 2087941074}
   m_Layer: 5
-  m_Name: StarScene
+  m_Name: 10Star
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

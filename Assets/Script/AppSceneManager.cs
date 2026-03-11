@@ -7,55 +7,53 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class AppSceneManager : MonoBehaviour
 {
-    private Button balloonSceneBtn;
-    private Button rubberDuckBtn;
-
     private void Awake()
     {
-        // Find the BalloonScene button by its hierarchy path in 00StartUI
-        GameObject balloonBtnGo = GameObject.Find("StartUiPanel/StageButtonsContainer/BalloonScene");
-        GameObject rubberDuckBtnGo = GameObject.Find("StartUiPanel/StageButtonsContainer/RubberDuckScene");
-        
-        if (balloonBtnGo != null)
+        // Find the container that holds all stage buttons
+        GameObject container = GameObject.Find("StartUiPanel/StageButtonsContainer");
+        if (container == null)
         {
-            balloonSceneBtn = balloonBtnGo.GetComponent<Button>();
-         
+            Debug.LogWarning("StageButtonsContainer not found under StartUiPanel.");
+            return;
         }
-        if (rubberDuckBtnGo != null)
+
+        // For each child under the container, get its name and wire up a button
+        foreach (Transform child in container.transform)
         {
-            rubberDuckBtn = rubberDuckBtnGo.GetComponent<Button>();
+            Button button = child.GetComponent<Button>();
+            if (button == null)
+            {
+                continue;
+            }
+
+            string sceneName = GetSceneNameFromButton(child.name);
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                continue;
+            }
+
+            // Capture local variable for closure
+            string capturedSceneName = sceneName;
+            button.onClick.AddListener(() => LoadStageScene(capturedSceneName));
         }
     }
 
-    private void Start()
+    /// <summary>
+    /// Maps a button GameObject name to the corresponding stage scene name.
+    /// By default, uses the button name itself.
+    /// </summary>
+    private string GetSceneNameFromButton(string buttonObjectName)
     {
-        if (balloonSceneBtn != null)
-        {
-            balloonSceneBtn.onClick.AddListener(OnBalloonSceneClick);
-        }
-        if (rubberDuckBtn != null)
-        {
-            rubberDuckBtn.onClick.AddListener(OnRubberDuckSceneClick);
-     
-        }
+        // 01Scarecrow ~ 12Snowman 은 버튼 오브젝트 이름과 씬 이름이 동일하다고 가정
+        return buttonObjectName;
     }
 
-    private void OnBalloonSceneClick()
+    /// <summary>
+    /// 요청한 스테이지 씬을 단일 모드로 로드한다.
+    /// (현재 씬은 언로드되고, DontDestroyOnLoad 객체만 유지됨)
+    /// </summary>
+    private void LoadStageScene(string stageSceneName)
     {
-        SceneManager.LoadScene("04Balloon");
-    }
-
-    private void OnRubberDuckSceneClick()
-    {
-        SceneManager.LoadScene("05RubberDuck");
-    }
-
-
-    private void OnDestroy()
-    {
-        if (balloonSceneBtn != null)
-        {
-            balloonSceneBtn.onClick.RemoveListener(OnBalloonSceneClick);
-        }
+        SceneManager.LoadScene(stageSceneName, LoadSceneMode.Single);
     }
 }
