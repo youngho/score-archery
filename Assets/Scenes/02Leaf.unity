@@ -1140,8 +1140,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ec5f5185c21a4688b87e7c93bfa5ec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScarecrowStart
-  contentButton: {fileID: 0}
-  descriptionPopup: {fileID: 0}
+  popupObject: {fileID: 0}
+  clickPanel: {fileID: 0}
   timer: {fileID: 0}
 --- !u!114 &1173657403
 MonoBehaviour:
@@ -1663,7 +1663,6 @@ MonoBehaviour:
   maxForce: 30
   maxPitchAngle: 80
   maxYawAngle: 80
-  minDrawDistance: 50
   maxDrawDistance: 300
   aimAdjustThreshold: 30
   cancelBorderSize: 140
@@ -1877,6 +1876,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 1406428823}
   - {fileID: 1161757366}
-  - {fileID: 2123934874}
   - {fileID: 220000016}
+  - {fileID: 2123934874}
   - {fileID: 890003627}
