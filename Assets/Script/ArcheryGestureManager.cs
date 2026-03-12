@@ -105,6 +105,10 @@ public class ArcheryGestureManager : MonoBehaviour
              "양수: 오른쪽으로 향함, 음수: 왼쪽으로 향함")]
     public float maxYawAngle = 70f;
 
+    [Header("제스처 설정")]
+    [Tooltip("화살을 당기기 시작하는 최소 거리 (픽셀)")]
+    public float minDrawDistance = 2.0f;
+
     [Tooltip("최대로 당길 수 있는 거리 (픽셀)")]
     public float maxDrawDistance = 300f;
 
@@ -432,9 +436,13 @@ public class ArcheryGestureManager : MonoBehaviour
 
             GestureData data = CreateGestureData();
 
-            LogDebug($"[ArcheryGestureManager] OnDrawing Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}");
+            // 최소 거리를 당겼는지 확인
+            if (data.distance >= minDrawDistance)
+            {
+                LogDebug($"[ArcheryGestureManager] OnDrawing Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}");
 
-            OnDrawing?.Invoke(data);
+                OnDrawing?.Invoke(data);
+            }
         }
         else if (fingerId == secondaryTouchId && currentState == GestureState.Aiming)
         {
@@ -469,24 +477,32 @@ public class ArcheryGestureManager : MonoBehaviour
 
             if (currentState == GestureState.Drawing || currentState == GestureState.Aiming)
             {
-                // 바로 발사
-                Vector2 velocity = touchInfo.GetVelocity();
-                data.velocity = velocity;
-
-                currentState = GestureState.Released;
-
-                LogDebug($"[ArcheryGestureManager] OnRelease Invoke - distance={data.distance:F1}, velocity={velocity.magnitude:F1}");
-
-                // 활 발사 효과음 재생
-                PlayBowReleaseSound();
-
-                OnRelease?.Invoke(data);
-                ShootArrow(data);
-
-                // 화살 발사 카운트 증가
-                if (ScoreManager.Instance != null)
+                // 발사 조건 확인
+                if (data.distance >= minDrawDistance)
                 {
-                    ScoreManager.Instance.OnArrowShot();
+                    Vector2 velocity = touchInfo.GetVelocity();
+                    data.velocity = velocity;
+
+                    currentState = GestureState.Released;
+
+                    LogDebug($"[ArcheryGestureManager] OnRelease Invoke - distance={data.distance:F1}, velocity={velocity.magnitude:F1}");
+
+                    // 활 발사 효과음 재생
+                    PlayBowReleaseSound();
+
+                    OnRelease?.Invoke(data);
+                    ShootArrow(data);
+
+                    // 화살 발사 카운트 증가
+                    if (ScoreManager.Instance != null)
+                    {
+                        ScoreManager.Instance.OnArrowShot();
+                    }
+                }
+                else
+                {
+                    LogDebug($"[ArcheryGestureManager] Too short to shoot - distance={data.distance:F1} < {minDrawDistance}");
+                    CancelGesture();
                 }
             }
 
@@ -679,7 +695,15 @@ public class ArcheryGestureManager : MonoBehaviour
         // 현재 제스처 데이터 조회
         var data = GetCurrentGestureData();
 
-        // 실제로 조준 중이므로 프리뷰를 보여줌 (minDrawDistance 삭제됨)
+        // 최소 드로우 거리 미만이면 "그냥 클릭"으로 간주하고 프리뷰를 숨긴다.
+        if (data.distance < minDrawDistance)
+        {
+            HidePreview();
+            HideTrajectory();
+            return;
+        }
+
+        // 실제로 조준 중이므로 프리뷰를 보여줌
         EnsurePreviewInstance();
         if (previewInstance == null) return;
 
@@ -1091,6 +1115,17 @@ public class ArcheryGestureManager : MonoBehaviour
             style.fontSize = 16;
             // ------------------------------------------
         }
+
+        // --- 설정 값 요약 표시 (요청사항) ---
+        float settingsY = 200;
+        GUI.Box(new Rect(5, settingsY - 5, 250, 190), "Aim & Gesture Settings");
+        style.fontSize = 14;
+        GUI.Label(new Rect(10, settingsY + 20, 240, 25), $"Pitch Angle: {maxPitchAngle}°", style);
+        GUI.Label(new Rect(10, settingsY + 45, 240, 25), $"Yaw Angle: {maxYawAngle}°", style);
+        GUI.Label(new Rect(10, settingsY + 70, 240, 25), $"Min Draw: {minDrawDistance}px", style);
+        GUI.Label(new Rect(10, settingsY + 95, 240, 25), $"Max Draw: {maxDrawDistance}px", style);
+        GUI.Label(new Rect(10, settingsY + 120, 240, 25), $"Aim Adjust: {aimAdjustThreshold}px", style);
+        GUI.Label(new Rect(10, settingsY + 145, 240, 25), $"Cancel Border: {cancelBorderSize}px", style);
 
         // --- Cancel Border 시각화 (요청사항) ---
         Color oldColor = GUI.color;
