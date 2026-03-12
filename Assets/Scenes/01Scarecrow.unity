@@ -393,6 +393,66 @@ RectTransform:
   m_AnchoredPosition: {x: -400, y: 879.3}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &147761893 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8960043904558079735, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
+  m_PrefabInstance: {fileID: 1834974017}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &147761897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 147761893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67b9ed268126c45c1a01bb8f378b5a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StrawEffigy
+  score: 30
+--- !u!65 &147761898
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 147761893}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.014129482, y: 0.0019091123, z: 0.001469583}
+  m_Center: {x: 0.0008847624, y: 0.00058711204, z: 0.0053580105}
+--- !u!65 &147761899
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 147761893}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0034360294, y: 0.0037804488, z: 0.011052441}
+  m_Center: {x: 0.00007852763, y: -0.00021483182, z: 0.004841715}
 --- !u!1001 &156821625
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -888,7 +948,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8960043904558079735, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1004761633}
   m_SourcePrefab: {fileID: 100100000, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
 --- !u!1 &649283257
 GameObject:
@@ -1340,6 +1403,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 786347877}
   m_CullTransparentMesh: 1
+--- !u!1 &1004761629 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8960043904558079735, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
+  m_PrefabInstance: {fileID: 566787645}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1004761633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004761629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67b9ed268126c45c1a01bb8f378b5a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StrawEffigy
+  score: 20
 --- !u!1 &1093647406
 GameObject:
   m_ObjectHideFlags: 0
@@ -1519,8 +1600,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8960043904558079735, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1320757960}
   m_SourcePrefab: {fileID: 100100000, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
+--- !u!1 &1320757956 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8960043904558079735, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
+  m_PrefabInstance: {fileID: 1121077956}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1320757960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1320757956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67b9ed268126c45c1a01bb8f378b5a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StrawEffigy
+  score: 10
 --- !u!1 &1328702953
 GameObject:
   m_ObjectHideFlags: 0
@@ -2374,7 +2476,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8580387369019425869, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.94
+      value: -0.773
       objectReference: {fileID: 0}
     - target: {fileID: 8580387369019425869, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2382,7 +2484,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8580387369019425869, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 10.1
+      value: 10.07
       objectReference: {fileID: 0}
     - target: {fileID: 8580387369019425869, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2419,7 +2521,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8960043904558079735, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 147761897}
+    - targetCorrespondingSourceObject: {fileID: 8960043904558079735, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 147761899}
+    - targetCorrespondingSourceObject: {fileID: 8960043904558079735, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 147761898}
   m_SourcePrefab: {fileID: 100100000, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
 --- !u!1 &1947724627
 GameObject:
