@@ -1429,15 +1429,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8580387369019425869, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.679
+      value: 4.76
       objectReference: {fileID: 0}
     - target: {fileID: 8580387369019425869, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.098
+      value: 2.35
       objectReference: {fileID: 0}
     - target: {fileID: 8580387369019425869, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.367
+      value: 3.29
       objectReference: {fileID: 0}
     - target: {fileID: 8580387369019425869, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1480,9 +1480,6 @@ PrefabInstance:
       addedObject: {fileID: 1320757960}
     - targetCorrespondingSourceObject: {fileID: 8960043904558079735, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1320757962}
-    - targetCorrespondingSourceObject: {fileID: 8960043904558079735, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1320757961}
   m_SourcePrefab: {fileID: 100100000, guid: 55e0344fda56745589f5b329edc7f5bc, type: 3}
 --- !u!1 &1320757956 stripped
@@ -1503,31 +1500,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StrawEffigy
   score: 1
---- !u!136 &1320757961
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1320757956}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Radius: 0.00059754547
-  m_Height: 0.015823998
-  m_Direction: 0
-  m_Center: {x: 0.000025056204, y: 0.00011607746, z: 0.005313409}
---- !u!136 &1320757962
-CapsuleCollider:
+--- !u!65 &1320757961
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1544,11 +1518,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.0016145289
-  m_Height: 0.010852629
-  m_Direction: 2
-  m_Center: {x: 0.00009547393, y: -0.0000035806497, z: 0.0047376733}
+  serializedVersion: 3
+  m_Size: {x: 0.0017022783, y: 0.0022450394, z: 0.010409488}
+  m_Center: {x: 0.00019527343, y: 0.000057783738, z: 0.004744944}
 --- !u!1 &1328702953
 GameObject:
   m_ObjectHideFlags: 0
@@ -2197,7 +2169,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.00059754547
   m_Height: 0.015823998
@@ -2339,7 +2311,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.00059754547
   m_Height: 0.015823998
@@ -2364,10 +2336,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.0016145289
-  m_Height: 0.010852629
+  m_Radius: 0.0008946071
+  m_Height: 0.01035181
   m_Direction: 2
-  m_Center: {x: 0.00009547393, y: -0.0000035806497, z: 0.0047376733}
+  m_Center: {x: 0.00009547389, y: 0.000090322144, z: 0.0046959394}
 --- !u!114 &1714133239
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,22 +3,17 @@ using UnityEngine;
 public class StrawEffigy : MonoBehaviour
 {
     [Header("허수아비 점수 설정")]
-    [SerializeField] private int score = 10;
+    [SerializeField] private int score = 1;
 
     public int Score => score;
 
     // 화살이 허수아비에 닿았을 때 화살을 멈추고 점수를 주는 역할
     private void OnCollisionEnter(Collision collision)
     {
-        TryHandleArrowHit(collision.collider, collision);
+        TryHandleArrowHit(collision.collider);
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        TryHandleArrowHit(other, null);
-    }
-
-    private void TryHandleArrowHit(Collider other, Collision collision)
+    private void TryHandleArrowHit(Collider other)
     {
         // 화살(ArcheryArrow)인지 확인
         ArcheryArrow arrow = other.GetComponentInParent<ArcheryArrow>();
@@ -27,14 +22,6 @@ public class StrawEffigy : MonoBehaviour
         // 화살의 Rigidbody / Collider 가져오기
         Rigidbody arrowRb = arrow.GetComponent<Rigidbody>();
         Collider arrowCol = arrow.GetComponent<Collider>();
-
-        // 충돌 지점 기준으로 위치/회전 정렬 (Collision 정보가 있을 때만)
-        if (collision != null && collision.contacts.Length > 0)
-        {
-            ContactPoint contact = collision.contacts[0];
-            arrow.transform.position = contact.point;
-            arrow.transform.rotation = Quaternion.LookRotation(-contact.normal, Vector3.up);
-        }
 
         // 화살 물리 멈추기
         if (arrowRb != null)
