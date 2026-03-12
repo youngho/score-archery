@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Terrain
   - WoodBoat
+  - Arrow
   layers:
   - Default
   - TransparentFX

@@ -105,10 +105,6 @@ public class ArcheryGestureManager : MonoBehaviour
              "양수: 오른쪽으로 향함, 음수: 왼쪽으로 향함")]
     public float maxYawAngle = 70f;
 
-    [Header("제스처 설정")]
-    [Tooltip("화살을 당기기 시작하는 최소 거리 (픽셀)")]
-    public float minDrawDistance = 50f;
-
     [Tooltip("최대로 당길 수 있는 거리 (픽셀)")]
     public float maxDrawDistance = 300f;
 
@@ -436,13 +432,9 @@ public class ArcheryGestureManager : MonoBehaviour
 
             GestureData data = CreateGestureData();
 
-            // 최소 거리를 당겼는지 확인
-            if (data.distance >= minDrawDistance)
-            {
-                LogDebug($"[ArcheryGestureManager] OnDrawing Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}");
+            LogDebug($"[ArcheryGestureManager] OnDrawing Invoke - distance={data.distance:F1}, power={data.normalizedPower:F2}, angle={data.angle:F1}");
 
-                OnDrawing?.Invoke(data);
-            }
+            OnDrawing?.Invoke(data);
         }
         else if (fingerId == secondaryTouchId && currentState == GestureState.Aiming)
         {
@@ -477,39 +469,29 @@ public class ArcheryGestureManager : MonoBehaviour
 
             if (currentState == GestureState.Drawing || currentState == GestureState.Aiming)
             {
-                // 발사 조건 확인
-                if (data.distance >= minDrawDistance)
+                // 바로 발사
+                Vector2 velocity = touchInfo.GetVelocity();
+                data.velocity = velocity;
+
+                currentState = GestureState.Released;
+
+                LogDebug($"[ArcheryGestureManager] OnRelease Invoke - distance={data.distance:F1}, velocity={velocity.magnitude:F1}");
+
+                // 활 발사 효과음 재생
+                PlayBowReleaseSound();
+
+                OnRelease?.Invoke(data);
+                ShootArrow(data);
+
+                // 화살 발사 카운트 증가
+                if (ScoreManager.Instance != null)
                 {
-                    Vector2 velocity = touchInfo.GetVelocity();
-                    data.velocity = velocity;
-
-                    currentState = GestureState.Released;
-
-                    LogDebug($"[ArcheryGestureManager] OnRelease Invoke - distance={data.distance:F1}, velocity={velocity.magnitude:F1}");
-
-                    // 활 발사 효과음 재생
-                    PlayBowReleaseSound();
-
-                    OnRelease?.Invoke(data);
-                    ShootArrow(data);
-
-                    // 화살 발사 카운트 증가
-                    if (ScoreManager.Instance != null)
-                    {
-                        ScoreManager.Instance.OnArrowShot();
-                    }
-                }
-                else
-                {
-                    // 충분히 당기지 않음 - 취소
-                    CancelGesture();
+                    ScoreManager.Instance.OnArrowShot();
                 }
             }
 
             OnDrawEnd?.Invoke(data);
-
             LogDebug("[ArcheryGestureManager] OnDrawEnd Invoke - gesture finished");
-
             ResetGesture();
         }
         else if (fingerId == secondaryTouchId)
@@ -519,7 +501,6 @@ public class ArcheryGestureManager : MonoBehaviour
             if (currentState == GestureState.Aiming)
             {
                 currentState = GestureState.Drawing;
-
                 LogDebug("[ArcheryGestureManager] Secondary touch ended - back to Drawing state");
             }
         }
@@ -698,15 +679,7 @@ public class ArcheryGestureManager : MonoBehaviour
         // 현재 제스처 데이터 조회
         var data = GetCurrentGestureData();
 
-        // 최소 드로우 거리 미만이면 "그냥 클릭"으로 간주하고 프리뷰를 숨긴다.
-        if (data.distance < minDrawDistance)
-        {
-            HidePreview();
-            HideTrajectory();
-            return;
-        }
-
-        // 여기까지 왔으면 실제로 조준 중이므로 프리뷰를 보여줌
+        // 실제로 조준 중이므로 프리뷰를 보여줌 (minDrawDistance 삭제됨)
         EnsurePreviewInstance();
         if (previewInstance == null) return;
 
