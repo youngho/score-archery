@@ -684,7 +684,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScarecrowStart
   popupObject: {fileID: 0}
   clickPanel: {fileID: 0}
-  timer: {fileID: 0}
+  timer: {fileID: 1947724629}
 --- !u!1 &471374778
 GameObject:
   m_ObjectHideFlags: 0
@@ -2262,9 +2262,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1947724627}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0674d9943d6314655beef618489951fe, type: 3}
+  m_Script: {fileID: 11500000, guid: 0ae392df589f1e8439316f88b61b2776, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ScarecrowTimer
+  m_EditorClassIdentifier: Assembly-CSharp::Timer
   onTimerEnd:
     m_PersistentCalls:
       m_Calls: []
