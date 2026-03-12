@@ -2329,7 +2329,7 @@ MonoBehaviour:
   minDrawDistance: 50
   maxDrawDistance: 300
   aimAdjustThreshold: 30
-  cancelBorderSize: 140
+  cancelBorderSize: 10
   bowDrawStartSound: {fileID: 0}
   bowReleaseSound: {fileID: 8300000, guid: 97527723d1d014afcb465bb141010346, type: 3}
   showDebugLog: 0

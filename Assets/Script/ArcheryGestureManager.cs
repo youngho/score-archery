@@ -116,7 +116,7 @@ public class ArcheryGestureManager : MonoBehaviour
     public float aimAdjustThreshold = 30f;
 
     [Tooltip("제스처가 취소되는 경계 영역 (화면 가장자리)")]
-    public float cancelBorderSize = 100f;
+    public float cancelBorderSize = 10f;
 
     [Header("Audio Settings")]
     [Tooltip("활을 당기기 시작할 때 재생할 효과음")]
@@ -1089,6 +1089,34 @@ public class ArcheryGestureManager : MonoBehaviour
             {
                 GUI.Label(new Rect(10, 160, 300, 30), $"Aim Offset: {data.aimOffset}", style);
             }
+
+            // --- Max Pitch Angle 시각화 (요청사항) ---
+            Color pitchColor = GUI.color;
+            
+            // 1. GUI 좌표계로 변환 (Unity GUI는 Top-Left가 0,0)
+            float guiStartX = drawStartPosition.x;
+            float guiStartY = Screen.height - drawStartPosition.y;
+            float guiCurY = Screen.height - currentDrawPosition.y;
+
+            // 2. 수직 가이드 영역 그리기 (maxDrawDistance 만큼 상하 범위)
+            GUI.color = new Color(0f, 1f, 0f, 0.2f); // 반투명 초록색
+            float barWidth = 10f;
+            GUI.Box(new Rect(guiStartX - barWidth / 2, guiStartY - maxDrawDistance, barWidth, maxDrawDistance * 2), "");
+
+            // 3. 현재 터치 위치 수직선 표시
+            GUI.color = Color.green;
+            GUI.Box(new Rect(guiStartX - 20, guiCurY - 2, 40, 4), "");
+
+            // 4. 상하단 캡션
+            style.fontSize = 12;
+            style.alignment = TextAnchor.MiddleCenter;
+            GUI.Label(new Rect(guiStartX - 50, guiStartY - maxDrawDistance - 20, 100, 20), $"+{maxPitchAngle}°", style);
+            GUI.Label(new Rect(guiStartX - 50, guiStartY + maxDrawDistance, 100, 20), $"-{maxPitchAngle}°", style);
+            
+            GUI.color = pitchColor;
+            style.alignment = TextAnchor.UpperLeft; // 스타일 복구
+            style.fontSize = 16;
+            // ------------------------------------------
         }
 
         // --- Cancel Border 시각화 (요청사항) ---
