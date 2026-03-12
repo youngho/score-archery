@@ -105,6 +105,13 @@ public class ArcheryGestureManager : MonoBehaviour
              "양수: 오른쪽으로 향함, 음수: 왼쪽으로 향함")]
     public float maxYawAngle = 70f;
 
+    [Header("화살 생명 시간 설정")]
+    [Tooltip("화살이 생성된 뒤 자동으로 사라질 때까지의 시간 (초)")]
+    public float arrowTotalLifetime = 8f;
+
+    [Tooltip("무언가에 맞은 후 유지되는 시간 (초)")]
+    public float arrowLifetimeAfterHit = 2f;
+
     [Header("제스처 설정")]
     [Tooltip("화살을 당기기 시작하는 최소 거리 (픽셀)")]
     public float minDrawDistance = 2.0f;
@@ -1059,6 +1066,13 @@ public class ArcheryGestureManager : MonoBehaviour
         else
         {
             LogDebug("[ArcheryGestureManager] Spawned arrow has no Rigidbody component");
+        }
+
+        // 9단계: 화살 생명 시간 설정 (총 생명 + 충돌 후 생명)
+        ArcheryArrow archeryArrow = arrow.GetComponent<ArcheryArrow>();
+        if (archeryArrow != null)
+        {
+            archeryArrow.ConfigureLifetime(arrowTotalLifetime, arrowLifetimeAfterHit);
         }
     }
     #endregion

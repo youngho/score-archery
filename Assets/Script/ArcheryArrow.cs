@@ -9,8 +9,10 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class ArcheryArrow : MonoBehaviour
 {
-    [Tooltip("화살이 자동으로 사라지는 시간 (초)")]
-    public float lifeTime = 8f;
+// 화살 총 생명 시간 / 피격 후 생명 시간은 ArcheryGestureManager 에서 주입한다.
+// 여기서는 인스펙터에 노출하지 않고, 기본값만 안전하게 잡아둔다.
+private float totalLifeTime = 8f;
+private float lifeTimeAfterHit = 2f;
 
     [Tooltip("아주 느리게 움직일 때 방향 보정을 멈추기 위한 최소 속도 제곱")]
     public float minVelocitySqrForRotate = 0.05f;
@@ -51,9 +53,9 @@ public class ArcheryArrow : MonoBehaviour
     private void Start()
     {
         // 일정 시간 후 자동 제거
-        if (lifeTime > 0f)
+        if (totalLifeTime > 0f)
         {
-            Destroy(gameObject, lifeTime);
+            Destroy(gameObject, totalLifeTime);
         }
 
         // Start에서 초기 회전 저장 (ShootArrow에서 설정한 회전을 보존)
@@ -68,8 +70,17 @@ public class ArcheryArrow : MonoBehaviour
 
         if (logDebug)
         {
-            Debug.Log($"[ArcheryArrow] Start - lifeTime={lifeTime}, initialRotation={initialRotation.eulerAngles}, showTrail={showTrail}", this); // ARCHERY_DEBUG_LOG
+            Debug.Log($"[ArcheryArrow] Start - totalLifeTime={totalLifeTime}, initialRotation={initialRotation.eulerAngles}, showTrail={showTrail}", this); // ARCHERY_DEBUG_LOG
         }
+    }
+
+    /// <summary>
+    /// ArcheryGestureManager 에서 화살 생성 직후 생명 시간을 설정할 때 사용.
+    /// </summary>
+    public void ConfigureLifetime(float totalLifetimeSeconds, float afterHitLifetimeSeconds)
+    {
+        totalLifeTime = totalLifetimeSeconds;
+        lifeTimeAfterHit = afterHitLifetimeSeconds;
     }
 
     private void SetupTrail()
@@ -173,7 +184,10 @@ public class ArcheryArrow : MonoBehaviour
         }
 
         // 충돌 직후 바로 사라지지 않도록 약간의 시간 후 제거
-        Destroy(gameObject, 2f);
+        if (lifeTimeAfterHit > 0f)
+        {
+            Destroy(gameObject, lifeTimeAfterHit);
+        }
 
         if (logDebug)
         {
