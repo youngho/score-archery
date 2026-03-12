@@ -1090,6 +1090,24 @@ public class ArcheryGestureManager : MonoBehaviour
                 GUI.Label(new Rect(10, 160, 300, 30), $"Aim Offset: {data.aimOffset}", style);
             }
         }
+
+        // --- Cancel Border 시각화 (요청사항) ---
+        Color oldColor = GUI.color;
+        // 반투명 빨간색으로 경계 표시
+        GUI.color = new Color(1f, 0f, 0f, 0.3f);
+        
+        float w = Screen.width;
+        float h = Screen.height;
+        float b = cancelBorderSize;
+
+        // 화면 4면에 박스 그려서 취소 영역 표시 (터치가 이 영역에 들어오면 취소됨)
+        GUI.Box(new Rect(0, 0, w, b), ""); // 상단
+        GUI.Box(new Rect(0, h - b, w, b), ""); // 하단
+        GUI.Box(new Rect(0, b, b, h - 2 * b), ""); // 좌측
+        GUI.Box(new Rect(w - b, b, b, h - 2 * b), ""); // 우측
+
+        GUI.color = oldColor;
+        // ------------------------------------
     }
 
     private void LogDebug(string message)
