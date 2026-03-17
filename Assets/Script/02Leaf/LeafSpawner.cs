@@ -25,6 +25,13 @@ public class LeafSpawner : MonoBehaviour
     [Tooltip("If the leaf falls below this local Y position relative to start position, it will be destroyed.")]
     public float leafFallingDistanceLimit = 20f;
 
+    [Header("Leaf Hit Settings")]
+    [Tooltip("Amount of score awarded when the leaf is hit")]
+    public int leafScore = 1;
+
+    [Tooltip("Particle effect spawned when the leaf is hit by an arrow")]
+    public GameObject leafHitEffectPrefab;
+
     private float _spawnTimer;
 
     private void Update()
@@ -62,6 +69,9 @@ public class LeafSpawner : MonoBehaviour
         fallingLeaf.swayDistanceX = leafSwayDistanceX;
         fallingLeaf.swayDistanceZ = leafSwayDistanceZ;
         fallingLeaf.fallingDistanceLimit = leafFallingDistanceLimit;
+        
+        fallingLeaf.scoreValue = leafScore;
+        fallingLeaf.hitEffectPrefab = leafHitEffectPrefab;
     }
 
     private void OnDrawGizmosSelected()
@@ -83,11 +93,16 @@ public class FallingLeaf : MonoBehaviour
     [HideInInspector] public float swayDistanceX;
     [HideInInspector] public float swayDistanceZ;
     [HideInInspector] public float fallingDistanceLimit;
+    
+    [HideInInspector] public int scoreValue;
+    [HideInInspector] public GameObject hitEffectPrefab;
 
     private float _randomTimeOffsetX;
     private float _randomTimeOffsetZ;
     private Vector3 _startPosition;
     private float _currentY;
+
+    private bool _isDestroyed = false;
 
     private void Start()
     {
@@ -107,6 +122,8 @@ public class FallingLeaf : MonoBehaviour
 
     private void Update()
     {
+        if (_isDestroyed) return;
+
         // 1. Calculate falling (downwards)
         _currentY -= fallSpeed * Time.deltaTime;
 
@@ -128,5 +145,41 @@ public class FallingLeaf : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        TryHandleArrowHit(collision.collider);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        TryHandleArrowHit(other);
+    }
+
+    private void TryHandleArrowHit(Collider other)
+    {
+        if (_isDestroyed) return;
+
+        // Check if hit object is an ArcheryArrow
+        ArcheryArrow arrow = other.GetComponentInParent<ArcheryArrow>();
+        if (arrow == null) return;
+
+        _isDestroyed = true;
+
+        // Spawn hit effect if assigned
+        if (hitEffectPrefab != null)
+        {
+            Instantiate(hitEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        // Add score
+        if (ScoreManager.Instance != null && scoreValue > 0)
+        {
+            ScoreManager.Instance.AddScore(scoreValue);
+        }
+
+        // Destroy Leaf
+        Destroy(gameObject);
     }
 }

@@ -530,7 +530,7 @@ MonoBehaviour:
   dialSlider: {fileID: 1971792171}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
   countDownSound: {fileID: 8300000, guid: 70014389074e9495db8a8142399628ce, type: 3}
-  startSeconds: 30
+  startSeconds: 60
   _timerText: {fileID: 1120113107}
 --- !u!1 &814761169
 GameObject:
@@ -1703,6 +1703,8 @@ MonoBehaviour:
   bowDrawStartSound: {fileID: 0}
   bowReleaseSound: {fileID: 8300000, guid: 97527723d1d014afcb465bb141010346, type: 3}
   showDebugLog: 0
+  showAimLine: 1
+  showTargetHighlight: 1
   drawLineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   aimLineColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!1 &1971792169
@@ -1828,11 +1830,13 @@ MonoBehaviour:
   spawnPoint: {fileID: 1718557539}
   spawnRadius: 5
   spawnInterval: 5
-  leafFallSpeed: 1.8
+  leafFallSpeed: 0.1
   leafSwaySpeed: 1
   leafSwayDistanceX: 0.1
   leafSwayDistanceZ: 3
   leafFallingDistanceLimit: 20
+  leafScore: 1
+  leafHitEffectPrefab: {fileID: 0}
 --- !u!1 &2122766135
 GameObject:
   m_ObjectHideFlags: 0
