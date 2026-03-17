@@ -135,8 +135,13 @@ public class ArcheryGestureManager : MonoBehaviour
     [Header("디버그")]
     [Tooltip("제스처 처리 및 조준 프리뷰 관련 로그를 출력할지 여부")]
     public bool showDebugLog = false;
+
+    [Tooltip("조준 궤적(Aim Line)을 화면에 표시할지 여부")]
+    public bool showAimLine = true;
+
+    [Tooltip("Line Renderer의 색상을 지정합니다")]
     public Color drawLineColor = Color.yellow;
-    public Color aimLineColor = Color.cyan;
+    public Color aimLineColor = Color.red;
 
     #endregion
 
@@ -859,12 +864,22 @@ public class ArcheryGestureManager : MonoBehaviour
     /// </summary>
     private void DrawTrajectory(Vector3 startPos, Vector3 velocity)
     {
+        if (!showAimLine)
+        {
+            HideTrajectory();
+            return;
+        }
+
         EnsureTrajectoryLineRenderer();
 
         if (trajectoryLineRenderer == null)
         {
             return;
         }
+
+        // 실시간으로 색상 업데이트 (인스펙터에서 변경 시 즉시 반영되도록)
+        trajectoryLineRenderer.startColor = aimLineColor;
+        trajectoryLineRenderer.endColor = aimLineColor;
 
         float timeStep = 0.05f;
         float maxTime = 2.0f;
@@ -914,8 +929,8 @@ public class ArcheryGestureManager : MonoBehaviour
         
         // LineRenderer 설정
         trajectoryLineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        trajectoryLineRenderer.startColor = Color.red;
-        trajectoryLineRenderer.endColor = Color.red;
+        trajectoryLineRenderer.startColor = aimLineColor;
+        trajectoryLineRenderer.endColor = aimLineColor;
         trajectoryLineRenderer.startWidth = 0.05f;
         trajectoryLineRenderer.endWidth = 0.02f;
         trajectoryLineRenderer.useWorldSpace = true;
