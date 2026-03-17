@@ -530,7 +530,7 @@ MonoBehaviour:
   dialSlider: {fileID: 1971792171}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
   countDownSound: {fileID: 8300000, guid: 70014389074e9495db8a8142399628ce, type: 3}
-  startSeconds: 60
+  startSeconds: 30
   _timerText: {fileID: 1120113107}
 --- !u!1 &814761169
 GameObject:
@@ -1142,7 +1142,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScarecrowStart
   popupObject: {fileID: 0}
   clickPanel: {fileID: 0}
-  timer: {fileID: 0}
+  timer: {fileID: 649023245}
 --- !u!114 &1173657403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1663,6 +1663,9 @@ MonoBehaviour:
   maxForce: 30
   maxPitchAngle: 80
   maxYawAngle: 80
+  arrowTotalLifetime: 8
+  arrowLifetimeAfterHit: 2
+  minDrawDistance: 2
   maxDrawDistance: 300
   aimAdjustThreshold: 30
   cancelBorderSize: 140
