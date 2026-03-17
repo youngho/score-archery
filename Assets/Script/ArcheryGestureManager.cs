@@ -139,6 +139,9 @@ public class ArcheryGestureManager : MonoBehaviour
     [Tooltip("조준 궤적(Aim Line)을 화면에 표시할지 여부")]
     public bool showAimLine = true;
 
+    [Tooltip("Aim이 오브젝트에 닿았을 때 오브젝트 주변을 강조할지 여부")]
+    public bool showTargetHighlight = true;
+
     [Tooltip("Line Renderer의 색상을 지정합니다")]
     public Color drawLineColor = Color.yellow;
     public Color aimLineColor = Color.red;
@@ -169,6 +172,15 @@ public class ArcheryGestureManager : MonoBehaviour
     // 궤적 시각화 관련
     private GameObject trajectoryLineObject;
     private LineRenderer trajectoryLineRenderer;
+
+    // 타겟 오브젝트 자체 색상 강조용 (PropertyBlock)
+    private Renderer currentHighlightedRenderer;
+    private MaterialPropertyBlock highlightPropertyBlock;
+
+    // 타겟 오브젝트를 감싸는 후광(아우라) 메쉬용
+    private GameObject targetHighlightAura;
+    private MeshFilter auraMeshFilter;
+    private MeshRenderer auraMeshRenderer;
     #endregion
 
     #region Enums
@@ -289,6 +301,7 @@ public class ArcheryGestureManager : MonoBehaviour
         // 3D 조준 프리뷰 정리
         HidePreview();
         HideTrajectory();
+        HideTargetHighlight();
         }
     }
 
@@ -701,6 +714,7 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             HidePreview();
             HideTrajectory();
+            HideTargetHighlight();
             return;
         }
 
@@ -712,6 +726,7 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             HidePreview();
             HideTrajectory();
+            HideTargetHighlight();
             return;
         }
 
@@ -888,10 +903,30 @@ public class ArcheryGestureManager : MonoBehaviour
         List<Vector3> trajectoryPoints = new List<Vector3>();
         trajectoryPoints.Add(startPos); // 시작점 추가
 
+        Vector3 lastPos = startPos;
+        bool objectHit = false;
+        Collider hitCollider = null;
+
         for (float t = timeStep; t <= maxTime; t += timeStep)
         {
             Vector3 pos = startPos + velocity * t + 0.5f * gravity * t * t;
+            
+            // 이전 위치와 현재 위치 사이에 오브젝트가 있는지 검사 (충돌 체크)
+            // QueryTriggerInteraction.Collide를 사용하여 Trigger 상태의 Leaf도 감지
+            if (Physics.Linecast(lastPos, pos, out RaycastHit hit, ~0, QueryTriggerInteraction.Collide))
+            {
+                // 화살 궤적은 자기 자신/발사대 근처를 무시할 필요가 있음
+                if (hit.collider.gameObject != gameObject && hit.collider.transform.root != transform.root)
+                {
+                    trajectoryPoints.Add(hit.point);
+                    objectHit = true;
+                    hitCollider = hit.collider;
+                    break; // 충돌했으므로 궤적 계산 중단
+                }
+            }
+
             trajectoryPoints.Add(pos);
+            lastPos = pos;
             
             if (pos.y < startPos.y - 0.1f && velocity.y < 0)
             {
@@ -910,7 +945,115 @@ public class ArcheryGestureManager : MonoBehaviour
             trajectoryLineObject.SetActive(true);
         }
 
-        LogDebug($"[ArcheryGestureManager] DrawTrajectory - startPos: {startPos}, velocity: {velocity}, points: {trajectoryPoints.Count}");
+        // 오브젝트에 궤적이 닿았다면 해당 타겟 강조!
+        if (objectHit && showTargetHighlight && hitCollider != null)
+        {
+            LogDebug($"[Target Highlight] 🎯 오브젝트 조준됨! 이름: '{hitCollider.name}', 위치: {hitCollider.transform.position}");
+            DrawTargetHighlight(hitCollider);
+        }
+        else
+        {
+            HideTargetHighlight();
+        }
+
+        LogDebug($"[ArcheryGestureManager] DrawTrajectory - startPos: {startPos}, velocity: {velocity}, points: {trajectoryPoints.Count}, hit: {objectHit}");
+    }
+
+    private void DrawTargetHighlight(Collider target)
+    {
+        // 1. 타겟 렌더러 찾기 (Material 인스턴스 변경 없이 Property Block으로 색상만 오버라이드)
+        Renderer targetRenderer = target.GetComponent<Renderer>();
+        if (targetRenderer == null) targetRenderer = target.GetComponentInChildren<Renderer>();
+
+        if (targetRenderer != null)
+        {
+            if (currentHighlightedRenderer != null && currentHighlightedRenderer != targetRenderer)
+            {
+                // 이전 타겟 복구
+                currentHighlightedRenderer.SetPropertyBlock(null);
+            }
+
+            currentHighlightedRenderer = targetRenderer;
+
+            if (highlightPropertyBlock == null)
+            {
+                highlightPropertyBlock = new MaterialPropertyBlock();
+            }
+
+            targetRenderer.GetPropertyBlock(highlightPropertyBlock);
+            
+            // 색상과 발광(Emission) 컬러를 현재 조준선 색으로 변경 (HDR 멀티플라이)
+            highlightPropertyBlock.SetColor("_Color", aimLineColor);
+            highlightPropertyBlock.SetColor("_BaseColor", aimLineColor);
+            highlightPropertyBlock.SetColor("_EmissionColor", aimLineColor * 2.5f);
+            
+            targetRenderer.SetPropertyBlock(highlightPropertyBlock);
+        }
+
+        // 2. 오브젝트 주변을 감싸는 빛나는 아우라 연출
+        MeshFilter targetMesh = target.GetComponent<MeshFilter>();
+        if (targetMesh == null) targetMesh = target.GetComponentInChildren<MeshFilter>();
+
+        if (targetMesh != null && targetMesh.sharedMesh != null && targetRenderer != null)
+        {
+            EnsureTargetHighlightRenderer();
+
+            // 매쉬 복사 및 동기화
+            auraMeshFilter.sharedMesh = targetMesh.sharedMesh;
+            targetHighlightAura.transform.position = targetRenderer.transform.position;
+            targetHighlightAura.transform.rotation = targetRenderer.transform.rotation;
+            
+            // 원본보다 살짝 크기를 키워서 껍질(Aura)처럼 감싸게 만들기
+            targetHighlightAura.transform.SetParent(null);
+            targetHighlightAura.transform.localScale = targetRenderer.transform.lossyScale * 1.15f;
+            targetHighlightAura.transform.SetParent(transform);
+
+            // 반투명 색상 설정
+            Color auraColor = aimLineColor;
+            auraColor.a = 0.4f; // 40% 투명도
+            auraMeshRenderer.material.color = auraColor;
+
+            targetHighlightAura.SetActive(true);
+        }
+        else if (targetHighlightAura != null)
+        {
+            targetHighlightAura.SetActive(false);
+        }
+    }
+
+    private void EnsureTargetHighlightRenderer()
+    {
+        if (targetHighlightAura != null) return;
+
+        targetHighlightAura = new GameObject("TargetHighlightAura");
+        targetHighlightAura.transform.SetParent(transform);
+        
+        auraMeshFilter = targetHighlightAura.AddComponent<MeshFilter>();
+        auraMeshRenderer = targetHighlightAura.AddComponent<MeshRenderer>();
+        
+        // 투명하고 빛나는 색을 입히기 좋은 기본 셰이더 (Unlit Transparent 방식)
+        Material auraMat = new Material(Shader.Find("Sprites/Default"));
+        auraMeshRenderer.material = auraMat;
+        auraMeshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        auraMeshRenderer.receiveShadows = false;
+
+        targetHighlightAura.SetActive(false);
+    }
+
+    private void HideTargetHighlight()
+    {
+        // 1. 오브젝트 자체 색상 복구
+        if (currentHighlightedRenderer != null)
+        {
+            currentHighlightedRenderer.SetPropertyBlock(null);
+            currentHighlightedRenderer = null;
+        }
+
+        // 2. 아우라 메쉬 끄기
+        if (targetHighlightAura != null && targetHighlightAura.activeSelf)
+        {
+            targetHighlightAura.SetActive(false);
+        }
     }
 
     private void EnsureTrajectoryLineRenderer()
