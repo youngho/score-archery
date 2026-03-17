@@ -1005,12 +1005,12 @@ public class ArcheryGestureManager : MonoBehaviour
             
             // 원본보다 살짝 크기를 키워서 껍질(Aura)처럼 감싸게 만들기
             targetHighlightAura.transform.SetParent(null);
-            targetHighlightAura.transform.localScale = targetRenderer.transform.lossyScale * 1.15f;
+            targetHighlightAura.transform.localScale = targetRenderer.transform.lossyScale * 1.0f;
             targetHighlightAura.transform.SetParent(transform);
 
             // 반투명 색상 설정
             Color auraColor = aimLineColor;
-            auraColor.a = 0.4f; // 40% 투명도
+            auraColor.a = 0.1f; // 10% 투명도
             auraMeshRenderer.material.color = auraColor;
 
             targetHighlightAura.SetActive(true);
