@@ -690,7 +690,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 926488743}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &617470907
@@ -1205,13 +1206,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 926488742}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.20327085, y: -0, z: -0, w: 0.9791226}
-  m_LocalPosition: {x: -735, y: -406.1435, z: 5.324237}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -2, z: 4.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 743254434}
-  m_Father: {fileID: 1781286125}
+  m_Father: {fileID: 617470906}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &926488744
 MonoBehaviour:
@@ -1248,12 +1249,17 @@ MonoBehaviour:
   maxForce: 30
   maxPitchAngle: 80
   maxYawAngle: 80
+  arrowTotalLifetime: 8
+  arrowLifetimeAfterHit: 2
+  minDrawDistance: 2
   maxDrawDistance: 300
   aimAdjustThreshold: 30
   cancelBorderSize: 140
   bowDrawStartSound: {fileID: 0}
   bowReleaseSound: {fileID: 8300000, guid: 97527723d1d014afcb465bb141010346, type: 3}
   showDebugLog: 0
+  showAimLine: 1
+  showTargetHighlight: 1
   drawLineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   aimLineColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!1001 &928256978
@@ -2514,7 +2520,6 @@ RectTransform:
   - {fileID: 973155922}
   - {fileID: 1359422190}
   - {fileID: 81378878}
-  - {fileID: 926488743}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
