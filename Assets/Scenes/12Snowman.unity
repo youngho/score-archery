@@ -549,6 +549,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1871826290}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &485479873
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 485479875}
+  - component: {fileID: 485479874}
+  m_Layer: 0
+  m_Name: SnowmanScoreManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &485479874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485479873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e2f7f4854fa44f8b5adca1a0d5437c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SnowmanScoreManager
+  snowmanScoreText: {fileID: 748458790}
+  snowColor: {r: 1, g: 1, b: 1, a: 1}
+  explosionDuration: 1
+  breakSound: {fileID: 0}
+--- !u!4 &485479875
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485479873}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 20}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &491351701
 GameObject:
   m_ObjectHideFlags: 0
@@ -2012,3 +2060,4 @@ SceneRoots:
   - {fileID: 109016985}
   - {fileID: 869010916}
   - {fileID: 1556953454}
+  - {fileID: 485479875}
