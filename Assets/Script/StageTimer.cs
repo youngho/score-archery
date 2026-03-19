@@ -20,6 +20,8 @@ public class Timer : MonoBehaviour
 
     bool timerRunning = false;
     bool timerPaused = false;
+
+    public bool IsRunning => timerRunning;
     
     [Header("Warning Settings")]
     public Color warningColor = Color.red;
