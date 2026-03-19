@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: a9ace6828e1fc498a888bebac00d52f8, type: 2}
+  m_LightingDataAsset: {fileID: 112000000, guid: 1ff9029b3470441e4bfeb678aa28f56a, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: d9ec5ae91131f463081918b1dc1748fd, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -193,6 +193,51 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6625984507259324429, guid: ccebfc242bed46749a5dcef87dd83423, type: 3}
   m_PrefabInstance: {fileID: 33210540}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &42427482
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 42427483}
+  - component: {fileID: 42427484}
+  m_Layer: 0
+  m_Name: RubberDuckScoreManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &42427483
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 42427482}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -19.85, y: 5.72, z: -40.72}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &42427484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 42427482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed151334aaa134ddab2fa4452d8c201e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RubberDuckScoreManager
+  pointsPerDuck: 1
 --- !u!1 &49976480
 GameObject:
   m_ObjectHideFlags: 0
@@ -16676,3 +16721,4 @@ SceneRoots:
   - {fileID: 1373059967}
   - {fileID: 1170059275}
   - {fileID: 812258012}
+  - {fileID: 42427483}
