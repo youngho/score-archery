@@ -43,7 +43,7 @@ public class SnowmanScoreManager : MonoBehaviour
         if (ScoreManager.Instance != null)
         {
             // Give 10 points for a snowman as they are harder/different from balloons
-            ScoreManager.Instance.AddScore(10);
+            ScoreManager.Instance.AddScore(1);
         }
 
         UpdateUI();
