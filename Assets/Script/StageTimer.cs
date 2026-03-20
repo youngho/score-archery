@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 public class Timer : MonoBehaviour
 {
     public UnityEvent onTimerEnd;
+    public UnityEvent onTimerStart;
     
     [Tooltip("If checked, runs the timer on play")]
     public bool startAtRuntime = true;
@@ -89,6 +90,7 @@ public class Timer : MonoBehaviour
         {
             timerRunning = true;
         }
+            onTimerStart.Invoke();
     }
 
     public void StopTimer()
