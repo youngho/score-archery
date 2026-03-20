@@ -1,18 +1,33 @@
 using UnityEngine;
 
+/// 월드 X축 방향으로 타겟 이동 (±)
+public enum MenTargetSpawnMoveAxis
+{
+    PositiveX,
+    NegativeX
+}
+
 /// <summary>
 /// 03MenTarget 씬 전용:
 /// - MenTargetSpawnPoint 1~3 중 임의 선택 후 타겟 프리팹 생성
+/// - 스폰포인트마다 X축 + 또는 - 방향 지정
 /// - Timer(StageTimer)가 실행 중(IsRunning)일 때 spawnInterval마다 스폰
-/// - 타겟 이동·회전은 MenTargetBehavior
 /// </summary>
 [DisallowMultipleComponent]
 public class MenTargetManager : MonoBehaviour
 {
-    [Header("MenTargetSpawnPoint 1~3")]
+    [Header("MenTargetSpawnPoint 1")]
     public Transform menTargetSpawnPoint1;
+    [Tooltip("월드 X축 + 또는 - 방향으로 이동")]
+    public MenTargetSpawnMoveAxis menTargetSpawnPoint1MoveAxis = MenTargetSpawnMoveAxis.PositiveX;
+
+    [Header("MenTargetSpawnPoint 2")]
     public Transform menTargetSpawnPoint2;
+    public MenTargetSpawnMoveAxis menTargetSpawnPoint2MoveAxis = MenTargetSpawnMoveAxis.PositiveX;
+
+    [Header("MenTargetSpawnPoint 3")]
     public Transform menTargetSpawnPoint3;
+    public MenTargetSpawnMoveAxis menTargetSpawnPoint3MoveAxis = MenTargetSpawnMoveAxis.PositiveX;
 
     [Header("Target Prefab")]
     public GameObject targetPrefab;
@@ -63,8 +78,9 @@ public class MenTargetManager : MonoBehaviour
 
     private void SpawnOne()
     {
-        Transform spawnPoint = ChooseSpawnPoint();
-        if (spawnPoint == null || targetPrefab == null)
+        if (!TryPickSpawn(out Transform spawnPoint, out Vector3 moveDir))
+            return;
+        if (targetPrefab == null)
             return;
 
         GameObject target = Instantiate(targetPrefab, spawnPoint.position, spawnPoint.rotation);
@@ -74,31 +90,53 @@ public class MenTargetManager : MonoBehaviour
         if (behavior == null)
             behavior = target.AddComponent<MenTargetBehavior>();
 
-        behavior.Configure(this, moveDistance, moveSpeed, spawnPoint.forward);
+        behavior.Configure(this, moveDistance, moveSpeed, moveDir);
     }
 
-    private Transform ChooseSpawnPoint()
+    private bool TryPickSpawn(out Transform spawnPoint, out Vector3 moveDir)
     {
+        moveDir = Vector3.right;
+        spawnPoint = null;
+
         int n = (menTargetSpawnPoint1 != null ? 1 : 0)
                 + (menTargetSpawnPoint2 != null ? 1 : 0)
                 + (menTargetSpawnPoint3 != null ? 1 : 0);
         if (n == 0)
-            return null;
+            return false;
 
         int idx = Random.Range(0, n);
         if (menTargetSpawnPoint1 != null)
         {
-            if (idx == 0) return menTargetSpawnPoint1;
+            if (idx == 0)
+            {
+                spawnPoint = menTargetSpawnPoint1;
+                moveDir = AxisToWorldDirection(menTargetSpawnPoint1MoveAxis);
+                return true;
+            }
+
             idx--;
         }
 
         if (menTargetSpawnPoint2 != null)
         {
-            if (idx == 0) return menTargetSpawnPoint2;
+            if (idx == 0)
+            {
+                spawnPoint = menTargetSpawnPoint2;
+                moveDir = AxisToWorldDirection(menTargetSpawnPoint2MoveAxis);
+                return true;
+            }
+
             idx--;
         }
 
-        return menTargetSpawnPoint3;
+        spawnPoint = menTargetSpawnPoint3;
+        moveDir = AxisToWorldDirection(menTargetSpawnPoint3MoveAxis);
+        return spawnPoint != null;
+    }
+
+    private static Vector3 AxisToWorldDirection(MenTargetSpawnMoveAxis axis)
+    {
+        return axis == MenTargetSpawnMoveAxis.NegativeX ? Vector3.left : Vector3.right;
     }
 
     public void NotifyMenTargetDestroyed()

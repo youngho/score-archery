@@ -2234,8 +2234,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenTargetManager
   menTargetSpawnPoint1: {fileID: 626095235}
+  menTargetSpawnPoint1MoveAxis: 0
   menTargetSpawnPoint2: {fileID: 1629920934}
+  menTargetSpawnPoint2MoveAxis: 1
   menTargetSpawnPoint3: {fileID: 1934937428}
+  menTargetSpawnPoint3MoveAxis: 0
   targetPrefab: {fileID: 7325237005762124563, guid: e5535907a4ecd44bbaae056ae0802423, type: 3}
   spawnInterval: 1
   maxTargetsAtOnce: 5
