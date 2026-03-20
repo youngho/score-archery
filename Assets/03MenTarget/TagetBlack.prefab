@@ -132,13 +132,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d60091f8a0b148919acf45da15b563c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenTargetBehavior
-  moveDistance: 5
-  moveSpeed: 2
-  moveDirection: {x: 1, y: 0, z: 0}
   faceRotationAngle: 90
   rotationSpeed: 5
-  randomStopMin: 0.2
-  randomStopMax: 0.85
   waitMinTime: 2
   waitMaxTime: 4
 --- !u!65 &239528816053001838

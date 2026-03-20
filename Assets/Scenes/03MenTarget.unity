@@ -2244,6 +2244,8 @@ MonoBehaviour:
   maxTargetsAtOnce: 5
   moveDistance: 20
   moveSpeed: 2
+  randomStopMin: 0.2
+  randomStopMax: 0.85
 --- !u!1 &1041107261
 GameObject:
   m_ObjectHideFlags: 0
@@ -3195,7 +3197,7 @@ Transform:
   m_GameObject: {fileID: 1629920933}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.72, y: 4.47, z: 29.58}
+  m_LocalPosition: {x: 2.23, y: 4.47, z: 22.46}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

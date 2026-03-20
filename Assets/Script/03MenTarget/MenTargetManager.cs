@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// 월드 X축 방향으로 타겟 이동 (±)
@@ -8,10 +9,7 @@ public enum MenTargetSpawnMoveAxis
 }
 
 /// <summary>
-/// 03MenTarget 씬 전용:
-/// - MenTargetSpawnPoint 1~3 중 임의 선택 후 타겟 프리팹 생성
-/// - 스폰포인트마다 X축 + 또는 - 방향 지정
-/// - Timer(StageTimer)가 실행 중(IsRunning)일 때 spawnInterval마다 스폰
+/// 03MenTarget: 스폰·직선 이동(나감/복귀). 회전·대기는 MenTargetBehavior.
 /// </summary>
 [DisallowMultipleComponent]
 public class MenTargetManager : MonoBehaviour
@@ -37,14 +35,37 @@ public class MenTargetManager : MonoBehaviour
     [Tooltip("동시 타겟 상한(0이면 제한 없음)")]
     public int maxTargetsAtOnce = 5;
 
-    [Header("Movement (타겟에 전달)")]
+    [Header("이동 (월드 직선)")]
     public float moveDistance = 5f;
     public float moveSpeed = 2f;
+    [Tooltip("이동 구간 중 멈춰서 회전을 시작할 거리 비율 범위")]
+    public float randomStopMin = 0.2f;
+    public float randomStopMax = 0.85f;
+
+    private enum MenTargetMovePhase
+    {
+        MovingOut,
+        Rotating,
+        MovingBack
+    }
+
+    private sealed class MenTargetMoveState
+    {
+        public MenTargetBehavior Behavior;
+        public Transform Transform;
+        public Vector3 StartPosition;
+        public Vector3 Direction;
+        public float Speed;
+        public float StopDistance;
+        public float Traveled;
+        public MenTargetMovePhase Phase;
+    }
 
     private bool _sceneActive;
     private Timer _timer;
     private float _nextSpawnTime;
     private int _aliveCount;
+    private readonly List<MenTargetMoveState> _movingTargets = new List<MenTargetMoveState>(8);
 
     private void Start()
     {
@@ -61,6 +82,8 @@ public class MenTargetManager : MonoBehaviour
         if (!_sceneActive)
             return;
 
+        TickTargetMovement(Time.deltaTime);
+
         if (_timer == null)
             _timer = Object.FindFirstObjectByType<Timer>();
         if (_timer == null || !_timer.IsRunning)
@@ -76,6 +99,59 @@ public class MenTargetManager : MonoBehaviour
         _nextSpawnTime = Time.time + Mathf.Max(0.01f, spawnInterval);
     }
 
+    private void TickTargetMovement(float dt)
+    {
+        for (int i = _movingTargets.Count - 1; i >= 0; i--)
+        {
+            MenTargetMoveState s = _movingTargets[i];
+            if (s.Behavior == null || s.Transform == null)
+            {
+                _movingTargets.RemoveAt(i);
+                continue;
+            }
+
+            switch (s.Phase)
+            {
+                case MenTargetMovePhase.MovingOut:
+                    float step = s.Speed * dt;
+                    s.Traveled += step;
+                    s.Transform.position += s.Direction * step;
+                    if (s.Traveled >= s.StopDistance)
+                    {
+                        s.Phase = MenTargetMovePhase.Rotating;
+                        MenTargetBehavior bh = s.Behavior;
+                        bh.BeginRotationSequence(() => OnTargetRotationFinished(bh));
+                    }
+
+                    break;
+
+                case MenTargetMovePhase.MovingBack:
+                    s.Transform.position = Vector3.MoveTowards(s.Transform.position, s.StartPosition, s.Speed * dt);
+                    if (Vector3.Distance(s.Transform.position, s.StartPosition) <= 0.05f)
+                    {
+                        s.Transform.position = s.StartPosition;
+                        _movingTargets.RemoveAt(i);
+                        Destroy(s.Behavior.gameObject);
+                    }
+
+                    break;
+            }
+        }
+    }
+
+    private void OnTargetRotationFinished(MenTargetBehavior behavior)
+    {
+        for (int i = 0; i < _movingTargets.Count; i++)
+        {
+            MenTargetMoveState s = _movingTargets[i];
+            if (s.Behavior == behavior && s.Phase == MenTargetMovePhase.Rotating)
+            {
+                s.Phase = MenTargetMovePhase.MovingBack;
+                return;
+            }
+        }
+    }
+
     private void SpawnOne()
     {
         if (!TryPickSpawn(out Transform spawnPoint, out Vector3 moveDir))
@@ -83,14 +159,31 @@ public class MenTargetManager : MonoBehaviour
         if (targetPrefab == null)
             return;
 
-        GameObject target = Instantiate(targetPrefab, spawnPoint.position, spawnPoint.rotation);
+        GameObject targetGo = Instantiate(targetPrefab, spawnPoint.position, spawnPoint.rotation);
         _aliveCount++;
 
-        MenTargetBehavior behavior = target.GetComponent<MenTargetBehavior>();
+        MenTargetBehavior behavior = targetGo.GetComponent<MenTargetBehavior>();
         if (behavior == null)
-            behavior = target.AddComponent<MenTargetBehavior>();
+            behavior = targetGo.AddComponent<MenTargetBehavior>();
 
-        behavior.Configure(this, moveDistance, moveSpeed, moveDir);
+        behavior.Configure(this);
+
+        float tLow = Mathf.Min(randomStopMin, randomStopMax);
+        float tHigh = Mathf.Max(randomStopMin, randomStopMax);
+        float stopFraction = Random.Range(tLow, tHigh);
+
+        var state = new MenTargetMoveState
+        {
+            Behavior = behavior,
+            Transform = targetGo.transform,
+            StartPosition = spawnPoint.position,
+            Direction = moveDir.normalized,
+            Speed = moveSpeed,
+            StopDistance = Mathf.Max(0.01f, moveDistance) * stopFraction,
+            Traveled = 0f,
+            Phase = MenTargetMovePhase.MovingOut
+        };
+        _movingTargets.Add(state);
     }
 
     private bool TryPickSpawn(out Transform spawnPoint, out Vector3 moveDir)
@@ -137,6 +230,18 @@ public class MenTargetManager : MonoBehaviour
     private static Vector3 AxisToWorldDirection(MenTargetSpawnMoveAxis axis)
     {
         return axis == MenTargetSpawnMoveAxis.NegativeX ? Vector3.left : Vector3.right;
+    }
+
+    public void UnregisterMovementTarget(MenTargetBehavior behavior)
+    {
+        for (int i = _movingTargets.Count - 1; i >= 0; i--)
+        {
+            if (_movingTargets[i].Behavior == behavior)
+            {
+                _movingTargets.RemoveAt(i);
+                return;
+            }
+        }
     }
 
     public void NotifyMenTargetDestroyed()
