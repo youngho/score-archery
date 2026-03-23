@@ -86,11 +86,14 @@ public class Timer : MonoBehaviour
 
     public void StartTimer()
     {
-        if (!timerRunning && !timerPaused)
+        bool startingNow = !timerRunning && !timerPaused;
+        if (startingNow)
         {
             timerRunning = true;
         }
-            onTimerStart.Invoke();
+        onTimerStart.Invoke();
+        if (startingNow)
+            StageRandomBGMController.NotifyStageGameplayStarted();
     }
 
     public void StopTimer()

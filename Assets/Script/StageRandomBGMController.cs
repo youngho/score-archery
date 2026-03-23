@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// 스테이지 씬이 로드될 때마다 Resources/bgm 폴더의 AudioClip 중 하나를 무작위로 루프 재생합니다.
+/// Resources/bgm 폴더의 AudioClip 중 하나를 무작위로 루프 재생합니다.
+/// 재생 시점은 <see cref="Timer.StartTimer"/> 호출 시(설명 팝업이 닫히고 타이머가 시작될 때)입니다.
 /// 00StartUI, 99StageResult 씬에서는 재생하지 않습니다.
 /// </summary>
 public class StageRandomBGMController : MonoBehaviour
@@ -85,13 +86,29 @@ public class StageRandomBGMController : MonoBehaviour
             return;
         }
 
-        if (_clips == null || _clips.Length == 0)
-            return;
+        // 스테이지 진입 직후(설명 팝업 표시 중)에는 재생하지 않음 — Timer.StartTimer 시점에 NotifyStageGameplayStarted
+        _audioSource.Stop();
+        _audioSource.clip = null;
+    }
+
+    /// <summary>
+    /// 타이머가 처음 시작될 때 호출합니다. (<see cref="Timer.StartTimer"/>에서 연결)
+    /// </summary>
+    public static void NotifyStageGameplayStarted()
+    {
+        if (_instance == null) return;
+        _instance.PlayRandomBgmIfStageScene();
+    }
+
+    private void PlayRandomBgmIfStageScene()
+    {
+        if (_audioSource == null) return;
+        if (!IsStageBgmScene(SceneManager.GetActiveScene().name)) return;
+        if (_clips == null || _clips.Length == 0) return;
 
         int idx = Random.Range(0, _clips.Length);
         AudioClip clip = _clips[idx];
-        if (clip == null)
-            return;
+        if (clip == null) return;
 
         _audioSource.Stop();
         _audioSource.clip = clip;
