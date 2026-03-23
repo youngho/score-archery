@@ -27,7 +27,8 @@ public class GameDescriptionPopup : MonoBehaviour
         if (popupPanel != null)
         {
             popupPanel.SetActive(true);
-            
+            StageDescriptionPopupAudio.PlayReady();
+
             // Add or get Button component on the panel itself to handle clicks anywhere
             Button panelButton = popupPanel.GetComponent<Button>();
             if (panelButton == null)
@@ -44,6 +45,8 @@ public class GameDescriptionPopup : MonoBehaviour
 
     private void OnStartButtonClicked()
     {
+        StageDescriptionPopupAudio.PlayGo();
+
         // Hide popup
         if (popupPanel != null)
         {

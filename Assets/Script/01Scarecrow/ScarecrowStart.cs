@@ -31,7 +31,9 @@ public class ScarecrowStart : MonoBehaviour
         }
 
         panelButton.onClick.AddListener(OnDescriptionClicked);
-        
+
+        StageDescriptionPopupAudio.PlayReady();
+
         Debug.Log($"[ScarecrowStart] Initialized. HidingTarget: {popupObject.name}, ClickTarget: {clickPanel.name}");
         if (timer == null) Debug.LogError("[ScarecrowStart] Timer가 인스펙터에 할당되지 않았습니다. (자동 탐색은 하지 않습니다)");
     }
@@ -39,6 +41,8 @@ public class ScarecrowStart : MonoBehaviour
     private void OnDescriptionClicked()
     {
         Debug.Log("[ScarecrowStart] Description Clicked - Starting Game...");
+
+        StageDescriptionPopupAudio.PlayGo();
 
         // Hide the entire popup
         if (popupObject != null)

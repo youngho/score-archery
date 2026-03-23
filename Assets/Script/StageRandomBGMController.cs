@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,8 +20,15 @@ public class StageRandomBGMController : MonoBehaviour
 
     private static StageRandomBGMController _instance;
 
+    /// <summary>다음 BGM 시작 시 go.wav 와 겹치면 이 시간(초) 동안 BGM 볼륨을 낮춥니다.</summary>
+    private static float _pendingGoOverlapSeconds;
+
     private AudioSource _audioSource;
     private AudioClip[] _clips;
+    private Coroutine _bgmDuckCoroutine;
+    private float _baseBgmVolume = 1f;
+
+    private const float BgmVolumeWhileGoSfx = 0.22f;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Bootstrap()
@@ -48,6 +56,7 @@ public class StageRandomBGMController : MonoBehaviour
         _audioSource.playOnAwake = false;
         _audioSource.loop = true;
         _audioSource.spatialBlend = 0f;
+        _audioSource.priority = 200;
 
         _clips = Resources.LoadAll<AudioClip>(ResourcesBgmFolder);
         if (_clips == null || _clips.Length == 0)
@@ -81,12 +90,16 @@ public class StageRandomBGMController : MonoBehaviour
 
         if (!IsStageBgmScene(sceneName))
         {
+            StopBgmDuckCoroutine();
+            _audioSource.volume = _baseBgmVolume;
             _audioSource.Stop();
             _audioSource.clip = null;
             return;
         }
 
         // 스테이지 진입 직후(설명 팝업 표시 중)에는 재생하지 않음 — Timer.StartTimer 시점에 NotifyStageGameplayStarted
+        StopBgmDuckCoroutine();
+        _audioSource.volume = _baseBgmVolume;
         _audioSource.Stop();
         _audioSource.clip = null;
     }
@@ -100,6 +113,30 @@ public class StageRandomBGMController : MonoBehaviour
         _instance.PlayRandomBgmIfStageScene();
     }
 
+    /// <summary>
+    /// go.wav 재생 직후에 호출됩니다. 이어지는 BGM 시작 시 일정 시간 BGM을 낮춰 효과음이 묻히지 않게 합니다.
+    /// </summary>
+    public static void RegisterPendingGoOverlap(float durationSeconds)
+    {
+        if (durationSeconds > 0f)
+            _pendingGoOverlapSeconds = durationSeconds;
+    }
+
+    private void StopBgmDuckCoroutine()
+    {
+        if (_bgmDuckCoroutine == null) return;
+        StopCoroutine(_bgmDuckCoroutine);
+        _bgmDuckCoroutine = null;
+    }
+
+    private IEnumerator RestoreBgmVolumeAfterGo(float delaySeconds)
+    {
+        yield return new WaitForSecondsRealtime(delaySeconds);
+        if (_audioSource != null)
+            _audioSource.volume = _baseBgmVolume;
+        _bgmDuckCoroutine = null;
+    }
+
     private void PlayRandomBgmIfStageScene()
     {
         if (_audioSource == null) return;
@@ -110,8 +147,23 @@ public class StageRandomBGMController : MonoBehaviour
         AudioClip clip = _clips[idx];
         if (clip == null) return;
 
+        float duckSeconds = _pendingGoOverlapSeconds;
+        _pendingGoOverlapSeconds = 0f;
+
+        StopBgmDuckCoroutine();
         _audioSource.Stop();
         _audioSource.clip = clip;
-        _audioSource.Play();
+
+        if (duckSeconds > 0f)
+        {
+            _audioSource.volume = _baseBgmVolume * BgmVolumeWhileGoSfx;
+            _audioSource.Play();
+            _bgmDuckCoroutine = StartCoroutine(RestoreBgmVolumeAfterGo(duckSeconds));
+        }
+        else
+        {
+            _audioSource.volume = _baseBgmVolume;
+            _audioSource.Play();
+        }
     }
 }
