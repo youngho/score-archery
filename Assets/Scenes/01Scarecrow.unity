@@ -1498,7 +1498,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 67b9ed268126c45c1a01bb8f378b5a44, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scarecrow
+  m_EditorClassIdentifier: Assembly-CSharp::ScarecrowBehavior
   score: 1
 --- !u!65 &1320757961
 BoxCollider:
@@ -2209,7 +2209,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 67b9ed268126c45c1a01bb8f378b5a44, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scarecrow
+  m_EditorClassIdentifier: Assembly-CSharp::ScarecrowBehavior
   score: 2
 --- !u!1001 &1714133235
 PrefabInstance:
@@ -2351,7 +2351,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 67b9ed268126c45c1a01bb8f378b5a44, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scarecrow
+  m_EditorClassIdentifier: Assembly-CSharp::ScarecrowBehavior
   score: 3
 --- !u!1 &1738808153
 GameObject:

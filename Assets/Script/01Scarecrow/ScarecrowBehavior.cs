@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Scarecrow : MonoBehaviour
+public class ScarecrowBehavior : MonoBehaviour
 {
     [Header("허수아비 점수 설정")]
     [SerializeField] private int score = 1;
