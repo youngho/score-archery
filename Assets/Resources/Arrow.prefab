@@ -74,7 +74,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ea02fcc8f3b8477e99f10271ba84bca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArcheryArrow
-  lifeTime: 8
   minVelocitySqrForRotate: 0.05
   logDebug: 0
   showTrail: 1
@@ -102,10 +101,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.0076731443
+  m_Height: 0.7621467
+  m_Direction: 2
+  m_Center: {x: 0.0009726286, y: 0, z: 0.3022982}
 --- !u!1001 &1620382906932752180
 PrefabInstance:
   m_ObjectHideFlags: 0

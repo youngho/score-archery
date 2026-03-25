@@ -9,6 +9,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.67692
       objectReference: {fileID: 0}
@@ -48,6 +60,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -62,68 +78,19 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 408008193450817106}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 592307730841589751}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 691285681654864315}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5473538696711113037}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8332862785367486366}
   m_SourcePrefab: {fileID: 100100000, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
 --- !u!1 &8960043904558079735 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2df5229ceff324e409db5ece8945df25, type: 3}
   m_PrefabInstance: {fileID: 8113535602225030054}
   m_PrefabAsset: {fileID: 0}
---- !u!136 &408008193450817106
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8960043904558079735}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.0016402858
-  m_Height: 0.019951478
-  m_Direction: 2
-  m_Center: {x: 0.00003921002, y: -0.000027008951, z: -0.00002606988}
---- !u!136 &592307730841589751
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8960043904558079735}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.00066067674
-  m_Height: 0.015820619
-  m_Direction: 0
-  m_Center: {x: 0.000039210317, y: -0.000027005077, z: 0.005341472}
 --- !u!54 &691285681654864315
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -164,3 +131,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScarecrowBehavior
   score: 1
+--- !u!136 &-8332862785367486366
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8960043904558079735}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1.1609381
+  m_Height: 10.84127
+  m_Direction: 2
+  m_Center: {x: 0.094009995, y: -0.14900565, z: 4.584147}
