@@ -13,6 +13,9 @@ public class ScarecrowBehavior : MonoBehaviour
     [SerializeField, Min(0.01f)] private float lateralFrequencyFactor = 1.12f;
     [Tooltip("좌우 움직임 위상(라디안).")]
     [SerializeField] private float lateralPhaseRadians = 0.8f;
+    [Header("소리 설정")]
+    [SerializeField] private AudioClip[] hitSounds;
+    [SerializeField] private AudioSource audioSource;
 
     public int Score => score;
 
@@ -21,6 +24,10 @@ public class ScarecrowBehavior : MonoBehaviour
     private void Awake()
     {
         _initialLocalEuler = transform.localEulerAngles;
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
     }
 
     private void LateUpdate()
@@ -46,6 +53,12 @@ public class ScarecrowBehavior : MonoBehaviour
 
     private void TryHandleArrowHit(Collider other)
     {
+        // 랜덤 소리 재생
+        if (audioSource != null && hitSounds != null && hitSounds.Length > 0)
+        {
+            int randomIndex = Random.Range(0, hitSounds.Length);
+            audioSource.PlayOneShot(hitSounds[randomIndex]);
+        }
 
         // 점수 추가
         if (ScoreManager.Instance != null)
