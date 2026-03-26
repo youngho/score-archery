@@ -32,6 +32,9 @@ public class LeafSpawner : MonoBehaviour
     [Tooltip("Particle effect spawned when the leaf is hit by an arrow")]
     public GameObject leafHitEffectPrefab;
 
+    [Tooltip("Sound effect played when the leaf is hit by an arrow")]
+    public AudioClip leafHitSound;
+
     private float _spawnTimer;
 
     private void Update()
@@ -72,6 +75,7 @@ public class LeafSpawner : MonoBehaviour
         
         fallingLeaf.scoreValue = leafScore;
         fallingLeaf.hitEffectPrefab = leafHitEffectPrefab;
+        fallingLeaf.hitSound = leafHitSound;
     }
 
     private void OnDrawGizmosSelected()
@@ -96,6 +100,7 @@ public class FallingLeaf : MonoBehaviour
     
     [HideInInspector] public int scoreValue;
     [HideInInspector] public GameObject hitEffectPrefab;
+    [HideInInspector] public AudioClip hitSound;
 
     private float _randomTimeOffsetX;
     private float _randomTimeOffsetZ;
@@ -171,6 +176,12 @@ public class FallingLeaf : MonoBehaviour
         if (hitEffectPrefab != null)
         {
             Instantiate(hitEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        // Play hit sound if assigned
+        if (hitSound != null)
+        {
+            AudioSource.PlayClipAtPoint(hitSound, transform.position);
         }
 
         // Add score

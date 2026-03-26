@@ -526,6 +526,9 @@ MonoBehaviour:
   onTimerEnd:
     m_PersistentCalls:
       m_Calls: []
+  onTimerStart:
+    m_PersistentCalls:
+      m_Calls: []
   startAtRuntime: 0
   dialSlider: {fileID: 1971792171}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
@@ -1836,7 +1839,8 @@ MonoBehaviour:
   leafSwayDistanceZ: 3
   leafFallingDistanceLimit: 20
   leafScore: 1
-  leafHitEffectPrefab: {fileID: 0}
+  leafHitEffectPrefab: {fileID: 1173657400}
+  leafHitSound: {fileID: 8300000, guid: 80df5b2e5ad08452683e782bd6cfc987, type: 3}
 --- !u!1 &2122766135
 GameObject:
   m_ObjectHideFlags: 0
