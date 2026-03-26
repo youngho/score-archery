@@ -52,10 +52,10 @@ private float lifeTimeAfterHit = 2f;
 
     private void Start()
     {
-        // 일정 시간 후 자동 제거
+        // 일정 시간 후 자동 제거 (허수아비에 맞으면 CancelInvoke로 취소)
         if (totalLifeTime > 0f)
         {
-            Destroy(gameObject, totalLifeTime);
+            Invoke(nameof(DestroyArrow), totalLifeTime);
         }
 
         // Start에서 초기 회전 저장 (ShootArrow에서 설정한 회전을 보존)
@@ -172,6 +172,9 @@ private float lifeTimeAfterHit = 2f;
             return;
         }
 
+        ScarecrowBehavior scarecrow = collision.gameObject.GetComponent<ScarecrowBehavior>()
+            ?? collision.gameObject.GetComponentInParent<ScarecrowBehavior>();
+
         // Not a balloon -> Hard object collision: stop and stick
         if (rb != null)
         {
@@ -181,6 +184,16 @@ private float lifeTimeAfterHit = 2f;
 
             // Stick to the hit object
             transform.SetParent(collision.transform);
+        }
+
+        if (scarecrow != null)
+        {
+            CancelInvoke(nameof(DestroyArrow));
+            if (logDebug)
+            {
+                Debug.Log($"[ArcheryArrow] OnCollisionEnter - Hit scarecrow {collision.collider.name}, arrow kept (no timed destroy).", this);
+            }
+            return;
         }
 
         // 충돌 직후 바로 사라지지 않도록 약간의 시간 후 제거
@@ -200,6 +213,11 @@ private float lifeTimeAfterHit = 2f;
                 $"[ArcheryArrow] OnCollisionEnter - hit={otherName}, contactPoint={contactPoint}, relativeVelocity={collision.relativeVelocity}",
                 this); // ARCHERY_DEBUG_LOG
         }
+    }
+
+    private void DestroyArrow()
+    {
+        Destroy(gameObject);
     }
 
     private void OnDestroy()
