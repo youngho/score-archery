@@ -517,12 +517,6 @@ public class ArcheryGestureManager : MonoBehaviour
 
                     OnRelease?.Invoke(data);
                     ShootArrow(data);
-
-                    // 화살 발사 카운트 증가
-                    if (ScoreManager.Instance != null)
-                    {
-                        ScoreManager.Instance.OnArrowShot();
-                    }
                 }
                 else
                 {
@@ -1232,6 +1226,9 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             archeryArrow.ConfigureLifetime(arrowTotalLifetime, arrowLifetimeAfterHit);
         }
+
+        if (ScoreManager.Instance != null)
+            ScoreManager.Instance.OnArrowShot();
     }
     #endregion
 

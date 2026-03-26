@@ -43,6 +43,10 @@ public class StageEndTrigger : MonoBehaviour
         while (!done) yield return null;
 
         if (!string.IsNullOrEmpty(nextSceneName))
-            StageResultService.RequestShowResult((int)score);
+        {
+            int arrows = ScoreManager.Instance != null ? ScoreManager.Instance.TotalArrowsShot : 0;
+            int hits = ScoreManager.Instance != null ? ScoreManager.Instance.TotalHits : 0;
+            StageResultService.RequestShowResult((int)score, arrows, hits);
+        }
     }
 }
