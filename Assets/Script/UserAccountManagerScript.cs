@@ -9,8 +9,7 @@ public class UserAccountManagerScript : ScriptableObject
     private const string PublicIdKey = "UserAccountPublicId";
     private const string NicknameKey = "UserAccountNickname";
     private const string ManagerPath = "UserAccountManagerScript";
-    private const string ApiBaseUrl = "http://158.179.161.203:8080/score/api/users"; // Adjust if necessary
-    // private const string ApiBaseUrl = "http://localhost:8081/api/users"; // Adjust if necessary
+    private static string UsersApiBase => $"{ScoreApiConfig.ApiBaseUrl}/users";
 
     [SerializeField] private UserAccountDataScript accountData;
 
@@ -147,7 +146,7 @@ public class UserAccountManagerScript : ScriptableObject
 
     public IEnumerator Login(string publicId, Action<bool, string> callback)
     {
-        string url = $"{ApiBaseUrl}/{publicId}";
+        string url = $"{UsersApiBase}/{publicId}";
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             yield return request.SendWebRequest();
@@ -201,7 +200,7 @@ public class UserAccountManagerScript : ScriptableObject
 
         string json = JsonUtility.ToJson(requestBody);
         
-        using (UnityWebRequest request = new UnityWebRequest(ApiBaseUrl + "/register", "POST"))
+        using (UnityWebRequest request = new UnityWebRequest(UsersApiBase + "/register", "POST"))
         {
             byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -237,7 +236,7 @@ public class UserAccountManagerScript : ScriptableObject
             yield break;
         }
 
-        string url = $"{ApiBaseUrl}/{publicId}/nickname";
+        string url = $"{UsersApiBase}/{publicId}/nickname";
         ChangeNicknameRequest requestBody = new ChangeNicknameRequest
         {
             nickname = newNickname

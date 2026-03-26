@@ -9,7 +9,7 @@ using System;
 /// </summary>
 public class StageScoreApiService : MonoBehaviour
 {
-    private const string ApiBaseUrl = "http://158.179.161.203:8080/score/api/stages";
+    private static string ApiStagesBaseUrl => $"{ScoreApiConfig.ApiBaseUrl}/stages";
 
     [Serializable]
     private class RecordRequest
@@ -102,7 +102,7 @@ public class StageScoreApiService : MonoBehaviour
 
         string json = JsonUtility.ToJson(requestBody);
 
-        using (var request = new UnityWebRequest(ApiBaseUrl + "/record", "POST"))
+        using (var request = new UnityWebRequest(ApiStagesBaseUrl + "/record", "POST"))
         {
             byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
