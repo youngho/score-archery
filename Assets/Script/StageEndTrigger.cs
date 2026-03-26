@@ -38,15 +38,15 @@ public class StageEndTrigger : MonoBehaviour
 
     private System.Collections.IEnumerator RecordAndLoadCoroutine(StageScoreApiService recorder, int worldNum, int stageNum, long score)
     {
+        string scene = SceneManager.GetActiveScene().name;
+        int arrows = ScoreManager.Instance != null ? ScoreManager.Instance.TotalArrowsShot : 0;
+        int hits = ScoreManager.Instance != null ? ScoreManager.Instance.TotalHits : 0;
+
         bool done = false;
-        yield return recorder.RecordScoreAsync(worldNum, stageNum, score, 0, 0, (_, _) => { done = true; });
+        yield return recorder.RecordScoreAsync(worldNum, stageNum, score, 0, 0, (_, _) => { done = true; }, scene, arrows, hits);
         while (!done) yield return null;
 
         if (!string.IsNullOrEmpty(nextSceneName))
-        {
-            int arrows = ScoreManager.Instance != null ? ScoreManager.Instance.TotalArrowsShot : 0;
-            int hits = ScoreManager.Instance != null ? ScoreManager.Instance.TotalHits : 0;
             StageResultService.RequestShowResult((int)score, arrows, hits);
-        }
     }
 }

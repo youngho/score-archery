@@ -22,6 +22,10 @@ public class StageScoreApiService : MonoBehaviour
         public int starsEarned;
         public int playDurationSeconds;
         public string difficulty;
+        /// <summary>Unity 빌드 씬 이름 (예: 01Scarecrow) — API match_history.stage_scene_name</summary>
+        public string stageSceneName;
+        public int totalArrowsUsed;
+        public int arrowsHit;
     }
 
     [Serializable]
@@ -65,13 +69,19 @@ public class StageScoreApiService : MonoBehaviour
     /// <param name="starsEarned">별 개수 (0~3, 선택)</param>
     /// <param name="playDurationSeconds">플레이 시간(초), 선택</param>
     /// <param name="callback">완료 콜백 (성공여부, 응답메시지)</param>
+    /// <param name="stageSceneName">현재 스테이지 씬 이름 (선택, null이면 빈 문자열 전송)</param>
+    /// <param name="totalArrowsUsed">발사한 화살 수 (명중률 기록용)</param>
+    /// <param name="arrowsHit">명중 횟수 (ScoreManager.TotalHits)</param>
     public IEnumerator RecordScoreAsync(
         int worldNumber,
         int stageNumber,
         long score,
         int starsEarned = 0,
         int playDurationSeconds = 0,
-        Action<bool, string> callback = null)
+        Action<bool, string> callback = null,
+        string stageSceneName = null,
+        int totalArrowsUsed = 0,
+        int arrowsHit = 0)
     {
         string publicId = UserAccountManagerScript.Instance != null
             ? UserAccountManagerScript.Instance.GetPublicId()
@@ -97,7 +107,10 @@ public class StageScoreApiService : MonoBehaviour
             score = score,
             starsEarned = starsEarned,
             playDurationSeconds = playDurationSeconds,
-            difficulty = "normal"
+            difficulty = "normal",
+            stageSceneName = stageSceneName ?? "",
+            totalArrowsUsed = totalArrowsUsed,
+            arrowsHit = arrowsHit
         };
 
         string json = JsonUtility.ToJson(requestBody);
@@ -147,7 +160,9 @@ public class StageScoreApiService : MonoBehaviour
         }
 
         long score = ScoreManager.Instance != null ? GetCurrentScore() : 0;
-        StartCoroutine(RecordAndContinue(worldNum, stageNum, score, onComplete));
+        int arrows = ScoreManager.Instance != null ? ScoreManager.Instance.TotalArrowsShot : 0;
+        int hits = ScoreManager.Instance != null ? ScoreManager.Instance.TotalHits : 0;
+        StartCoroutine(RecordAndContinue(worldNum, stageNum, score, sceneName, arrows, hits, onComplete));
     }
 
     private int GetCurrentScore()
@@ -155,10 +170,26 @@ public class StageScoreApiService : MonoBehaviour
         return ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
     }
 
-    private IEnumerator RecordAndContinue(int worldNum, int stageNum, long score, Action onComplete)
+    private IEnumerator RecordAndContinue(
+        int worldNum,
+        int stageNum,
+        long score,
+        string stageSceneName,
+        int totalArrowsUsed,
+        int arrowsHit,
+        Action onComplete)
     {
         bool done = false;
-        yield return RecordScoreAsync(worldNum, stageNum, score, 0, 0, (success, msg) => { done = true; });
+        yield return RecordScoreAsync(
+            worldNum,
+            stageNum,
+            score,
+            0,
+            0,
+            (success, msg) => { done = true; },
+            stageSceneName,
+            totalArrowsUsed,
+            arrowsHit);
         while (!done) yield return null;
         onComplete?.Invoke();
     }
