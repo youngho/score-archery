@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: 1ff9029b3470441e4bfeb678aa28f56a, type: 2}
+  m_LightingDataAsset: {fileID: 112000000, guid: 988ba4c6f1c864cb09b23bb5fbe6b3b7, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: d9ec5ae91131f463081918b1dc1748fd, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -4802,6 +4802,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Timer
   onTimerEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  onTimerStart:
     m_PersistentCalls:
       m_Calls: []
   startAtRuntime: 0
