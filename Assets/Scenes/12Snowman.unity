@@ -437,6 +437,9 @@ MonoBehaviour:
   onTimerEnd:
     m_PersistentCalls:
       m_Calls: []
+  onTimerStart:
+    m_PersistentCalls:
+      m_Calls: []
   startAtRuntime: 0
   dialSlider: {fileID: 491351703}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
@@ -581,6 +584,7 @@ MonoBehaviour:
   snowmanScoreText: {fileID: 748458790}
   snowColor: {r: 1, g: 1, b: 1, a: 1}
   explosionDuration: 1
+  hitEffectPrefab: {fileID: 5112403345868107898, guid: 56d0c28aa5f1b49a7b55624d51280843, type: 3}
   breakSound: {fileID: 0}
 --- !u!4 &485479875
 Transform:

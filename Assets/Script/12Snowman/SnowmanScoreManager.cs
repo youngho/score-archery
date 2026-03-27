@@ -11,6 +11,7 @@ public class SnowmanScoreManager : MonoBehaviour
     [Header("Visual Effects")]
     public Color snowColor = Color.white;
     public float explosionDuration = 1.0f;
+    public GameObject hitEffectPrefab;
 
     [Header("Sound Effects")]
     public AudioClip breakSound;
@@ -47,7 +48,16 @@ public class SnowmanScoreManager : MonoBehaviour
         }
 
         UpdateUI();
-        CreateSnowExplosion(snowman.transform.position, impactNormal);
+
+        // Use the hit effect prefab if it exists, otherwise fallback to procedural explosion
+        if (hitEffectPrefab != null)
+        {
+            Instantiate(hitEffectPrefab, snowman.transform.position, Quaternion.identity);
+        }
+        else
+        {
+            CreateSnowExplosion(snowman.transform.position, impactNormal);
+        }
         
         if (breakSound != null)
         {

@@ -209,6 +209,5 @@ AssetOrigin:
   productId: 109565
   packageName: Cartoon FX Remaster Free
   packageVersion: R 1.5.0
-  assetPath: Assets/JMO Assets/Cartoon FX Remaster/CFXR Assets/Shaders/CFXR Particle
-    Ubershader.cfxrshader
+  assetPath: Assets/FX/CartoonFX_Core/CFXR Assets/Shaders/CFXR Particle Ubershader.cfxrshader
   uploadId: 836238
