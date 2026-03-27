@@ -1839,7 +1839,7 @@ MonoBehaviour:
   leafSwayDistanceZ: 3
   leafFallingDistanceLimit: 20
   leafScore: 1
-  leafHitEffectPrefab: {fileID: 1173657400}
+  leafHitEffectPrefab: {fileID: 4021103657954561961, guid: 5c755f9bc5253ea418e919994537dcc7, type: 3}
   leafHitSound: {fileID: 8300000, guid: 80df5b2e5ad08452683e782bd6cfc987, type: 3}
 --- !u!1 &2122766135
 GameObject:
