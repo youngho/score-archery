@@ -119,6 +119,33 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &17975752 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8772162308106668003, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
+  m_PrefabInstance: {fileID: 595149171}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &17975756
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17975752}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 3942895302924928478, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
 --- !u!1 &83677986
 GameObject:
   m_ObjectHideFlags: 0
@@ -552,57 +579,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1871826290}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &485479873
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 485479875}
-  - component: {fileID: 485479874}
-  m_Layer: 0
-  m_Name: SnowmanScoreManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &485479874
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 485479873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e2f7f4854fa44f8b5adca1a0d5437c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SnowmanScoreManager
-  snowmanScoreText: {fileID: 748458790}
-  snowColor: {r: 1, g: 1, b: 1, a: 1}
-  explosionDuration: 1
-  hitEffectPrefab: {fileID: 5112403345868107898, guid: 56d0c28aa5f1b49a7b55624d51280843, type: 3}
-  breakSounds:
-  - {fileID: 8300000, guid: 16399b00c73a9404584a3ebbcbee44b2, type: 3}
-  - {fileID: 8300000, guid: ddd5f4b9ab6d04019a59cb2bba283435, type: 3}
---- !u!4 &485479875
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 485479873}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 20}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &491351701
 GameObject:
   m_ObjectHideFlags: 0
@@ -778,9 +754,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8772162308106668003, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -8662161802991379556, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: -6689036041284674117, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
       propertyPath: m_Name
       value: low_poly_winter_tree_pack
+      objectReference: {fileID: 0}
+    - target: {fileID: 1841855332297500501, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2774220344278030320, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
       propertyPath: m_LocalPosition.x
@@ -825,7 +813,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: -8772162308106668003, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 17975756}
+    - targetCorrespondingSourceObject: {fileID: 1841855332297500501, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 829295832}
   m_SourcePrefab: {fileID: -5645937942226959685, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
 --- !u!1 &748458789
 GameObject:
@@ -964,6 +958,33 @@ RectTransform:
   m_AnchoredPosition: {x: -400, y: 879.3}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &829295828 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1841855332297500501, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
+  m_PrefabInstance: {fileID: 595149171}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &829295832
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 829295828}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2714381490183391642, guid: 1439ff684aaea4da7a77a64b2333d560, type: 3}
 --- !u!1 &869010914
 GameObject:
   m_ObjectHideFlags: 0
@@ -1000,8 +1021,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 20, y: 1, z: 20}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 20, y: 1, z: 4.940658}
+  m_Center: {x: 0, y: 0, z: 7.5296707}
 --- !u!4 &869010916
 Transform:
   m_ObjectHideFlags: 0
@@ -1010,13 +1031,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 869010914}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 20}
+  m_LocalRotation: {x: -0, y: 0.053244416, z: -0, w: 0.9985815}
+  m_LocalPosition: {x: -3.1316917, y: -0.026, z: 9.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 6.104, z: 0}
 --- !u!1 &922585379
 GameObject:
   m_ObjectHideFlags: 0
@@ -1256,8 +1277,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1556953454}
   - component: {fileID: 1556953453}
+  - component: {fileID: 1556953455}
   m_Layer: 0
-  m_Name: SnowmanManagerObject
+  m_Name: SnowmanManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1293,6 +1315,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1556953455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1556953452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e2f7f4854fa44f8b5adca1a0d5437c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SnowmanScoreManager
+  snowmanScoreText: {fileID: 748458790}
+  snowColor: {r: 1, g: 1, b: 1, a: 1}
+  explosionDuration: 1
+  hitEffectPrefab: {fileID: 5112403345868107898, guid: 56d0c28aa5f1b49a7b55624d51280843, type: 3}
+  breakSounds:
+  - {fileID: 8300000, guid: 16399b00c73a9404584a3ebbcbee44b2, type: 3}
+  - {fileID: 8300000, guid: ddd5f4b9ab6d04019a59cb2bba283435, type: 3}
 --- !u!1 &1687443457
 GameObject:
   m_ObjectHideFlags: 0
@@ -1379,14 +1420,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1687443457}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: -0, y: -0.5250938, z: -0, w: 0.8510444}
+  m_LocalPosition: {x: 33.2, y: 5, z: 15.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1871826290}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -63.349, z: 0}
 --- !u!114 &1687443461
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2004,4 +2045,3 @@ SceneRoots:
   - {fileID: 109016985}
   - {fileID: 869010916}
   - {fileID: 1556953454}
-  - {fileID: 485479875}
