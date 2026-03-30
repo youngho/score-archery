@@ -585,7 +585,9 @@ MonoBehaviour:
   snowColor: {r: 1, g: 1, b: 1, a: 1}
   explosionDuration: 1
   hitEffectPrefab: {fileID: 5112403345868107898, guid: 56d0c28aa5f1b49a7b55624d51280843, type: 3}
-  breakSound: {fileID: 0}
+  breakSounds:
+  - {fileID: 8300000, guid: 16399b00c73a9404584a3ebbcbee44b2, type: 3}
+  - {fileID: 8300000, guid: ddd5f4b9ab6d04019a59cb2bba283435, type: 3}
 --- !u!4 &485479875
 Transform:
   m_ObjectHideFlags: 0

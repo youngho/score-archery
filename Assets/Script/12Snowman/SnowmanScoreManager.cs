@@ -14,7 +14,7 @@ public class SnowmanScoreManager : MonoBehaviour
     public GameObject hitEffectPrefab;
 
     [Header("Sound Effects")]
-    public AudioClip breakSound;
+    public AudioClip[] breakSounds;
 
     private int _snowmenHit = 0;
 
@@ -59,9 +59,13 @@ public class SnowmanScoreManager : MonoBehaviour
             CreateSnowExplosion(snowman.transform.position, impactNormal);
         }
         
-        if (breakSound != null)
+        if (breakSounds != null && breakSounds.Length > 0)
         {
-            AudioSource.PlayClipAtPoint(breakSound, snowman.transform.position);
+            AudioClip clip = breakSounds[Random.Range(0, breakSounds.Length)];
+            if (clip != null)
+            {
+                AudioSource.PlayClipAtPoint(clip, snowman.transform.position);
+            }
         }
 
         Destroy(snowman);
