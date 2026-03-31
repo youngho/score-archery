@@ -62,6 +62,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -6689036041284674117, guid: b4c232a99ebfb488097c0e3af584f28c, type: 3}
       insertIndex: -1
       addedObject: {fileID: -4765968592749367167}
+    - targetCorrespondingSourceObject: {fileID: -6689036041284674117, guid: b4c232a99ebfb488097c0e3af584f28c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7875372872712597155}
   m_SourcePrefab: {fileID: -5645937942226959685, guid: b4c232a99ebfb488097c0e3af584f28c, type: 3}
 --- !u!1 &625760596389815404 stripped
 GameObject:
@@ -90,8 +93,8 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -116,3 +119,29 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.12677874, y: 0.15794805, z: 0.0562793}
   m_Center: {x: 0.00051503093, y: 0.0070663854, z: -0.0017071156}
+--- !u!114 &7875372872712597155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625760596389815404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254b8cf5e7ec44598b50b4b8fed2f70d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StarBehavior
+  minScale: 0.05
+  maxScale: 10
+  growDuration: 7
+  shrinkDuration: 5
+  minLightIntensity: 0
+  maxLightIntensity: 6
+  points: 1
+  useExplosion: 1
+  explosionDuration: 0.12
+  explosionLifetime: 0.25
+  explosionRadius: 0.06
+  explosionParticleCount: 30
+  explosionSpeedMin: 2
+  explosionSpeedMax: 6

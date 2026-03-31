@@ -300,6 +300,9 @@ MonoBehaviour:
   onTimerEnd:
     m_PersistentCalls:
       m_Calls: []
+  onTimerStart:
+    m_PersistentCalls:
+      m_Calls: []
   startAtRuntime: 0
   dialSlider: {fileID: 1626868681}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
@@ -1632,13 +1635,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1579529758}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.003746428, y: 0.00086361024, z: 0.22462314, w: 0.97443813}
-  m_LocalPosition: {x: 8.91, y: 7.29, z: 0.281}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.039369624, y: -0.16163807, z: 0.260331, w: 0.95107883}
+  m_LocalPosition: {x: 13.43, y: 18.83, z: 3.33}
+  m_LocalScale: {x: 1, y: 10.334639, z: 7.798309}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0.396, y: 0.193, z: 25.962}
+  m_LocalEulerAnglesHint: {x: 0.531, y: -19.146, z: 30.527}
 --- !u!1 &1616895158
 GameObject:
   m_ObjectHideFlags: 0
@@ -1816,6 +1819,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1838499359}
   - component: {fileID: 1838499360}
+  - component: {fileID: 1838499361}
   m_Layer: 0
   m_Name: StarManager
   m_TagString: Untagged
@@ -1861,6 +1865,19 @@ MonoBehaviour:
   maxStarScale: 10
   growDuration: 7
   shrinkDuration: 5
+--- !u!114 &1838499361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838499358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fc2763fce70c4620956760f5c6ba6d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StarScoreManager
+  pointsPerStar: 1
 --- !u!1 &1933005656
 GameObject:
   m_ObjectHideFlags: 0
@@ -1936,51 +1953,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1933005656}
   m_CullTransparentMesh: 1
---- !u!1 &1944304552
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1944304554}
-  - component: {fileID: 1944304553}
-  m_Layer: 0
-  m_Name: StarScoreManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1944304553
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1944304552}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fc2763fce70c4620956760f5c6ba6d6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StarScoreManager
-  pointsPerStar: 1
---- !u!4 &1944304554
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1944304552}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.32237, y: 2.32632, z: 0.75396}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2002923779
 GameObject:
   m_ObjectHideFlags: 0
@@ -2067,10 +2039,9 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1161757366}
+  - {fileID: 1579529760}
   - {fileID: 100129968}
   - {fileID: 638473773}
   - {fileID: 1278899224}
   - {fileID: 726709540}
-  - {fileID: 1579529760}
   - {fileID: 1838499359}
-  - {fileID: 1944304554}

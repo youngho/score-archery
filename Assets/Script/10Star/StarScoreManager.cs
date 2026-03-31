@@ -44,16 +44,15 @@ public class StarScoreManager : MonoBehaviour
         _starsHit = 0;
     }
 
-    public void AddStarScore(int? overridePoints = null)
+    public void AddStarScore()
     {
-        int add = overridePoints.HasValue ? overridePoints.Value : pointsPerStar;
-        if (add <= 0) return;
+        if (pointsPerStar <= 0) return;
 
         _starsHit++;
 
         if (ScoreManager.Instance != null)
         {
-            ScoreManager.Instance.AddScore(add);
+            ScoreManager.Instance.AddScore(pointsPerStar);
         }
     }
 

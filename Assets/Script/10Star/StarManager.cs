@@ -18,25 +18,6 @@ public class StarManager : MonoBehaviour
     [Tooltip("생성할 별 프리팹 (예: star.prefab). StarBehavior가 붙어 있어야 함.")]
     public GameObject starPrefab;
 
-    [Header("Spawn Settings")]
-    [Tooltip("동시에 존재 가능한 별 최대 개수")]
-    public int maxStarsAlive = 10;
-
-    [Tooltip("별 생성 간격 (초)")]
-    public float spawnInterval = 0.6f;
-
-    [Tooltip("StarSpawnPoint가 비어있어도 별을 생성할지 여부")]
-    public bool logIfMissingSpawnPoint = true;
-
-    [Header("Star Defaults")]
-    public int pointsPerStar = 1;
-    public Color starColor = Color.cyan;
-    public float minStarScale = 0.05f;
-    public float maxStarScale = 0.30f;
-    public float growDuration = 2.5f;
-    public float shrinkDuration = 2.5f;
-
-    private readonly HashSet<StarBehavior> _activeStars = new HashSet<StarBehavior>();
     private Coroutine _spawnRoutine;
 
     private void Start()
@@ -55,33 +36,20 @@ public class StarManager : MonoBehaviour
 
     private IEnumerator SpawnLoop()
     {
-        // 시작 직후는 약간 더 빠르게 생성되도록
+        // 시작 직후부터 랜덤하게 계속 생성
         while (true)
         {
-            CleanupNulls();
-
             if (StarSpawnPoint == null || starPrefab == null)
             {
-                if (logIfMissingSpawnPoint)
-                {
-                    if (StarSpawnPoint == null)
-                        Debug.LogWarning("[StarManager] StarSpawnPoint is null. Spawn is paused.");
-                    if (starPrefab == null)
-                        Debug.LogWarning("[StarManager] starPrefab is null. Inspector에서 star.prefab을 할당해주세요.");
-                    logIfMissingSpawnPoint = false;
-                }
-
                 yield return null;
                 continue;
             }
 
-            while (_activeStars.Count < maxStarsAlive)
-            {
-                SpawnOne();
-                yield return null;
-            }
+            SpawnOne();
 
-            yield return new WaitForSeconds(spawnInterval);
+            // 랜덤 생성 간격 (0.2 ~ 1.0초 사이로 무작위 지연)
+            float randomDelay = Random.Range(0.2f, 1.0f);
+            yield return new WaitForSeconds(randomDelay);
         }
     }
 
@@ -94,44 +62,13 @@ public class StarManager : MonoBehaviour
             Random.Range(bounds.min.z, bounds.max.z)
         );
 
-        GameObject star = Instantiate(starPrefab, pos, starPrefab.transform.rotation);
+        GameObject star = Instantiate(starPrefab, pos, Random.rotation);
         star.name = "StarPoint";
 
         var behavior = star.GetComponent<StarBehavior>();
         if (behavior == null) behavior = star.AddComponent<StarBehavior>();
 
         behavior.SetOwner(this);
-        behavior.points = pointsPerStar;
-        behavior.starColor = starColor;
-        behavior.minScale = minStarScale;
-        behavior.maxScale = maxStarScale;
-        behavior.growDuration = growDuration;
-        behavior.shrinkDuration = shrinkDuration;
-
-        _activeStars.Add(behavior);
-    }
-
-    public void NotifyStarDestroyed(StarBehavior star)
-    {
-        if (star == null) return;
-        _activeStars.Remove(star);
-    }
-
-    private void CleanupNulls()
-    {
-        if (_activeStars.Count == 0) return;
-
-        // HashSet은 foreach 중 삭제가 불가하므로 List로 복사
-        var toRemove = new List<StarBehavior>();
-        foreach (var s in _activeStars)
-        {
-            if (s == null) toRemove.Add(s);
-        }
-
-        for (int i = 0; i < toRemove.Count; i++)
-        {
-            _activeStars.Remove(toRemove[i]);
-        }
     }
 
     private void EnsureBootstrap()
@@ -139,7 +76,7 @@ public class StarManager : MonoBehaviour
         // 이미 씬 오브젝트가 있으면 유지
         if (StarSpawnPoint != null) return;
 
-        // 10Star 타겟이 씬에 존재한다면 그 주변을 기본 범위로 잡음
+        // 10Star 타켓이 씬에 존재한다면 그 주변을 기본 범위로 잡음
         GameObject target = GameObject.Find("power_star");
 
         GameObject spawnGO = GameObject.Find("StarSpawnPoint");

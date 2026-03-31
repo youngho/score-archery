@@ -24,27 +24,19 @@ public class StarBehavior : MonoBehaviour
     public float shrinkDuration = 2.5f;
 
     [Header("Visual Brightness")]
-    [Tooltip("별 색(라이트/폭발 파티클에 사용)")]
-    public Color starColor = Color.cyan;
-
     [Tooltip("시작 라이트 intensity")]
     public float minLightIntensity = 0f;
 
     [Tooltip("최대 라이트 intensity")]
     public float maxLightIntensity = 6f;
 
-    [Header("Scoring")]
-    [Tooltip("화살이 맞추면 올릴 점수 (StarScoreManager에서 반영)")]
-    public int points = 1;
 
     [Header("Explosion Effect")]
+    [Tooltip("맞았을 때 터지는 외부 VFX 프리팹 (예: CFXR Hit A)")]
+    public GameObject hitEffectPrefab;
+
+    [Tooltip("폭발 효과 사용 여부")]
     public bool useExplosion = true;
-    public float explosionDuration = 0.12f;
-    public float explosionLifetime = 0.25f;
-    public float explosionRadius = 0.06f;
-    public int explosionParticleCount = 30;
-    public float explosionSpeedMin = 2.0f;
-    public float explosionSpeedMax = 6.0f;
 
     private StarManager _owner;
     private bool _isHit;
@@ -52,14 +44,25 @@ public class StarBehavior : MonoBehaviour
     private Renderer _renderer;
     private Material _material;
     private Light _light;
+    private Color _originalColor = Color.white;
 
     public void SetOwner(StarManager owner) => _owner = owner;
 
     private void Awake()
     {
         _renderer = GetComponentInChildren<Renderer>();
-        _material = _renderer != null ? _renderer.material : null;
+        if (_renderer != null)
+        {
+            _material = _renderer.material;
+            _originalColor = _material.color;
+        }
+        
         _light = GetComponentInChildren<Light>();
+        if (_light != null && _originalColor != Color.white)
+        {
+            // 라이트 색상도 머티리얼 기본색에 맞춤
+            _light.color = _originalColor;
+        }
 
         // InstantiatePrimitive 기준으로, 씬에서 잘못된 초기 스케일이 들어가도 안전하게 고정
         transform.localScale = Vector3.one * minScale;
@@ -117,7 +120,7 @@ public class StarBehavior : MonoBehaviour
         // 머티리얼 컬러는 있는 경우에만 간단히 조절
         if (_material != null)
         {
-            Color c = starColor;
+            Color c = _originalColor;
             c.a = Mathf.Clamp01(brightness01);
             // 일부 셰이더는 alpha가 의미가 없을 수 있어도 안전하게 SetColor만 수행
             _material.color = c * Mathf.Lerp(0.2f, 1.2f, brightness01);
@@ -148,76 +151,20 @@ public class StarBehavior : MonoBehaviour
         }
 
         // 점수 1회 반영
-        StarScoreManager.Instance?.AddStarScore(points);
+        StarScoreManager.Instance?.AddStarScore();
 
         // VFX
-        if (useExplosion)
+        if (useExplosion && hitEffectPrefab != null)
         {
-            CreateStarExplosion(impactPoint, impactNormal);
+            Instantiate(hitEffectPrefab, impactPoint, Quaternion.LookRotation(impactNormal));
         }
 
         // 같은 프레임에서 ArcheryArrow가 SetParent/물리처리를 하므로 즉시 Destroy해도 end-of-frame 처리로 안전
         Destroy(gameObject);
     }
 
-    private void CreateStarExplosion(Vector3 position, Vector3 impactNormal)
-    {
-        GameObject explosion = new GameObject("StarExplosion");
-        explosion.transform.position = position;
-
-        // 파티클 방향을 대략 충돌 노멀 쪽으로 맞춤 (없는 경우 identity)
-        if (impactNormal.sqrMagnitude > 0.0001f)
-        {
-            explosion.transform.rotation = Quaternion.LookRotation(impactNormal);
-        }
-
-        ParticleSystem ps = explosion.AddComponent<ParticleSystem>();
-        ps.Stop();
-
-        var main = ps.main;
-        var emission = ps.emission;
-        var shape = ps.shape;
-
-        main.duration = explosionDuration;
-        main.loop = false;
-        main.playOnAwake = false;
-        main.startLifetime = explosionLifetime;
-        main.startSpeed = new ParticleSystem.MinMaxCurve(explosionSpeedMin, explosionSpeedMax);
-        main.startSize = new ParticleSystem.MinMaxCurve(0.03f, 0.10f);
-        main.startColor = starColor;
-
-        // 0초에 Burst로 즉시 터뜨림
-        emission.rateOverTime = 0f;
-        emission.SetBursts(new ParticleSystem.Burst[]
-        {
-            new ParticleSystem.Burst(0f, (short)explosionParticleCount, (short)explosionParticleCount)
-        });
-
-        shape.shapeType = ParticleSystemShapeType.Sphere;
-        shape.radius = explosionRadius;
-
-        var renderer = ps.GetComponent<ParticleSystemRenderer>();
-        if (renderer != null)
-        {
-            Shader shader = Shader.Find("Particles/Standard Unlit");
-            if (shader == null) shader = Shader.Find("Mobile/Particles/Additive");
-            if (shader == null) shader = Shader.Find("Particles/Additive");
-            if (shader != null)
-            {
-                renderer.material = new Material(shader);
-                renderer.material.color = starColor;
-            }
-        }
-
-        ps.Play();
-
-        float lifetimeMax = explosionLifetime; // main.startLifetime은 float으로 세팅되므로 상한도 동일 취급
-        Destroy(explosion, explosionDuration + lifetimeMax + 0.1f);
-    }
-
     private void OnDestroy()
     {
-        _owner?.NotifyStarDestroyed(this);
+        // StarManager no longer tracks active stars
     }
 }
-
