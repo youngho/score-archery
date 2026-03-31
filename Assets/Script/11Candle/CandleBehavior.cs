@@ -12,14 +12,6 @@ public class CandleBehavior : MonoBehaviour
     [Tooltip("candle.prefab 내부에서 끌 오브젝트 이름")]
     public string flameObjectName = "candleFlame";
 
-    [Header("쓰러짐")]
-    [Tooltip("화살 충돌 시 넘어지는 힘 배율 (작을수록 살짝만 쓰러짐)")]
-    [Range(0.1f, 1.5f)]
-    public float hitImpulseMultiplier = 0.35f;
-    [Tooltip("넘어질 때 토크 배율")]
-    [Range(0.05f, 1f)]
-    public float hitTorqueMultiplier = 0.25f;
-
     private Rigidbody _rb;
     private GameObject _flame;
     private Vector3 _initialUpWorld;
@@ -36,7 +28,6 @@ public class CandleBehavior : MonoBehaviour
         if (_rb != null)
         {
             _rb.isKinematic = true;
-            _rb.useGravity = false;
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
         }
@@ -55,32 +46,10 @@ public class CandleBehavior : MonoBehaviour
         if (_rb != null)
         {
             _rb.isKinematic = false;
-            _rb.useGravity = true;
             _rb.constraints = RigidbodyConstraints.None;
 
-            Vector3 contactPoint = (collision.contacts != null && collision.contacts.Length > 0)
-                ? collision.contacts[0].point
-                : transform.position;
-            Vector3 impulse = collision.relativeVelocity.sqrMagnitude > 0.0001f
-                ? collision.relativeVelocity
-                : (collision.impulse.sqrMagnitude > 0.0001f ? collision.impulse : transform.forward);
-
-            Vector3 forceDir = impulse.normalized;
-            float forceMag = impulse.magnitude * hitImpulseMultiplier;
-            _rb.AddForceAtPosition(forceDir * forceMag, contactPoint, ForceMode.Impulse);
-
-            Vector3 torqueAxis = Vector3.Cross(_initialUpWorld, forceDir);
-            if (torqueAxis.sqrMagnitude < 0.0001f) torqueAxis = Random.onUnitSphere;
-            _rb.AddTorque(torqueAxis.normalized * (forceMag * hitTorqueMultiplier), ForceMode.Impulse);
-        }
-
-        // 화살은 맞은 뒤 바로 멈춤 (튀지 않도록)
-        var arrowRb = arrow.GetComponent<Rigidbody>();
-        if (arrowRb != null)
-        {
-            arrowRb.linearVelocity = Vector3.zero;
-            arrowRb.angularVelocity = Vector3.zero;
-            arrowRb.isKinematic = true;
+            // 물리 엔진이 이미 계산한 충격량(Impulse)을 그대로 전달하여 자연스럽게 밀려나게 함
+            _rb.AddForce(collision.impulse, ForceMode.Impulse);
         }
 
         // 촛불 꺼짐 + 점수 1회

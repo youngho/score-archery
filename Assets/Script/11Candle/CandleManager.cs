@@ -3,8 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// 11Candle 씬 전용:
-/// - Step_A 위에 CandleSpawnPoint를 10개 랜덤 생성
-/// - 해당 스폰포인트 위에 양초를 생성
+/// - Step_A 위에 양초를 10개 랜덤 생성
 /// </summary>
 [DisallowMultipleComponent]
 public class CandleManager : MonoBehaviour
@@ -13,11 +12,8 @@ public class CandleManager : MonoBehaviour
     [Tooltip("Step_A 위에 생성할 양초 개수")]
     public int candleCount = 10;
 
-    [Tooltip("스폰 Y 오프셋 (Step_A 표면 위로 살짝 띄움)")]
-    public float spawnYOffset = 0.02f;
-
     [Tooltip("스폰 랜덤 범위에서 가장자리 제외를 위한 마진")]
-    public float spawnMargin = 0.08f;
+    public float spawnMargin = 0.05f;
 
     [Tooltip("생성할 양초 프리팹 에셋 (Assets/11Candle/candle.prefab 을 할당)")]
     public GameObject candlePrefabAsset;
@@ -25,14 +21,6 @@ public class CandleManager : MonoBehaviour
     [Tooltip("Step_A 오브젝트 이름")]
     public string stepAName = "Step_A";
 
-    [Header("CandleSpawnPoint")]
-    [Tooltip("생성할 스폰 포인트 오브젝트 이름 prefix")]
-    public string spawnPointPrefix = "CandleSpawnPoint";
-
-    [Tooltip("스폰포인트를 먼저 만들고 그 위치를 이용해 양초를 생성")]
-    public bool createSpawnPoints = true;
-
-    private readonly List<Transform> _spawnPoints = new List<Transform>();
 
     private void Start()
     {
@@ -68,7 +56,6 @@ public class CandleManager : MonoBehaviour
             return;
         }
 
-        CreateSpawnPointsIfNeeded(bounds, stepA.transform);
 
         if (candlePrefabAsset == null)
         {
@@ -78,17 +65,8 @@ public class CandleManager : MonoBehaviour
 
         for (int i = 0; i < candleCount; i++)
         {
-            Vector3 spawnPos;
+            Vector3 spawnPos = GetRandomPointOnBounds(bounds, stepA.transform);
             Quaternion spawnRot = GetUprightRotation(stepA.transform);
-
-            if (_spawnPoints.Count > i)
-            {
-                spawnPos = _spawnPoints[i].position;
-            }
-            else
-            {
-                spawnPos = GetRandomPointOnBounds(bounds, stepA.transform);
-            }
 
             // 약간 랜덤 yaw (시각적 다양성)
             spawnRot = spawnRot * Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
@@ -113,36 +91,8 @@ public class CandleManager : MonoBehaviour
                 Destroy(candles[i].gameObject);
         }
 
-        // 이전 런에서 만든 스폰 포인트 제거(이름 prefix로만 정리)
-        var candidates = GameObject.FindObjectsOfType<Transform>();
-        foreach (var t in candidates)
-        {
-            if (t != null && t.name != null && t.name.StartsWith(spawnPointPrefix))
-            {
-                Destroy(t.gameObject);
-            }
-        }
     }
 
-    private void CreateSpawnPointsIfNeeded(Bounds bounds, Transform stepA)
-    {
-        _spawnPoints.Clear();
-
-        if (!createSpawnPoints)
-            return;
-
-        for (int i = 0; i < candleCount; i++)
-        {
-            Vector3 pos = GetRandomPointOnBounds(bounds, stepA);
-
-            var go = new GameObject($"{spawnPointPrefix}_{i}");
-            go.transform.position = pos;
-            go.transform.rotation = Quaternion.identity;
-            go.transform.SetParent(transform, true);
-
-            _spawnPoints.Add(go.transform);
-        }
-    }
 
     private Vector3 GetRandomPointOnBounds(Bounds bounds, Transform stepA)
     {
@@ -151,15 +101,26 @@ public class CandleManager : MonoBehaviour
         float zMin = bounds.min.z + spawnMargin;
         float zMax = bounds.max.z - spawnMargin;
 
+        // 마진이 너무 커서 범위가 역전되는 경우 방지
+        if (xMin > xMax) { xMin = xMax = bounds.center.x; }
+        if (zMin > zMax) { zMin = zMax = bounds.center.z; }
+
         float x = Random.Range(xMin, xMax);
         float z = Random.Range(zMin, zMax);
 
-        // Step_A 표면 위
-        float y = bounds.max.y + spawnYOffset;
+        // 계단 형태의 오브젝트 표면을 찾기 위해 위에서 아래로 Raycast
+        // 바운드 최상단보다 5m 위에서 아래로 쏨
+        float rayStartHeight = bounds.max.y + 5f;
+        Vector3 rayOrigin = new Vector3(x, rayStartHeight, z);
 
-        // Step_A가 회전되어 있을 수 있으니 약간 더 안정적으로: stepA up 기준으로 살짝 조정
-        // (현재 bounds는 world AABB이므로 완벽하진 않지만 Step_A가 평평하다는 가정에서는 충분)
-        return new Vector3(x, y, z);
+        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 10f))
+        {
+            // 실제 충돌 지점의 좌표를 반환
+            return hit.point;
+        }
+
+        // Raycast가 실패한 경우(콜라이더가 없는 지점 등) 기존 방식대로 바운드 상단 사용
+        return new Vector3(x, bounds.max.y, z);
     }
 
     private static Quaternion GetUprightRotation(Transform stepA)
