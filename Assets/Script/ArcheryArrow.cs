@@ -182,6 +182,15 @@ private float lifeTimeAfterHit = 2f;
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
 
+            // 충돌 후 물리적인 반발이나 충돌 간섭을 없애기 위해 콜라이더 비활성화
+            if (TryGetComponent<Collider>(out var col)) col.enabled = false;
+
+            // 튕겨나가는 효과를 방지하기 위해 강제로 충돌 지점에 고정
+            if (collision.contacts != null && collision.contacts.Length > 0)
+            {
+                transform.position = collision.contacts[0].point;
+            }
+
             // Stick to the hit object
             transform.SetParent(collision.transform);
         }
