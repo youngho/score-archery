@@ -144,11 +144,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2774220344278030320, guid: 9a0ab2cd5eddd496aab188cae9e34db9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.172
       objectReference: {fileID: 0}
     - target: {fileID: 2774220344278030320, guid: 9a0ab2cd5eddd496aab188cae9e34db9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.057
       objectReference: {fileID: 0}
     - target: {fileID: 2774220344278030320, guid: 9a0ab2cd5eddd496aab188cae9e34db9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -239,7 +239,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -262,10 +262,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.0070121
-  m_Height: 5.508693
-  m_Direction: 2
-  m_Center: {x: 0.0068843365, y: 0.010625333, z: 2.7879858}
+  m_Radius: 1.0431648
+  m_Height: 5.779043
+  m_Direction: 1
+  m_Center: {x: 0.0068843365, y: 2.864098, z: -0.01989454}
 --- !u!114 &-509781372270078097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -279,5 +279,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CandleBehavior
   flameObjectName: candleFlame
-  hitImpulseMultiplier: 0.169
-  hitTorqueMultiplier: 0.102
+  hitImpulseMultiplier: 0.688
+  hitTorqueMultiplier: 0.535
