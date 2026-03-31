@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 코코넛 개별 동작:
 /// - 스폰 지점에서 서서히 자람(Scale lerp)
-/// - 화살(ArcheryArrow)에 맞으면 점수 1회 + 중력/물리 활성화로 "실제처럼" 떨어짐
+/// - 화살(ArcheryArrow)에 맞으면 히트 SFX(랜덤) + 점수 1회 + 중력/물리 활성화로 "실제처럼" 떨어짐
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider))]
@@ -31,6 +31,13 @@ public class CoconutBehavior : MonoBehaviour
 
     [Tooltip("맞았을 때 떨어지기 시작할 때 살짝 주는 임펄스(낙하가 너무 정적일 때 보정)")]
     public float extraImpulse = 0.6f;
+
+    [Header("Hit audio")]
+    [Tooltip("화살에 맞을 때 무작위로 재생할 효과음")]
+    [SerializeField] private AudioClip[] hitClips;
+
+    [SerializeField, Range(0f, 2f)]
+    private float hitClipVolume = 1f;
 
     private CoconutManager _owner;
     private Rigidbody _rb;
@@ -129,7 +136,18 @@ public class CoconutBehavior : MonoBehaviour
 
         CoconutScoreManager.Instance?.AddCoconutScore(points);
 
+        PlayRandomHitClip(hitPoint);
+
         BeginFall(hitPoint);
+    }
+
+    private void PlayRandomHitClip(Vector3 position)
+    {
+        if (hitClips == null || hitClips.Length == 0) return;
+
+        var clip = hitClips[Random.Range(0, hitClips.Length)];
+        if (clip != null)
+            AudioSource.PlayClipAtPoint(clip, position, hitClipVolume);
     }
 
     private void BeginFall(Vector3 hitPoint)

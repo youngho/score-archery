@@ -6,7 +6,8 @@ using UnityEngine;
 /// - CoconutSpawnPoint 2곳(BoxCollider bounds) 중 임의 선택
 /// - 선택된 bounds 범위 안에서 코코넛을 랜덤 생성
 /// - StageTimer(=Timer)가 시작되면 스폰 시작
-/// - 코코넛은 스폰 지점에서 서서히 자라며, 화살에 맞으면 실제처럼 떨어짐(CoconutBehavior)
+/// - 코코넛은 스폰 지점에서 서서히 자라며, 스폰 시 줄기 중심을 향하도록 방향을 잡고 약간의 랜덤 기울기를 줌
+/// - 화살에 맞으면 실제처럼 떨어짐(CoconutBehavior)
 /// </summary>
 [DisallowMultipleComponent]
 public class CoconutManager : MonoBehaviour
@@ -26,8 +27,12 @@ public class CoconutManager : MonoBehaviour
     public float outerRadius = 1.5f;
 
     [Header("Coconut Prefab")]
-    [Tooltip("생성할 코코넛 프리팹(없으면 런타임에 Sphere로 대체 생성)")]
+    [Tooltip("생성할 코코넛 디폴트 프리팹(없으면 스폰하지 않음)")]
     public GameObject coconutPrefab;
+
+    [Header("Spawn Orientation")]
+    [Tooltip("XZ 평면에서 스폰 중심(줄기) 쪽을 향하게 한 뒤, 로컬 회전으로 ±이 값(도) 범위만큼 무작위 기울기 — 모두 같으면 매 판마다 동일한 자세")]
+    public Vector3 spawnRandomEulerHalfExtents = new Vector3(12f, 22f, 12f);
 
     [Header("Spawn Settings")]
     [Tooltip("코코넛 생성 간격(초)")]
@@ -105,19 +110,14 @@ public class CoconutManager : MonoBehaviour
 
         Vector3 pos = GetRandomPointInRing(chosen);
 
-        GameObject go;
-        if (coconutPrefab != null)
+        if (coconutPrefab == null)
         {
-            go = Instantiate(coconutPrefab, pos, coconutPrefab.transform.rotation);
-        }
-        else
-        {
-            go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            go.transform.position = pos;
-            go.transform.rotation = Quaternion.identity;
-            go.transform.localScale = Vector3.one * 0.25f;
+            Debug.LogError("[CoconutManager] coconutPrefab이 비어 있습니다.", this);
+            return;
         }
 
+        Quaternion rot = GetSpawnRotationFacingCenter(chosen.position, pos, coconutPrefab.transform.rotation);
+        GameObject go = Instantiate(coconutPrefab, pos, rot);
         go.name = "Coconut";
 
         // 코코넛은 매달린 상태 -> 기본은 물리 비활성(Behavior에서 처리)
@@ -141,6 +141,28 @@ public class CoconutManager : MonoBehaviour
         col.isTrigger = false;
 
         _aliveCount++;
+    }
+
+    /// <summary>
+    /// XZ 기준으로 중심을 바라보게 한 뒤(입구/앞면이 줄기 쪽), 지정한 범위에서 로컬 Euler를 무작위로 더합니다.
+    /// </summary>
+    private Quaternion GetSpawnRotationFacingCenter(Vector3 centerWorld, Vector3 spawnWorld, Quaternion prefabRotation)
+    {
+        Vector3 horiz = centerWorld - spawnWorld;
+        horiz.y = 0f;
+        if (horiz.sqrMagnitude < 1e-8f)
+            horiz = Vector3.forward;
+        else
+            horiz.Normalize();
+
+        Quaternion faceCenter = Quaternion.LookRotation(horiz, Vector3.up);
+
+        float ex = Mathf.Max(0f, spawnRandomEulerHalfExtents.x);
+        float ey = Mathf.Max(0f, spawnRandomEulerHalfExtents.y);
+        float ez = Mathf.Max(0f, spawnRandomEulerHalfExtents.z);
+        Quaternion jitter = Quaternion.Euler(Random.Range(-ex, ex), Random.Range(-ey, ey), Random.Range(-ez, ez));
+
+        return faceCenter * jitter * prefabRotation;
     }
 
     private Transform ChooseSpawnCenter()
