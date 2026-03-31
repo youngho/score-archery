@@ -38,6 +38,13 @@ public class StarBehavior : MonoBehaviour
     [Tooltip("폭발 효과 사용 여부")]
     public bool useExplosion = true;
 
+    [Header("Audio")]
+    [Tooltip("화살에 맞았을 때만 재생")]
+    public AudioClip hitSound;
+
+    [Range(0f, 1f)]
+    public float hitSoundVolume = 1f;
+
     private StarManager _owner;
     private bool _isHit;
     private float _elapsed;
@@ -159,12 +166,10 @@ public class StarBehavior : MonoBehaviour
             Instantiate(hitEffectPrefab, impactPoint, Quaternion.LookRotation(impactNormal));
         }
 
+        if (hitSound != null)
+            AudioSource.PlayClipAtPoint(hitSound, impactPoint, hitSoundVolume);
+
         // 같은 프레임에서 ArcheryArrow가 SetParent/물리처리를 하므로 즉시 Destroy해도 end-of-frame 처리로 안전
         Destroy(gameObject);
-    }
-
-    private void OnDestroy()
-    {
-        // StarManager no longer tracks active stars
     }
 }

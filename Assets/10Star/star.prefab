@@ -137,11 +137,7 @@ MonoBehaviour:
   shrinkDuration: 5
   minLightIntensity: 0
   maxLightIntensity: 6
-  points: 1
+  hitEffectPrefab: {fileID: 8791802859087666345, guid: 2b8de66cd1544405b5db98dc100b30b4, type: 3}
   useExplosion: 1
-  explosionDuration: 0.12
-  explosionLifetime: 0.25
-  explosionRadius: 0.06
-  explosionParticleCount: 30
-  explosionSpeedMin: 2
-  explosionSpeedMax: 6
+  hitSound: {fileID: 8300000, guid: 3e6201ec9bd5e486986746d4c099d8ad, type: 3}
+  hitSoundVolume: 1
