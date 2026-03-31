@@ -204,6 +204,7 @@ GameObject:
   m_Component:
   - component: {fileID: 310593154}
   - component: {fileID: 310593153}
+  - component: {fileID: 310593155}
   m_Layer: 0
   m_Name: WatermelonManager
   m_TagString: Untagged
@@ -251,6 +252,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &310593155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310593152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4b645045c41943dd855acde8f3bc3fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WatermelonScoreManager
+  pointsPerWatermelon: 1
 --- !u!1 &495050432
 GameObject:
   m_ObjectHideFlags: 0
@@ -305,11 +319,14 @@ MonoBehaviour:
   onTimerEnd:
     m_PersistentCalls:
       m_Calls: []
+  onTimerStart:
+    m_PersistentCalls:
+      m_Calls: []
   startAtRuntime: 0
   dialSlider: {fileID: 923242023}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
   countDownSound: {fileID: 8300000, guid: 70014389074e9495db8a8142399628ce, type: 3}
-  startSeconds: 20
+  startSeconds: 30
   _timerText: {fileID: 1784712781}
 --- !u!1 &644721911
 GameObject:
@@ -1270,7 +1287,7 @@ GameObject:
   - component: {fileID: 1411839906}
   - component: {fileID: 1411839905}
   m_Layer: 0
-  m_Name: Terrain
+  m_Name: WatermelonTerrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1317,9 +1334,9 @@ Terrain:
   m_HeightmapMinimumLODSimplification: 0
   m_HeightmapMaximumLOD: 0
   m_ShadowCastingMode: 2
-  m_DrawHeightmap: 1
+  m_DrawHeightmap: 0
   m_DrawInstanced: 0
-  m_DrawTreesAndFoliage: 1
+  m_DrawTreesAndFoliage: 0
   m_StaticShadowCaster: 0
   m_IgnoreQualitySettings: 0
   m_ReflectionProbeUsage: 1
@@ -1345,8 +1362,8 @@ Transform:
   m_GameObject: {fileID: 1411839904}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -88.5, y: -21, z: 0.6}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -503.8, y: -21, z: -444.4}
+  m_LocalScale: {x: 0.2, y: 1, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1488,51 +1505,6 @@ RectTransform:
   m_AnchoredPosition: {x: -400, y: 879.3}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &1695952606
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1695952608}
-  - component: {fileID: 1695952607}
-  m_Layer: 0
-  m_Name: WatermelonScoreManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1695952607
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1695952606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4b645045c41943dd855acde8f3bc3fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WatermelonScoreManager
-  pointsPerWatermelon: 1
---- !u!4 &1695952608
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1695952606}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1784712779
 GameObject:
   m_ObjectHideFlags: 0
@@ -2011,7 +1983,7 @@ Transform:
   m_GameObject: {fileID: 1907928365}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 1, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2152,6 +2124,5 @@ SceneRoots:
   - {fileID: 825740293}
   - {fileID: 1789930442}
   - {fileID: 310593154}
-  - {fileID: 1695952608}
   - {fileID: 644721913}
   - {fileID: 1411839907}

@@ -135,13 +135,10 @@ MonoBehaviour:
   bounciness: 0.9
   dynamicFriction: 0.1
   maxSpeed: 12
-  initialImpulse: {x: 0, y: 0, z: 0}
-  points: 1
-  useExplosion: 1
-  explosionColor: {r: 0.35, g: 1, b: 0.45, a: 1}
-  explosionDuration: 0.12
-  explosionLifetime: 0.35
-  explosionRadius: 0.2
-  explosionParticleCount: 60
-  explosionSpeedMin: 2
-  explosionSpeedMax: 7
+  initialImpulse: {x: 0, y: 1, z: 0}
+  hitEffectPrefab: {fileID: 9157105887711914197, guid: c4f829cb7dd4b864caf8832ec5b1ee55, type: 3}
+  hitPopClips:
+  - {fileID: 8300000, guid: fa59f78a424da46979bab4255190966e, type: 3}
+  - {fileID: 8300000, guid: 5a66af2c33ab8423c872fefd7c7d1aab, type: 3}
+  - {fileID: 8300000, guid: a3a945706b8374318a23341cb4f9e75f, type: 3}
+  hitPopVolume: 1

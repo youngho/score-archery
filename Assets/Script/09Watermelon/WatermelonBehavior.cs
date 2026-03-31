@@ -4,7 +4,7 @@ using UnityEngine;
 /// 수박 개별 동작:
 /// - Rigidbody 기반으로 공처럼 튀도록 PhysicMaterial 세팅
 /// - 스폰 직후 초기 임펄스를 적용
-/// - 화살(ArcheryArrow)에 맞으면 폭발 VFX + 점수 1회 + 즉시 파괴
+/// - 화살(ArcheryArrow)에 맞으면 팝 SFX(랜덤) + VFX + WatermelonScoreManager 경유 점수 + 즉시 파괴
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider))]
@@ -26,19 +26,16 @@ public class WatermelonBehavior : MonoBehaviour
     [Tooltip("스폰 시 적용할 초기 임펄스")]
     public Vector3 initialImpulse = Vector3.zero;
 
-    [Header("Scoring")]
-    [Tooltip("맞추면 올릴 점수")]
-    public int points = 1;
+    [Header("Hit VFX")]
+    [Tooltip("맞았을 때 재생할 VFX 프리팹")]
+    public GameObject hitEffectPrefab;
 
-    [Header("Explosion Effect")]
-    public bool useExplosion = true;
-    public Color explosionColor = new Color(0.35f, 1.0f, 0.45f, 1f);
-    public float explosionDuration = 0.12f;
-    public float explosionLifetime = 0.35f;
-    public float explosionRadius = 0.20f;
-    public int explosionParticleCount = 60;
-    public float explosionSpeedMin = 2.0f;
-    public float explosionSpeedMax = 7.0f;
+    [Header("Hit audio")]
+    [Tooltip("맞을 때 무작위로 재생할 효과음")]
+    [SerializeField] private AudioClip[] hitPopClips;
+
+    [SerializeField, Range(0f, 2f)]
+    private float hitPopVolume = 1f;
 
     private WatermelonManager _owner;
     private Rigidbody _rb;
@@ -106,6 +103,15 @@ public class WatermelonBehavior : MonoBehaviour
         _col.material = _runtimeMat;
     }
 
+    private void PlayRandomHitPop(Vector3 position)
+    {
+        if (hitPopClips == null || hitPopClips.Length == 0) return;
+
+        var clip = hitPopClips[Random.Range(0, hitPopClips.Length)];
+        if (clip != null)
+            AudioSource.PlayClipAtPoint(clip, position, hitPopVolume);
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (_isHit) return;
@@ -128,61 +134,14 @@ public class WatermelonBehavior : MonoBehaviour
             impactNormal = collision.contacts[0].normal;
         }
 
-        WatermelonScoreManager.Instance?.AddWatermelonScore(points);
+        WatermelonScoreManager.Instance?.AddWatermelonScore();
 
-        if (useExplosion)
-            CreateWatermelonExplosion(impactPoint, impactNormal);
+        if (hitEffectPrefab != null)
+            Instantiate(hitEffectPrefab, impactPoint, Quaternion.LookRotation(impactNormal));
+
+        PlayRandomHitPop(impactPoint);
 
         Destroy(gameObject);
-    }
-
-    private void CreateWatermelonExplosion(Vector3 position, Vector3 impactNormal)
-    {
-        GameObject explosion = new GameObject("WatermelonExplosion");
-        explosion.transform.position = position;
-
-        if (impactNormal.sqrMagnitude > 0.0001f)
-            explosion.transform.rotation = Quaternion.LookRotation(impactNormal);
-
-        ParticleSystem ps = explosion.AddComponent<ParticleSystem>();
-        ps.Stop();
-
-        var main = ps.main;
-        var emission = ps.emission;
-        var shape = ps.shape;
-
-        main.duration = explosionDuration;
-        main.loop = false;
-        main.playOnAwake = false;
-        main.startLifetime = explosionLifetime;
-        main.startSpeed = new ParticleSystem.MinMaxCurve(explosionSpeedMin, explosionSpeedMax);
-        main.startSize = new ParticleSystem.MinMaxCurve(0.05f, 0.16f);
-        main.startColor = explosionColor;
-
-        emission.rateOverTime = 0f;
-        emission.SetBursts(new[]
-        {
-            new ParticleSystem.Burst(0f, (short)explosionParticleCount, (short)explosionParticleCount)
-        });
-
-        shape.shapeType = ParticleSystemShapeType.Sphere;
-        shape.radius = explosionRadius;
-
-        var renderer = ps.GetComponent<ParticleSystemRenderer>();
-        if (renderer != null)
-        {
-            Shader shader = Shader.Find("Particles/Standard Unlit");
-            if (shader == null) shader = Shader.Find("Mobile/Particles/Additive");
-            if (shader == null) shader = Shader.Find("Particles/Additive");
-            if (shader != null)
-            {
-                renderer.material = new Material(shader);
-                renderer.material.color = explosionColor;
-            }
-        }
-
-        ps.Play();
-        Destroy(explosion, explosionDuration + explosionLifetime + 0.1f);
     }
 
     private void OnDestroy()
