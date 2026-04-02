@@ -19,6 +19,7 @@ public class MenTargetBehavior : MonoBehaviour
     public float waitMaxTime = 4f;
 
     private Quaternion _initialRotation;
+    private bool _initialRotationLocked;
     private bool _isHit;
     private MenTargetManager _manager;
 
@@ -49,9 +50,20 @@ public class MenTargetBehavior : MonoBehaviour
         _manager = owner;
     }
 
-    private void Start()
+    /// <summary>
+    /// 매니저 스폰 직후 호출. Start보다 먼저 잡아 두어 스폰 포인트 회전과 무관하게
+    /// 프리팹 기본 자세를 "초기"로 쓰고, 이동 후 faceRotation만 적용한다.
+    /// </summary>
+    public void CaptureInitialRotationForMovement()
     {
         _initialRotation = transform.rotation;
+        _initialRotationLocked = true;
+    }
+
+    private void Start()
+    {
+        if (!_initialRotationLocked)
+            _initialRotation = transform.rotation;
     }
 
     /// <summary>

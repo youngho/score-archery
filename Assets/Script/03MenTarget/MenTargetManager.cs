@@ -36,7 +36,7 @@ public class MenTargetManager : MonoBehaviour
     public int maxTargetsAtOnce = 5;
 
     [Header("이동 (월드 직선)")]
-    public float moveDistance = 5f;
+    public float moveDistance = 17f;
     public float moveSpeed = 2f;
     [Tooltip("이동 구간 중 멈춰서 회전을 시작할 거리 비율 범위")]
     public float randomStopMin = 0.2f;
@@ -159,7 +159,8 @@ public class MenTargetManager : MonoBehaviour
         if (targetPrefab == null)
             return;
 
-        GameObject targetGo = Instantiate(targetPrefab, spawnPoint.position, spawnPoint.rotation);
+        // 스폰 포인트 회전은 이동 방향만 쓰고, 과녘 방향은 프리팹 기본(씬에 직접 배치했을 때와 동일)로 둔다.
+        GameObject targetGo = Instantiate(targetPrefab, spawnPoint.position, targetPrefab.transform.rotation);
         _aliveCount++;
 
         MenTargetBehavior behavior = targetGo.GetComponent<MenTargetBehavior>();
@@ -167,6 +168,7 @@ public class MenTargetManager : MonoBehaviour
             behavior = targetGo.AddComponent<MenTargetBehavior>();
 
         behavior.Configure(this);
+        behavior.CaptureInitialRotationForMovement();
 
         float tLow = Mathf.Min(randomStopMin, randomStopMax);
         float tHigh = Mathf.Max(randomStopMin, randomStopMax);
