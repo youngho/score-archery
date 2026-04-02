@@ -76,6 +76,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArcheryArrow
   minVelocitySqrForRotate: 0.05
   logDebug: 0
+  appleMomentumTransferMultiplier: 0.4
   showTrail: 1
   trailColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   trailTime: 0.5
