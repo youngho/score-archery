@@ -1,33 +1,56 @@
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 /// <summary>
 /// 07Container 씬용 스탠드 표적 개별 동작.
-/// - 화살(ArcheryArrow)이 충돌한 위치를 기준으로 중심점까지의 거리로 서클링을 판정
-/// - StandTargetManager/StandTargetScoreManager 와 연동해 링별로 다른 점수를 부여
+/// - 화살(ArcheryArrow) 충돌 지점을 <b>과녁 면</b>에 투영한 뒤, 중심까지의 반경으로 링을 판정 (기울어진 표적에 적합)
+/// - StandTargetManager / StandTargetScoreManager 와 연동
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider))]
 public class StandTargetBehavior : MonoBehaviour
 {
-    [Header("Center / Ring Settings")]
-    [Tooltip("서클 중심 기준이 될 트랜스폼 (없으면 이 오브젝트의 Transform 사용)")]
+    [Header("Center / Face")]
+    [Tooltip("과녁 면 위의 중심(황심). 회전은 면이 놓인 방향과 같아야 함 (로컬 forward가 면의 법선)")]
     public Transform centerPoint;
+
+    [Tooltip("true면 법선을 -centerPoint.forward 로 사용 (모델이 반대로 잡힌 경우)")]
+    public bool invertFaceNormal;
 
     [System.Serializable]
     public class RingScore
     {
-        [Tooltip("에디터용 이름 (예: Inner, Middle, Outer)")]
+        [Tooltip("에디터용 이름")]
         public string ringName = "Ring";
 
-        [Tooltip("이 링의 최대 반지름 (centerPoint 기준, 월드 좌표)")]
+        [Tooltip("이 링 경계까지의 최대 반경 — 과녁 <b>면</b> 위에서 중심까지의 거리(미터). 안쪽 링부터 작은 값으로 나열")]
         public float radius = 0.1f;
 
-        [Tooltip("이 링을 맞췄을 때 획득할 점수")]
+        [Tooltip("이 링을 맞췄을 때 점수")]
         public int score = 1;
     }
 
-    [Tooltip("안쪽 링부터 바깥쪽 링 순서대로 설정")]
+    [Tooltip("황심(가장 안쪽)부터 바깥 링 순으로 반경 오름차순 정렬")]
     public RingScore[] ringScores;
+
+    [Header("Scene (에디터 기즈모)")]
+    [Tooltip("Scene 뷰에 점수 판정과 같은 면·반경으로 링을 원형으로 표시")]
+    public bool drawScoreRingsInScene = true;
+
+    [Tooltip("켜면 이 오브젝트를 선택했을 때만 링을 그림")]
+    public bool drawRingsOnlyWhenSelected;
+
+    [Tooltip("면 법선 방향으로 짧게 그려서 과녁이 어느 쪽을 바라보는지 확인")]
+    public bool drawFaceNormalGizmo = true;
+
+    [Tooltip("각 링 근처에 점수 숫자 표시 (에디터에서만)")]
+    public bool showRingScoreLabels = true;
+
+    [Range(12, 96)]
+    [Tooltip("원을 몇 각형으로 근사할지")]
+    public int gizmoRingSegments = 48;
 
     [Header("Hit Settings")]
     [Tooltip("한 번 점수 처리 후에는 다시 맞아도 점수를 주지 않음")]
@@ -40,18 +63,126 @@ public class StandTargetBehavior : MonoBehaviour
 
     private void Reset()
     {
-        // 기본 링 세트 예시
         ringScores = new[]
         {
-            new RingScore { ringName = "Inner", radius = 0.05f, score = 10 },
-            new RingScore { ringName = "Middle", radius = 0.10f, score = 5 },
-            new RingScore { ringName = "Outer", radius = 0.15f, score = 3 },
+            new RingScore { ringName = "10 (황)", radius = 0.05f, score = 10 },
+            new RingScore { ringName = "9", radius = 0.065f, score = 9 },
+            new RingScore { ringName = "8", radius = 0.08f, score = 8 },
+            new RingScore { ringName = "7", radius = 0.095f, score = 7 },
+            new RingScore { ringName = "6", radius = 0.11f, score = 6 },
+            new RingScore { ringName = "5", radius = 0.125f, score = 5 },
+            new RingScore { ringName = "4", radius = 0.14f, score = 4 },
+            new RingScore { ringName = "3", radius = 0.155f, score = 3 },
+            new RingScore { ringName = "2", radius = 0.17f, score = 2 },
+            new RingScore { ringName = "1 (바깥)", radius = 0.185f, score = 1 },
         };
+    }
+
+    /// <summary>
+    /// 과녁 면 법선(단위 벡터, 화살이 맞는 쪽으로 향함).
+    /// </summary>
+    private Vector3 GetFaceNormalWorld()
+    {
+        Transform t = centerPoint != null ? centerPoint : transform;
+        Vector3 n = t.forward;
+        if (invertFaceNormal)
+            n = -n;
+        return n.sqrMagnitude > 1e-8f ? n.normalized : Vector3.forward;
+    }
+
+    /// <summary>
+    /// 월드 좌표 hit를 과녁 면(중심을 지나 법선에 수직인 평면)에 투영한 뒤, 중심까지의 거리.
+    /// </summary>
+    private float GetRadialDistanceOnFace(Vector3 hitPointWorld, Vector3 centerWorld, Vector3 faceNormal)
+    {
+        Vector3 toHit = hitPointWorld - centerWorld;
+        Vector3 onPlane = Vector3.ProjectOnPlane(toHit, faceNormal);
+        return onPlane.magnitude;
+    }
+
+    private static void GetPlaneTangentAxes(Vector3 planeNormal, out Vector3 axisU, out Vector3 axisV)
+    {
+        Vector3 n = planeNormal.normalized;
+        axisU = Vector3.Cross(n, Vector3.up);
+        if (axisU.sqrMagnitude < 1e-6f)
+            axisU = Vector3.Cross(n, Vector3.right);
+        axisU.Normalize();
+        axisV = Vector3.Cross(n, axisU).normalized;
+    }
+
+    private void DrawScoreRingGizmos()
+    {
+        if (ringScores == null || ringScores.Length == 0)
+            return;
+
+        Transform centerTf = centerPoint != null ? centerPoint : transform;
+        Vector3 center = centerTf.position;
+        Vector3 normal = GetFaceNormalWorld();
+        GetPlaneTangentAxes(normal, out Vector3 axisU, out Vector3 axisV);
+
+        if (drawFaceNormalGizmo)
+        {
+            Gizmos.color = new Color(0.2f, 0.9f, 0.3f, 0.9f);
+            Gizmos.DrawLine(center, center + normal * 0.12f);
+        }
+
+        Gizmos.matrix = Matrix4x4.identity;
+        int segments = Mathf.Clamp(gizmoRingSegments, 12, 96);
+
+        // 바깥부터 그려 안쪽 링 선이 위에 보이도록
+        for (int idx = ringScores.Length - 1; idx >= 0; idx--)
+        {
+            var ring = ringScores[idx];
+            if (ring == null || ring.radius <= 0f)
+                continue;
+
+            float t = ringScores.Length > 1 ? (float)idx / (ringScores.Length - 1) : 0f;
+            var c = Color.Lerp(new Color(1f, 0.82f, 0.15f), new Color(0.35f, 0.55f, 1f), t);
+            c.a = 0.88f;
+            Gizmos.color = c;
+
+            Vector3 prev = center + axisU * ring.radius;
+            for (int s = 1; s <= segments; s++)
+            {
+                float ang = (float)s / segments * Mathf.PI * 2f;
+                Vector3 p = center + (axisU * Mathf.Cos(ang) + axisV * Mathf.Sin(ang)) * ring.radius;
+                Gizmos.DrawLine(prev, p);
+                prev = p;
+            }
+
+#if UNITY_EDITOR
+            if (showRingScoreLabels)
+            {
+                float labelAng = (float)idx / Mathf.Max(1, ringScores.Length) * Mathf.PI * 2f + 0.4f;
+                Vector3 labelDir = (axisU * Mathf.Cos(labelAng) + axisV * Mathf.Sin(labelAng)).normalized;
+                Vector3 labelAt = center + labelDir * (ring.radius * 0.94f);
+                Handles.Label(labelAt, ring.score.ToString(), EditorStyles.boldLabel);
+            }
+#endif
+        }
+
+        Gizmos.color = new Color(1f, 1f, 1f, 0.95f);
+        float ch = 0.018f;
+        Gizmos.DrawLine(center - axisU * ch, center + axisU * ch);
+        Gizmos.DrawLine(center - axisV * ch, center + axisV * ch);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!drawScoreRingsInScene || drawRingsOnlyWhenSelected)
+            return;
+        DrawScoreRingGizmos();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (!drawScoreRingsInScene || !drawRingsOnlyWhenSelected)
+            return;
+        DrawScoreRingGizmos();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        // 이미 점수 처리한 경우
         if (scoreOnlyOnce && _alreadyScored)
             return;
 
@@ -64,7 +195,6 @@ public class StandTargetBehavior : MonoBehaviour
         if (arrow == null)
             return;
 
-        // 충돌 지점
         Vector3 hitPoint = transform.position;
         if (collision.contacts != null && collision.contacts.Length > 0)
             hitPoint = collision.contacts[0].point;
@@ -76,11 +206,9 @@ public class StandTargetBehavior : MonoBehaviour
         if (scoreOnlyOnce)
             _alreadyScored = true;
 
-        // 화살 멈추기/붙이기
         if (stickArrowOnHit)
             StickArrow(arrow, hitPoint);
 
-        // 점수 반영
         StandTargetScoreManager.Instance?.AddStandTargetScore(gainedScore, ringName);
     }
 
@@ -91,26 +219,24 @@ public class StandTargetBehavior : MonoBehaviour
         if (ringScores == null || ringScores.Length == 0)
             return 0;
 
-        Transform center = centerPoint != null ? centerPoint : transform;
+        Transform centerTf = centerPoint != null ? centerPoint : transform;
+        Vector3 centerWorld = centerTf.position;
+        Vector3 normal = GetFaceNormalWorld();
+        float radial = GetRadialDistanceOnFace(hitPoint, centerWorld, normal);
 
-        // 월드 좌표에서 중심까지의 거리
-        float distance = Vector3.Distance(hitPoint, center.position);
-
-        // 안쪽 링부터 검사
         for (int i = 0; i < ringScores.Length; i++)
         {
             var ring = ringScores[i];
             if (ring == null) continue;
             if (ring.radius <= 0f) continue;
 
-            if (distance <= ring.radius)
+            if (radial <= ring.radius)
             {
                 ringName = ring.ringName;
                 return ring.score;
             }
         }
 
-        // 어떤 링에도 포함되지 않으면 0점
         return 0;
     }
 
@@ -124,9 +250,7 @@ public class StandTargetBehavior : MonoBehaviour
             arrowRb.isKinematic = true;
         }
 
-        // 살짝 표적에 붙도록 위치/부모 조정
         arrow.transform.position = hitPoint;
         arrow.transform.SetParent(transform, true);
     }
 }
-

@@ -807,6 +807,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -5645937942226959685, guid: e2bfdd0a64b84465abbd311cd68fb093, type: 3}
+--- !u!4 &715828805 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9040400755245757577, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+  m_PrefabInstance: {fileID: 1501438716}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &738922059
 GameObject:
   m_ObjectHideFlags: 0
@@ -1306,7 +1311,7 @@ MonoBehaviour:
   bowReleaseSound: {fileID: 8300000, guid: 97527723d1d014afcb465bb141010346, type: 3}
   showDebugLog: 0
   showAimLine: 1
-  showTargetHighlight: 1
+  showTargetHighlight: 0
   drawLineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   aimLineColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!1001 &928256978
@@ -1870,11 +1875,15 @@ MonoBehaviour:
   onTimerEnd:
     m_PersistentCalls:
       m_Calls: []
+  onTimerStart:
+    m_PersistentCalls:
+      m_Calls: []
   startAtRuntime: 0
   dialSlider: {fileID: 1708577741}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
   countDownSound: {fileID: 8300000, guid: 70014389074e9495db8a8142399628ce, type: 3}
   startSeconds: 60
+  _unlimitedTimeDisplay: "\u221E"
   _timerText: {fileID: 906886064}
 --- !u!1001 &1501438716
 PrefabInstance:
@@ -1884,9 +1893,149 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: centerPoint
+      value: 
+      objectReference: {fileID: 2130734896}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: scoreOnlyOnce
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: drawRingsOnlyWhenSelected
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[1].score
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[2].score
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[3].score
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[4].score
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[5].score
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[6].score
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[7].score
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[8].score
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[9].score
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[0].radius
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[1].radius
+      value: 0.11
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[2].radius
+      value: 0.16
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[3].radius
+      value: 0.22
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[4].radius
+      value: 0.28
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[5].radius
+      value: 0.33
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[6].radius
+      value: 0.38
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[7].radius
+      value: 0.44
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[8].radius
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[9].radius
+      value: 0.56
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[0].ringName
+      value: "10 (\uD669)"
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[1].ringName
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[2].ringName
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[3].ringName
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[4].ringName
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[5].ringName
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[6].ringName
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[7].ringName
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[8].ringName
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -926894123846946459, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: ringScores.Array.data[9].ringName
+      value: "1 (\uBC14\uAE65)"
+      objectReference: {fileID: 0}
     - target: {fileID: 8520287377114590771, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
       propertyPath: m_Name
-      value: ArcheryTarget
+      value: StandTarget
+      objectReference: {fileID: 0}
+    - target: {fileID: 8520287377114590771, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9040400755245757577, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
       propertyPath: m_LocalScale.x
@@ -1942,8 +2091,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 9040400755245757577, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 2130734896}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1675321250826716124, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1655422975}
   m_SourcePrefab: {fileID: 100100000, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
 --- !u!1 &1520762150
 GameObject:
@@ -2094,6 +2249,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -5645937942226959685, guid: ae4ea108c28ca4dc79d8bcae8a1b8e8b, type: 3}
+--- !u!1 &1655422970 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1675321250826716124, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+  m_PrefabInstance: {fileID: 1501438716}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1655422975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1655422970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eab9ed9e57cc24a86a9760bc5b299fbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StandTargetBehavior
+  centerPoint: {fileID: 2130734896}
+  invertFaceNormal: 0
+  ringScores:
+  - ringName: "10 (\uD669)"
+    radius: 0.05
+    score: 10
+  - ringName: 9
+    radius: 0.11
+    score: 9
+  - ringName: 8
+    radius: 0.16
+    score: 8
+  - ringName: 7
+    radius: 0.22
+    score: 7
+  - ringName: 6
+    radius: 0.28
+    score: 6
+  - ringName: 5
+    radius: 0.33
+    score: 5
+  - ringName: 4
+    radius: 0.38
+    score: 4
+  - ringName: 3
+    radius: 0.44
+    score: 3
+  - ringName: 2
+    radius: 0.5
+    score: 2
+  - ringName: "1 (\uBC14\uAE65)"
+    radius: 0.56
+    score: 1
+  drawScoreRingsInScene: 1
+  drawRingsOnlyWhenSelected: 1
+  drawFaceNormalGizmo: 1
+  showRingScoreLabels: 1
+  gizmoRingSegments: 48
+  scoreOnlyOnce: 0
+  stickArrowOnHit: 1
 --- !u!1001 &1679110761
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2837,6 +3049,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -5645937942226959685, guid: 754ffb0f3a6624848b9619f4f55050b5, type: 3}
+--- !u!1 &2130734895
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2130734896}
+  m_Layer: 0
+  m_Name: StandTargetCenter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2130734896
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130734895}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.9842643, z: 0.17670266, w: 0}
+  m_LocalPosition: {x: 0.072, y: 1.051, z: 0.103000164}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 715828805}
+  m_LocalEulerAnglesHint: {x: 20.356, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
