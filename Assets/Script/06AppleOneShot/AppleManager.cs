@@ -24,6 +24,14 @@ public class AppleManager : MonoBehaviour
     [Tooltip("사과 명중 시 켤 화면용 VFX 루트(씬에 미리 두고 비활성화). ParticleSystem 등 자식 포함.")]
     public GameObject appleHitScreenVfx;
 
+    [Header("Apple hit — audio")]
+    [Tooltip("사과 명중 시 재생 (예: AppleHit.wav)")]
+    public AudioClip appleHitClip;
+
+    [Range(0f, 1f)]
+    [Tooltip("사과 명중 효과음 볼륨")]
+    public float appleHitVolume = 1f;
+
     [Tooltip("한 발 발사 후 이 시간(초) 뒤 Timer 종료와 동일한 흐름으로 스테이지 완료(명중 여부 무관, startSeconds=0 무제한 씬용)")]
     [FormerlySerializedAs("delayAfterHitBeforeStageEnd")]
     public float delayAfterShotBeforeStageEnd = 3f;
@@ -131,6 +139,12 @@ public class AppleManager : MonoBehaviour
     {
         if (_appleHitHandled) return;
         _appleHitHandled = true;
+
+        if (appleHitClip != null)
+        {
+            Vector3 pos = apple != null ? apple.transform.position : transform.position;
+            AudioSource.PlayClipAtPoint(appleHitClip, pos, appleHitVolume);
+        }
 
         if (appleHitScreenVfx != null)
         {

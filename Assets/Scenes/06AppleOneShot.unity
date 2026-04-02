@@ -39150,6 +39150,8 @@ MonoBehaviour:
   appleTarget: {fileID: 351113261}
   pointsPerApple: 1
   appleHitScreenVfx: {fileID: 8934282537221906046}
+  appleHitClip: {fileID: 8300000, guid: da9275e3dfa2441c4b60f7b8fc0318b1, type: 3}
+  appleHitVolume: 1
   delayAfterShotBeforeStageEnd: 3
 --- !u!4 &1784116320
 Transform:
