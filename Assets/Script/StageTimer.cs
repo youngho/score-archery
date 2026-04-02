@@ -34,6 +34,9 @@ public class Timer : MonoBehaviour
     [Tooltip("시작 초 (9 → 0 카운트다운)")]
     public int startSeconds = 9;
 
+    [Tooltip("startSeconds가 0(무제한)일 때 숫자 대신 표시할 문자 (예: ∞, 무제한)")]
+    [SerializeField] private string _unlimitedTimeDisplay = "\u221E";
+
     [SerializeField] private TextMeshProUGUI _timerText;
 
     private float _remainingSeconds;
@@ -195,7 +198,11 @@ public class Timer : MonoBehaviour
 
     private void UpdateDisplay()
     {
-        if (_timerText != null)
+        if (_timerText == null) return;
+
+        if (startSeconds <= 0)
+            _timerText.text = string.IsNullOrEmpty(_unlimitedTimeDisplay) ? "\u221E" : _unlimitedTimeDisplay;
+        else
             _timerText.text = Mathf.CeilToInt(_remainingSeconds).ToString();
     }
 
