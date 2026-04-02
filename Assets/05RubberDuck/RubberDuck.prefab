@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -6689036041284674117, guid: 9dd0801db425a43079818746826c06b3, type: 3}
       propertyPath: m_Name
-      value: rubber_duck_toy
+      value: RubberDuck
       objectReference: {fileID: 0}
     - target: {fileID: 2774220344278030320, guid: 9dd0801db425a43079818746826c06b3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -162,6 +162,6 @@ MonoBehaviour:
   bounceCooldown: 1
   terrainPushForce: 12
   destroyZ: 10
-  hitEffectPrefab: {fileID: 0}
-  hitSound: {fileID: 0}
+  hitEffectPrefab: {fileID: 5880797563127281583, guid: 0e6020b544094420bd6e2046153bc84c, type: 3}
+  hitSound: {fileID: 8300000, guid: 3293e52745dc94d629d96994856985da, type: 3}
   hitSoundVolume: 1
