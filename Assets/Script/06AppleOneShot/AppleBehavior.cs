@@ -32,6 +32,7 @@ public class AppleBehavior : MonoBehaviour
         _isHit = true;
 
         AppleScoreManager.Instance?.AddAppleScore(points);
+        _owner?.NotifyAppleHit(this);
     }
 
     private void OnDestroy()

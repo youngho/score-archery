@@ -37,6 +37,7 @@ public class Timer : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _timerText;
 
     private float _remainingSeconds;
+    private bool _stageCompletionHandled;
 
     private void Awake()
     {
@@ -105,6 +106,7 @@ public class Timer : MonoBehaviour
     private void ResetTimer()
     {
         timerPaused = false;
+        _stageCompletionHandled = false;
         _remainingSeconds = startSeconds;
         UpdateVisuals();
         if(dialSlider)
@@ -147,6 +149,30 @@ public class Timer : MonoBehaviour
 
     private void HandleTimerEnd()
     {
+        CompleteStageFromTimer();
+    }
+
+    /// <summary>카운트다운만 멈춤 (AppleOneShot 등에서 사과 명중 후 이중 종료 방지).</summary>
+    public void PauseCountdown()
+    {
+        if (_stageCompletionHandled) return;
+        timerRunning = false;
+        timerPaused = true;
+    }
+
+    /// <summary>시간이 0이 된 것과 동일하게 스테이지 종료(API 기록, 결과 화면).</summary>
+    public void FinishStageLikeTimerEnd()
+    {
+        CompleteStageFromTimer();
+    }
+
+    private void CompleteStageFromTimer()
+    {
+        if (_stageCompletionHandled) return;
+        _stageCompletionHandled = true;
+
+        _remainingSeconds = 0f;
+        timerPaused = false;
         UpdateVisuals();
         timerRunning = false;
         onTimerEnd.Invoke();

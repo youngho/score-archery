@@ -417,6 +417,9 @@ public class ArcheryGestureManager : MonoBehaviour
         if (IsNearScreenBorder(position))
             return;
 
+        if (AppleOneShotStageRules.ShouldBlockBowGestures())
+            return;
+
         LogDebug($"[ArcheryGestureManager] HandleTouchBegan - fingerId={fingerId}, pos={position}, state={currentState}");
 
         TouchInfo touchInfo = new TouchInfo(fingerId, position);
@@ -1226,6 +1229,8 @@ public class ArcheryGestureManager : MonoBehaviour
         {
             archeryArrow.ConfigureLifetime(arrowTotalLifetime, arrowLifetimeAfterHit);
         }
+
+        AppleOneShotStageRules.MarkArrowFiredIfApplicable();
 
         if (ScoreManager.Instance != null)
             ScoreManager.Instance.OnArrowShot();
