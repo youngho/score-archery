@@ -21,8 +21,17 @@ private float lifeTimeAfterHit = 2f;
     [Tooltip("화살의 생성/비행/충돌 과정을 상세 로그로 출력할지 여부")]
     public bool logDebug = false;
 
+    [Header("사과 적중")]
+    [Tooltip("충돌 직전 화살 운동량(m·v)을 사과에 AddForceAtPosition으로 줄 비율. 엔진 처리와 겹치면 0.4~0.8 정도로 낮춤.")]
+    [Min(0f)]
+    public float appleMomentumTransferMultiplier = 1f;
+
     private Rigidbody rb;
     private bool hasLoggedFirstFlight = false;
+    /// <summary>사과 등에 박음: RB 제거 후 회전 보정을 멈춤</summary>
+    private bool _embeddedWithoutRigidbody;
+    /// <summary>직전 FixedUpdate 시점 속도(충돌 콜백에서는 이미 감속된 값일 수 있음)</summary>
+    private Vector3 _preCollisionVelocity;
     private Quaternion initialRotation; // 초기 회전 저장 (ShootArrow에서 설정한 회전)
     private bool hasInitialRotation = false; // 초기 회전이 설정되었는지 여부
 
@@ -129,6 +138,11 @@ private float lifeTimeAfterHit = 2f;
 
     private void FixedUpdate()
     {
+        if (_embeddedWithoutRigidbody) return;
+
+        if (rb != null)
+            _preCollisionVelocity = rb.linearVelocity;
+
         if (rb == null) return;
 
         // 화살이 날아가는 방향으로 forward를 자동 정렬
@@ -172,28 +186,28 @@ private float lifeTimeAfterHit = 2f;
             return;
         }
 
+        AppleBehavior appleBehavior = collision.gameObject.GetComponent<AppleBehavior>()
+            ?? collision.gameObject.GetComponentInParent<AppleBehavior>();
+
+        // 사과: 운동량 전달 후 박기 — 엔진만 믿으면 질량 비·수면·밀림에서 안 움직이는 경우가 있음
+        if (appleBehavior != null)
+        {
+            ApplyMomentumToApple(appleBehavior, collision);
+            StickToSurface(collision, appleBehavior.transform, removeArrowRigidbody: true);
+            CancelInvoke(nameof(DestroyArrow));
+            if (logDebug)
+            {
+                Debug.Log($"[ArcheryArrow] OnCollisionEnter - Hit apple {collision.collider.name}, embedded (no timed destroy).", this);
+            }
+            return;
+        }
+
         ScarecrowBehavior scarecrow = collision.gameObject.GetComponent<ScarecrowBehavior>()
             ?? collision.gameObject.GetComponentInParent<ScarecrowBehavior>();
 
         // Not a balloon -> Hard object collision: stop and stick
         if (rb != null)
-        {
-            rb.isKinematic = true;
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-
-            // 충돌 후 물리적인 반발이나 충돌 간섭을 없애기 위해 콜라이더 비활성화
-            if (TryGetComponent<Collider>(out var col)) col.enabled = false;
-
-            // 튕겨나가는 효과를 방지하기 위해 강제로 충돌 지점에 고정
-            if (collision.contacts != null && collision.contacts.Length > 0)
-            {
-                transform.position = collision.contacts[0].point;
-            }
-
-            // Stick to the hit object
-            transform.SetParent(collision.transform);
-        }
+            StickToSurface(collision, collision.transform, removeArrowRigidbody: false);
 
         if (scarecrow != null)
         {
@@ -221,6 +235,66 @@ private float lifeTimeAfterHit = 2f;
             Debug.Log(
                 $"[ArcheryArrow] OnCollisionEnter - hit={otherName}, contactPoint={contactPoint}, relativeVelocity={collision.relativeVelocity}",
                 this); // ARCHERY_DEBUG_LOG
+        }
+    }
+
+    /// <summary>
+    /// 충돌 직전 화살 속도 기준으로 사과에 충격량(impulse)을 가해 굴러떨어리게 함.
+    /// </summary>
+    private void ApplyMomentumToApple(AppleBehavior apple, Collision collision)
+    {
+        if (apple == null || appleMomentumTransferMultiplier <= 0f || rb == null)
+            return;
+
+        Rigidbody appleRb = apple.GetComponent<Rigidbody>();
+        if (appleRb == null || appleRb.isKinematic)
+            return;
+
+        appleRb.WakeUp();
+
+        Vector3 v = _preCollisionVelocity.sqrMagnitude > 1e-6f
+            ? _preCollisionVelocity
+            : rb.linearVelocity;
+        if (v.sqrMagnitude < 1e-6f)
+            v = collision.relativeVelocity;
+
+        if (v.sqrMagnitude < 1e-8f)
+            return;
+
+        float m = rb.mass;
+        Vector3 impulse = v * (m * appleMomentumTransferMultiplier);
+
+        Vector3 point = collision.contactCount > 0
+            ? collision.GetContact(0).point
+            : transform.position;
+
+        appleRb.AddForceAtPosition(impulse, point, ForceMode.Impulse);
+    }
+
+    /// <summary>
+    /// 충돌 지점에 붙이고, 필요 시 화살 Rigidbody를 제거해 부모(사과) 단일 강체 시뮬에 맞춤.
+    /// </summary>
+    private void StickToSurface(Collision collision, Transform parent, bool removeArrowRigidbody)
+    {
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        if (TryGetComponent<Collider>(out var col)) col.enabled = false;
+
+        if (collision.contacts != null && collision.contacts.Length > 0)
+            transform.position = collision.contacts[0].point;
+
+        transform.SetParent(parent, worldPositionStays: true);
+
+        if (removeArrowRigidbody && rb != null)
+        {
+            Destroy(rb);
+            rb = null;
+            _embeddedWithoutRigidbody = true;
         }
     }
 
