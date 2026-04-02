@@ -42,6 +42,16 @@ public class RubberDuckBehavior : MonoBehaviour
     [Header("Lifecycle")]
     public float destroyZ = 10f;
 
+    [Header("Hit (화살 명중)")]
+    [Tooltip("맞았을 때 재생할 외부 VFX 프리팹(파티클 등). 비워 두면 생략.")]
+    public GameObject hitEffectPrefab;
+
+    [Tooltip("맞았을 때 재생할 효과음 (예: RubberDuck.wav)")]
+    [SerializeField] private AudioClip hitSound;
+
+    [SerializeField, Range(0f, 1f)]
+    private float hitSoundVolume = 1f;
+
     private Rigidbody _rb;
     private Vector3 _driftDirection;
     private Vector3 _flowDirection;
@@ -50,6 +60,7 @@ public class RubberDuckBehavior : MonoBehaviour
     private float _swayPhase;
     private float _lastBounceTime = -999f;
     private float _initialHeadingY;
+    private bool _hitByArrow;
 
     void Start()
     {
@@ -221,7 +232,8 @@ public class RubberDuckBehavior : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        // 화살에 맞으면 점수 추가
+        if (_hitByArrow) return;
+
         var arrow = collision.collider != null
             ? collision.collider.GetComponentInParent<ArcheryArrow>()
             : null;
@@ -229,7 +241,31 @@ public class RubberDuckBehavior : MonoBehaviour
             arrow = collision.gameObject.GetComponentInParent<ArcheryArrow>();
         if (arrow != null)
         {
+            _hitByArrow = true;
+
+            Vector3 impactPoint = transform.position;
+            Vector3 impactNormal = Vector3.up;
+            if (collision.contactCount > 0)
+            {
+                var c = collision.GetContact(0);
+                impactPoint = c.point;
+                impactNormal = c.normal;
+            }
+
             RubberDuckScoreManager.Instance?.AddRubberDuckScore(null);
+
+            if (hitEffectPrefab != null)
+            {
+                Quaternion vfxRot = impactNormal.sqrMagnitude > 1e-6f
+                    ? Quaternion.LookRotation(impactNormal)
+                    : Quaternion.identity;
+                Instantiate(hitEffectPrefab, impactPoint, vfxRot);
+            }
+
+            if (hitSound != null)
+                AudioSource.PlayClipAtPoint(hitSound, impactPoint, hitSoundVolume);
+
+            Destroy(gameObject);
             return;
         }
 

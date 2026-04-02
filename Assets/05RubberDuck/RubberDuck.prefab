@@ -162,3 +162,6 @@ MonoBehaviour:
   bounceCooldown: 1
   terrainPushForce: 12
   destroyZ: 10
+  hitEffectPrefab: {fileID: 0}
+  hitSound: {fileID: 0}
+  hitSoundVolume: 1
