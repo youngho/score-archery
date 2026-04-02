@@ -31,8 +31,8 @@ public class MenTargetScoreManager : MonoBehaviour
     public int pointsPerTarget = 1;
 
     [Header("Visual Effects")]
-    public Color explosionColor = Color.white;
-    public float explosionDuration = 1f;
+    [Tooltip("비어 있으면 기본 파티클 폭발을 사용합니다.")]
+    public GameObject hitEffectPrefab;
 
     [Header("Sound Effects")]
     public AudioClip breakSound;
@@ -76,7 +76,18 @@ public class MenTargetScoreManager : MonoBehaviour
 
         Vector3 pos = target.transform.position;
         AddMenTargetScore();
-        CreateExplosion(pos, impactNormal);
+
+        if (hitEffectPrefab != null)
+        {
+            Quaternion rot = impactNormal != Vector3.zero
+                ? Quaternion.LookRotation(impactNormal)
+                : Quaternion.identity;
+            Instantiate(hitEffectPrefab, pos, rot);
+        }
+        else
+        {
+            CreateExplosionFallback(pos, impactNormal);
+        }
 
         if (breakSound != null)
             AudioSource.PlayClipAtPoint(breakSound, pos);
@@ -85,8 +96,9 @@ public class MenTargetScoreManager : MonoBehaviour
         Debug.Log($"[MenTargetScoreManager] Target hit. Total: {_targetsHit}");
     }
 
-    private void CreateExplosion(Vector3 position, Vector3 impactNormal)
+    private void CreateExplosionFallback(Vector3 position, Vector3 impactNormal)
     {
+        const float duration = 1f;
         var explosion = new GameObject("MenTargetExplosion");
         explosion.transform.position = position;
 
@@ -98,12 +110,12 @@ public class MenTargetScoreManager : MonoBehaviour
         ParticleSystem.ShapeModule shape = ps.shape;
         var renderer = ps.GetComponent<ParticleSystemRenderer>();
 
-        main.duration = explosionDuration;
+        main.duration = duration;
         main.startLifetime = 1f;
         main.startSpeed = new ParticleSystem.MinMaxCurve(3f, 8f);
         main.startSize = new ParticleSystem.MinMaxCurve(0.1f, 0.4f);
         main.loop = false;
-        main.startColor = explosionColor;
+        main.startColor = Color.white;
 
         Shader shader = Shader.Find("Particles/Standard Unlit");
         if (shader == null)
@@ -111,7 +123,7 @@ public class MenTargetScoreManager : MonoBehaviour
         if (shader != null)
         {
             renderer.material = new Material(shader);
-            renderer.material.color = explosionColor;
+            renderer.material.color = Color.white;
         }
 
         emission.rateOverTime = 0;
