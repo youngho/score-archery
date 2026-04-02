@@ -16,16 +16,6 @@ public class AppleManager : MonoBehaviour
     [Tooltip("사과 1개당 기본 점수")]
     public int pointsPerApple = 1;
 
-    [Header("Explosion Defaults")]
-    public bool useExplosion = true;
-    public Color explosionColor = new Color(1.0f, 0.25f, 0.25f, 1f);
-    public float explosionDuration = 0.12f;
-    public float explosionLifetime = 0.35f;
-    public float explosionRadius = 0.18f;
-    public int explosionParticleCount = 50;
-    public float explosionSpeedMin = 2.0f;
-    public float explosionSpeedMax = 7.0f;
-
     private AppleBehavior _appleBehavior;
 
     private void Start()
@@ -61,20 +51,17 @@ public class AppleManager : MonoBehaviour
 
         _appleBehavior.SetOwner(this);
         _appleBehavior.points = pointsPerApple;
-        _appleBehavior.useExplosion = useExplosion;
-        _appleBehavior.explosionColor = explosionColor;
-        _appleBehavior.explosionDuration = explosionDuration;
-        _appleBehavior.explosionLifetime = explosionLifetime;
-        _appleBehavior.explosionRadius = explosionRadius;
-        _appleBehavior.explosionParticleCount = explosionParticleCount;
-        _appleBehavior.explosionSpeedMin = explosionSpeedMin;
-        _appleBehavior.explosionSpeedMax = explosionSpeedMax;
+
+        var appleRb = appleTarget.GetComponent<Rigidbody>();
+        if (appleRb == null)
+            appleRb = appleTarget.AddComponent<Rigidbody>();
+        appleRb.useGravity = true;
+        appleRb.isKinematic = false;
     }
 
     public void NotifyAppleDestroyed(AppleBehavior apple)
     {
-        // 현재는 한 번만 등장하는 원샷 구조라 별도 추적은 하지 않음.
-        // 필요하면 여기에서 리스폰/연출 등을 확장할 수 있음.
+        // 사과 오브젝트가 파괴될 때만 호출됨 (씬 종료 등). 맞춤만으로는 파괴되지 않음.
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -94,4 +81,3 @@ public class AppleManager : MonoBehaviour
         _ = AppleScoreManager.Instance;
     }
 }
-

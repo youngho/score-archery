@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: 3dcb39abe627e46b5b578745db1b161c, type: 2}
+  m_LightingDataAsset: {fileID: 112000000, guid: 629566f790c5d4106ab814eabeca2d47, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 8747c6fc39e97428bad915a0b9f4bc0d, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -193,51 +193,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6625984507259324429, guid: ccebfc242bed46749a5dcef87dd83423, type: 3}
   m_PrefabInstance: {fileID: 33210540}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &34159589
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 34159590}
-  - component: {fileID: 34159591}
-  m_Layer: 0
-  m_Name: AppleScoreManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &34159590
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 34159589}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -19.85, y: 5.72, z: -40.72}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &34159591
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 34159589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2dcb95a7cc3df4aa38fe8f69896e7768, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AppleScoreManager
-  pointsPerApple: 1
 --- !u!1 &49976480
 GameObject:
   m_ObjectHideFlags: 0
@@ -1059,7 +1014,7 @@ Transform:
   m_GameObject: {fileID: 111804757}
   serializedVersion: 2
   m_LocalRotation: {x: 0.04376867, y: -0.43801948, z: -0.0052918214, w: -0.8978838}
-  m_LocalPosition: {x: -28.7, y: 7.42, z: -46.72}
+  m_LocalPosition: {x: -28.7, y: 3, z: -46.72}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3120,14 +3075,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppleBehavior
   points: 1
-  useExplosion: 1
-  explosionColor: {r: 1, g: 0.25, b: 0.25, a: 1}
-  explosionDuration: 0.12
-  explosionLifetime: 0.35
-  explosionRadius: 0.18
-  explosionParticleCount: 50
-  explosionSpeedMin: 2
-  explosionSpeedMax: 7
 --- !u!1001 &377475432
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5248,7 +5195,7 @@ Transform:
   m_GameObject: {fileID: 719418541}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -2, z: 4.5}
+  m_LocalPosition: {x: 0, y: -1, z: 4.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -12836,11 +12783,14 @@ MonoBehaviour:
   onTimerEnd:
     m_PersistentCalls:
       m_Calls: []
+  onTimerStart:
+    m_PersistentCalls:
+      m_Calls: []
   startAtRuntime: 0
   dialSlider: {fileID: 1391558840}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
   countDownSound: {fileID: 8300000, guid: 70014389074e9495db8a8142399628ce, type: 3}
-  startSeconds: 60
+  startSeconds: 10
   _timerText: {fileID: 1464855371}
 --- !u!1001 &1548843026
 PrefabInstance:
@@ -14332,6 +14282,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1784116320}
   - component: {fileID: 1784116319}
+  - component: {fileID: 1784116321}
   m_Layer: 0
   m_Name: AppleManager
   m_TagString: Untagged
@@ -14353,14 +14304,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AppleManager
   appleTarget: {fileID: 351113261}
   pointsPerApple: 1
-  useExplosion: 1
-  explosionColor: {r: 1, g: 0.25, b: 0.25, a: 1}
-  explosionDuration: 0.12
-  explosionLifetime: 0.35
-  explosionRadius: 0.18
-  explosionParticleCount: 50
-  explosionSpeedMin: 2
-  explosionSpeedMax: 7
 --- !u!4 &1784116320
 Transform:
   m_ObjectHideFlags: 0
@@ -14376,6 +14319,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1784116321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1784116318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dcb95a7cc3df4aa38fe8f69896e7768, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppleScoreManager
+  pointsPerApple: 1
 --- !u!1001 &1800943573
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17674,4 +17630,3 @@ SceneRoots:
   - {fileID: 737671728}
   - {fileID: 1206432356}
   - {fileID: 1784116320}
-  - {fileID: 34159590}
