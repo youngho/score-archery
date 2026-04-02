@@ -5,8 +5,8 @@ using UnityEngine;
 /// - Rigidbody를 이용해 물리적으로 날아가게 함
 /// - 속도 방향으로 화살의 forward를 맞춤
 /// - 일정 시간이 지나면 자동 파괴
+/// - RequireComponent(Rigidbody) 미사용: 사과 박을 때 화살 Rigidbody를 Destroy하므로 엔진이 RB 제거를 막지 않게 함
 /// </summary>
-[RequireComponent(typeof(Rigidbody))]
 public class ArcheryArrow : MonoBehaviour
 {
 // 화살 총 생명 시간 / 피격 후 생명 시간은 ArcheryGestureManager 에서 주입한다.
@@ -38,6 +38,12 @@ private float lifeTimeAfterHit = 2f;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            Debug.LogError("[ArcheryArrow] 비행에는 Rigidbody가 필요합니다. 프리팹에 Rigidbody를 추가하세요.", this);
+            enabled = false;
+            return;
+        }
 
         if (logDebug)
         {
@@ -292,9 +298,10 @@ private float lifeTimeAfterHit = 2f;
 
         if (removeArrowRigidbody && rb != null)
         {
+            // Destroy는 프레임 말에 실행되므로 먼저 플래그로 FixedUpdate 등을 멈춤
+            _embeddedWithoutRigidbody = true;
             Destroy(rb);
             rb = null;
-            _embeddedWithoutRigidbody = true;
         }
     }
 
