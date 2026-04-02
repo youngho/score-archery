@@ -12789,8 +12789,8 @@ MonoBehaviour:
   startAtRuntime: 0
   dialSlider: {fileID: 1391558840}
   warningColor: {r: 1, g: 0, b: 0, a: 1}
-  countDownSound: {fileID: 8300000, guid: 70014389074e9495db8a8142399628ce, type: 3}
-  startSeconds: 10
+  countDownSound: {fileID: 0}
+  startSeconds: 0
   _timerText: {fileID: 1464855371}
 --- !u!1001 &1548843026
 PrefabInstance:
@@ -14304,6 +14304,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AppleManager
   appleTarget: {fileID: 351113261}
   pointsPerApple: 1
+  appleHitScreenVfx: {fileID: 0}
+  delayAfterShotBeforeStageEnd: 3
 --- !u!4 &1784116320
 Transform:
   m_ObjectHideFlags: 0

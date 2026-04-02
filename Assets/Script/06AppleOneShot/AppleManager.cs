@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 06AppleOneShot 씬 전용:
@@ -7,6 +9,7 @@ using UnityEngine;
 /// - AppleScoreManager/ScoreManager와 연동해 점수 처리를 담당
 /// </summary>
 [DisallowMultipleComponent]
+[DefaultExecutionOrder(-1000)]
 public class AppleManager : MonoBehaviour
 {
     [Header("Apple Target")]
@@ -21,25 +24,41 @@ public class AppleManager : MonoBehaviour
     [Tooltip("사과 명중 시 켤 화면용 VFX 루트(씬에 미리 두고 비활성화). ParticleSystem 등 자식 포함.")]
     public GameObject appleHitScreenVfx;
 
-    [Tooltip("사과 명중 후 이 시간(초) 뒤 Timer 종료와 동일한 흐름으로 스테이지 완료")]
-    public float delayAfterHitBeforeStageEnd = 3f;
+    [Tooltip("한 발 발사 후 이 시간(초) 뒤 Timer 종료와 동일한 흐름으로 스테이지 완료(명중 여부 무관, startSeconds=0 무제한 씬용)")]
+    [FormerlySerializedAs("delayAfterHitBeforeStageEnd")]
+    public float delayAfterShotBeforeStageEnd = 3f;
 
     private AppleBehavior _appleBehavior;
     private bool _appleHitHandled;
-    private Coroutine _stageEndAfterHitRoutine;
+    private bool _postShotEndFlowStarted;
+    private Coroutine _stageEndAfterShotRoutine;
+
+    /// <summary>비활성 UI 아래 Timer 등: 활성 씬에 속한 Timer만 사용.</summary>
+    private static Timer FindTimerInActiveScene()
+    {
+        var scene = SceneManager.GetActiveScene();
+        var timers = Object.FindObjectsByType<Timer>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var t in timers)
+        {
+            if (t != null && t.gameObject.scene == scene)
+                return t;
+        }
+        return null;
+    }
 
     private void Start()
     {
         // AppleOneShot 전용으로 제한 (씬 이름은 프로젝트에서 사용하는 실제 이름으로 맞춤)
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != AppleOneShotStageRules.SceneName)
+        if (SceneManager.GetActiveScene().name != AppleOneShotStageRules.SceneName)
             return;
 
         AppleOneShotStageRules.Reset();
         _appleHitHandled = false;
-        if (_stageEndAfterHitRoutine != null)
+        _postShotEndFlowStarted = false;
+        if (_stageEndAfterShotRoutine != null)
         {
-            StopCoroutine(_stageEndAfterHitRoutine);
-            _stageEndAfterHitRoutine = null;
+            StopCoroutine(_stageEndAfterShotRoutine);
+            _stageEndAfterShotRoutine = null;
         }
 
         EnsureAppleSetup();
@@ -82,7 +101,32 @@ public class AppleManager : MonoBehaviour
         // 사과 오브젝트가 파괴될 때만 호출됨 (씬 종료 등). 맞춤만으로는 파괴되지 않음.
     }
 
-    /// <summary>사과에 화살이 맞았을 때: 화면 VFX, 타이머 정지, 지연 후 기존 타이머 종료와 동일하게 마무리.</summary>
+    /// <summary>ArcheryGestureManager → AppleOneShotStageRules 에서 한 발 발사 직후 호출. 타이머 일시정지 + 지연 후 종료.</summary>
+    public static void NotifySingleArrowFiredInThisScene()
+    {
+        if (SceneManager.GetActiveScene().name != AppleOneShotStageRules.SceneName)
+            return;
+
+        var mgr = Object.FindFirstObjectByType<AppleManager>(FindObjectsInactive.Include);
+        if (mgr != null)
+            mgr.OnSingleArrowFired();
+    }
+
+    private void OnSingleArrowFired()
+    {
+        if (_postShotEndFlowStarted) return;
+        _postShotEndFlowStarted = true;
+
+        var timer = FindTimerInActiveScene();
+        if (timer != null)
+            timer.PauseCountdown();
+
+        if (_stageEndAfterShotRoutine != null)
+            StopCoroutine(_stageEndAfterShotRoutine);
+        _stageEndAfterShotRoutine = StartCoroutine(StageEndAfterSingleShot());
+    }
+
+    /// <summary>사과 명중 시에만 화면 VFX. 스테이지 종료 타이밍은 발사 시점 기준(<see cref="OnSingleArrowFired"/>)과 동일.</summary>
     public void NotifyAppleHit(AppleBehavior apple)
     {
         if (_appleHitHandled) return;
@@ -94,36 +138,33 @@ public class AppleManager : MonoBehaviour
             foreach (var ps in appleHitScreenVfx.GetComponentsInChildren<ParticleSystem>(true))
                 ps.Play();
         }
-
-        var timer = FindFirstObjectByType<Timer>();
-        if (timer != null)
-            timer.PauseCountdown();
-
-        if (_stageEndAfterHitRoutine != null)
-            StopCoroutine(_stageEndAfterHitRoutine);
-        _stageEndAfterHitRoutine = StartCoroutine(StageEndAfterAppleHit(timer));
     }
 
-    private IEnumerator StageEndAfterAppleHit(Timer timer)
+    private IEnumerator StageEndAfterSingleShot()
     {
-        float wait = Mathf.Max(0f, delayAfterHitBeforeStageEnd);
+        float wait = Mathf.Max(0f, delayAfterShotBeforeStageEnd);
         if (wait > 0f)
-            yield return new WaitForSeconds(wait);
+            yield return new WaitForSecondsRealtime(wait);
 
+        // 발사 직후 캡처한 참조보다 종료 직전 재탐색이 안전(비활성·로딩 타이밍)
+        var timer = FindTimerInActiveScene();
         if (timer != null)
             timer.FinishStageLikeTimerEnd();
-        _stageEndAfterHitRoutine = null;
+        else
+            Debug.LogError("[AppleManager] 활성 씬에서 Timer를 찾지 못했습니다. 스테이지 종료를 건너뜁니다. DialCountDown 등에 Timer가 있는지 확인하세요.");
+
+        _stageEndAfterShotRoutine = null;
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Bootstrap()
     {
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != AppleOneShotStageRules.SceneName)
+        if (SceneManager.GetActiveScene().name != AppleOneShotStageRules.SceneName)
             return;
 
         AppleOneShotStageRules.Reset();
 
-        var mgr = Object.FindFirstObjectByType<AppleManager>();
+        var mgr = Object.FindFirstObjectByType<AppleManager>(FindObjectsInactive.Include);
         if (mgr == null)
         {
             var go = new GameObject("AppleManager");

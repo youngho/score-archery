@@ -127,8 +127,8 @@ public class Timer : MonoBehaviour
     {
         if (!dialSlider) return;
 
-        // 경고 색 및 사운드
-        if (_remainingSeconds <= 5.0f)
+        // 경고 색 및 사운드 (실제 카운트다운이 있을 때만 — startSeconds=0 무제한 씬에서는 남은 시간이 0이라 경고가 켜지지 않게)
+        if (startSeconds > 0 && _remainingSeconds > 0f && _remainingSeconds <= 5.0f)
         {
             dialSlider.color = warningColor;
 
@@ -144,6 +144,11 @@ public class Timer : MonoBehaviour
         {
             float timeRangeClamped = Mathf.InverseLerp(startSeconds, 0, _remainingSeconds);
             dialSlider.fillAmount = Mathf.Lerp(1, 0, timeRangeClamped);
+        }
+        else
+        {
+            // 무제한(startSeconds=0): 플레이 중엔 다이얼 유지, 스테이지 완료 시에만 비움(남은 시간은 항상 0)
+            dialSlider.fillAmount = _stageCompletionHandled ? 0f : 1f;
         }
     }
 

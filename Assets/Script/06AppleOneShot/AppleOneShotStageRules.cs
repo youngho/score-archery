@@ -22,6 +22,8 @@ public static class AppleOneShotStageRules
     {
         if (!IsAppleOneShotScene) return;
         HasFiredSingleArrow = true;
+        // 사과 명중 여부와 무관: 이후 재발사는 막혀 있으므로 N초 뒤 타이머 종료와 동일하게 마무리
+        AppleManager.NotifySingleArrowFiredInThisScene();
     }
 
     public static bool ShouldBlockBowGestures()
