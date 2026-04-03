@@ -16,7 +16,8 @@ public class CoconutScoreManager : MonoBehaviour
         {
             if (_instance != null) return _instance;
 
-            _instance = FindObjectOfType<CoconutScoreManager>();
+            // FindObjectOfType<T>() is deprecated; sorting is unnecessary.
+            _instance = Object.FindFirstObjectByType<CoconutScoreManager>();
             if (_instance != null) return _instance;
 
             var go = new GameObject("CoconutScoreManager");
