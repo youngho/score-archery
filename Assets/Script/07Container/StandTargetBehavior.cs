@@ -66,15 +66,15 @@ public class StandTargetBehavior : MonoBehaviour
         ringScores = new[]
         {
             new RingScore { ringName = "10 (황)", radius = 0.05f, score = 10 },
-            new RingScore { ringName = "9", radius = 0.065f, score = 9 },
-            new RingScore { ringName = "8", radius = 0.08f, score = 8 },
-            new RingScore { ringName = "7", radius = 0.095f, score = 7 },
-            new RingScore { ringName = "6", radius = 0.11f, score = 6 },
-            new RingScore { ringName = "5", radius = 0.125f, score = 5 },
-            new RingScore { ringName = "4", radius = 0.14f, score = 4 },
-            new RingScore { ringName = "3", radius = 0.155f, score = 3 },
-            new RingScore { ringName = "2", radius = 0.17f, score = 2 },
-            new RingScore { ringName = "1 (바깥)", radius = 0.185f, score = 1 },
+            new RingScore { ringName = "9", radius = 0.11f, score = 9 },
+            new RingScore { ringName = "8", radius = 0.16f, score = 8 },
+            new RingScore { ringName = "7", radius = 0.22f, score = 7 },
+            new RingScore { ringName = "6", radius = 0.28f, score = 6 },
+            new RingScore { ringName = "5", radius = 0.33f, score = 5 },
+            new RingScore { ringName = "4", radius = 0.38f, score = 4 },
+            new RingScore { ringName = "3", radius = 0.44f, score = 3 },
+            new RingScore { ringName = "2", radius = 0.5f, score = 2 },
+            new RingScore { ringName = "1 (바깥)", radius = 0.56f, score = 1 },
         };
     }
 
