@@ -50,7 +50,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/12Snowman.unity
     guid: 6ac0c6234e076444bb6d9a13049a0ede
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/_CommonSystems.unity
     guid: a06e7bfa0aa9d41febf365cd261deb13
   m_configObjects:
