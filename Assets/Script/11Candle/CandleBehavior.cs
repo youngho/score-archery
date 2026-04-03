@@ -27,9 +27,11 @@ public class CandleBehavior : MonoBehaviour
         _rb = GetComponentInChildren<Rigidbody>();
         if (_rb != null)
         {
-            _rb.isKinematic = true;
+            // Unity는 isKinematic Rigidbody에 대해 angularVelocity 설정을 지원하지 않습니다.
+            // 따라서 velocity 0 설정을 kinematic 전환보다 먼저 합니다.
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
+            _rb.isKinematic = true;
         }
     }
 

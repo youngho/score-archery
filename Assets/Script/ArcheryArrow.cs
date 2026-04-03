@@ -284,9 +284,15 @@ private float lifeTimeAfterHit = 2f;
     {
         if (rb != null)
         {
+            // Unity는 isKinematic인 Rigidbody에 대해 angularVelocity 설정을 지원하지 않습니다.
+            // 그래서 kinematic으로 전환하기 전에(또는 이미 kinematic이라면) velocity 설정을 건너뜁니다.
+            if (!rb.isKinematic)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+
             rb.isKinematic = true;
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
         }
 
         if (TryGetComponent<Collider>(out var col)) col.enabled = false;
