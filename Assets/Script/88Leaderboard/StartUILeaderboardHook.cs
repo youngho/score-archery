@@ -3,11 +3,11 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// 00StartUI 로드 시 "랭킹" 버튼을 동으로 추가하고 00Leaderboard 씬으로 연결합니다.
+/// 00StartUI 로드 시 "랭킹" 버튼을 동으로 추가하고 88Leaderboard 씬으로 연결합니다.
 /// </summary>
 public class StartUILeaderboardHook : MonoBehaviour
 {
-    private const string LeaderboardSceneName = "00Leaderboard";
+    private const string LeaderboardSceneName = "88Leaderboard";
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void AfterSceneLoad()

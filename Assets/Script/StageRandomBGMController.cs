@@ -15,7 +15,7 @@ public class StageRandomBGMController : MonoBehaviour
     private static bool IsStageBgmScene(string sceneName)
     {
         if (string.IsNullOrEmpty(sceneName)) return false;
-        return sceneName != "00StartUI" && sceneName != "99StageResult" && sceneName != "00Leaderboard";
+        return sceneName != "00StartUI" && sceneName != "99StageResult" && sceneName != "88Leaderboard";
     }
 
     private static StageRandomBGMController _instance;
