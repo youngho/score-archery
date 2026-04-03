@@ -23,7 +23,7 @@ public class StageResultScoreDisplay : MonoBehaviour
     private void Start()
     {
         // UI 조작을 위한 EventSystem 확인 및 생성
-        if (FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
+        if (Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
         {
             var eventSystem = new GameObject("EventSystem");
             eventSystem.AddComponent<UnityEngine.EventSystems.EventSystem>();

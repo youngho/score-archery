@@ -16,7 +16,7 @@ public class StandTargetScoreManager : MonoBehaviour
         {
             if (_instance != null) return _instance;
 
-            _instance = FindObjectOfType<StandTargetScoreManager>();
+            _instance = Object.FindFirstObjectByType<StandTargetScoreManager>();
             if (_instance != null) return _instance;
 
             var go = new GameObject("StandTargetScoreManager");

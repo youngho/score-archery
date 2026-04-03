@@ -16,7 +16,7 @@ public class StarScoreManager : MonoBehaviour
         {
             if (_instance != null) return _instance;
 
-            _instance = FindObjectOfType<StarScoreManager>();
+            _instance = Object.FindFirstObjectByType<StarScoreManager>();
             if (_instance != null) return _instance;
 
             var go = new GameObject("StarScoreManager");

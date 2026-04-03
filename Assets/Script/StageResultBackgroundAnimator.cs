@@ -113,7 +113,7 @@ public class StageResultBackgroundAnimator : MonoBehaviour
             canvasToReveal.SetActive(true);
 
         // 캔버스 활성화 후 점수 표시 세팅
-        var scoreDisplay = FindObjectOfType<StageResultScoreDisplay>();
+        var scoreDisplay = Object.FindFirstObjectByType<StageResultScoreDisplay>();
         if (scoreDisplay != null)
             scoreDisplay.SetupDisplay();
     }

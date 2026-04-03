@@ -16,7 +16,7 @@ public class RubberDuckScoreManager : MonoBehaviour
         {
             if (_instance != null) return _instance;
 
-            _instance = FindObjectOfType<RubberDuckScoreManager>();
+            _instance = Object.FindFirstObjectByType<RubberDuckScoreManager>();
             if (_instance != null) return _instance;
 
             var go = new GameObject("RubberDuckScoreManager");

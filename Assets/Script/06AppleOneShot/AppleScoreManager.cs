@@ -16,7 +16,7 @@ public class AppleScoreManager : MonoBehaviour
         {
             if (_instance != null) return _instance;
 
-            _instance = FindObjectOfType<AppleScoreManager>();
+            _instance = Object.FindFirstObjectByType<AppleScoreManager>();
             if (_instance != null) return _instance;
 
             var go = new GameObject("AppleScoreManager");

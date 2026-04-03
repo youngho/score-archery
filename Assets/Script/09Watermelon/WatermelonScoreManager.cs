@@ -16,7 +16,7 @@ public class WatermelonScoreManager : MonoBehaviour
         {
             if (_instance != null) return _instance;
 
-            _instance = FindObjectOfType<WatermelonScoreManager>();
+            _instance = Object.FindFirstObjectByType<WatermelonScoreManager>();
             if (_instance != null) return _instance;
 
             var go = new GameObject("WatermelonScoreManager");

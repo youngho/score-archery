@@ -14,7 +14,7 @@ public class CandleScoreManager : MonoBehaviour
         {
             if (_instance != null) return _instance;
 
-            _instance = FindObjectOfType<CandleScoreManager>();
+            _instance = Object.FindFirstObjectByType<CandleScoreManager>();
             if (_instance != null) return _instance;
 
             var go = new GameObject("CandleScoreManager");
