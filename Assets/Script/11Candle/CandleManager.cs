@@ -84,7 +84,8 @@ public class CandleManager : MonoBehaviour
     private void ClearPreviouslySpawned()
     {
         // CandleBehavior가 붙어있던 양초 제거
-        var candles = FindObjectsOfType<CandleBehavior>();
+        // FindObjectsOfType<T>() is deprecated; sorting is unnecessary here.
+        var candles = FindObjectsByType<CandleBehavior>(FindObjectsSortMode.None);
         for (int i = candles.Length - 1; i >= 0; i--)
         {
             if (candles[i] != null)
