@@ -43,7 +43,6 @@ public class CoconutBehavior : MonoBehaviour
     private Rigidbody _rb;
     private Collider _col;
     private bool _isHit;
-    private bool _isGrown;
     private Vector3 _baseScale;
     private Coroutine _growRoutine;
 
@@ -72,8 +71,6 @@ public class CoconutBehavior : MonoBehaviour
 
     private IEnumerator GrowRoutine()
     {
-        _isGrown = false;
-
         float start = Mathf.Max(0.0001f, startScale);
         Vector3 from = _baseScale * start;
         Vector3 to = _baseScale * Mathf.Max(0.0001f, targetScaleMultiplier);
@@ -95,7 +92,6 @@ public class CoconutBehavior : MonoBehaviour
         }
 
         transform.localScale = to;
-        _isGrown = true;
         _growRoutine = null;
     }
 
