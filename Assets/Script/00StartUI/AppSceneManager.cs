@@ -11,31 +11,50 @@ public class AppSceneManager : MonoBehaviour
     {
         // Find the container that holds all stage buttons
         GameObject container = GameObject.Find("StartUiPanel/StageButtonsContainer");
-        if (container == null)
+        if (container != null)
+        {
+            // For each child under the container, get its name and wire up a button
+            foreach (Transform child in container.transform)
+            {
+                RegisterButton(child);
+            }
+        }
+        else
         {
             Debug.LogWarning("StageButtonsContainer not found under StartUiPanel.");
+        }
+
+        // Specifically find Button_Leaderboard if it's outside the container
+        GameObject leaderboardBtnGo = GameObject.Find("StartUiPanel/Button_Leaderboard");
+        if (leaderboardBtnGo == null)
+        {
+            // Fallback for different hierarchy paths
+            leaderboardBtnGo = GameObject.Find("Button_Leaderboard");
+        }
+
+        if (leaderboardBtnGo != null)
+        {
+             RegisterButton(leaderboardBtnGo.transform);
+        }
+    }
+
+    private void RegisterButton(Transform child)
+    {
+        Button button = child.GetComponent<Button>();
+        if (button == null)
+        {
             return;
         }
 
-        // For each child under the container, get its name and wire up a button
-        foreach (Transform child in container.transform)
+        string sceneName = GetSceneNameFromButton(child.name);
+        if (string.IsNullOrEmpty(sceneName))
         {
-            Button button = child.GetComponent<Button>();
-            if (button == null)
-            {
-                continue;
-            }
-
-            string sceneName = GetSceneNameFromButton(child.name);
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                continue;
-            }
-
-            // Capture local variable for closure
-            string capturedSceneName = sceneName;
-            button.onClick.AddListener(() => LoadStageScene(capturedSceneName));
+            return;
         }
+
+        // Capture local variable for closure
+        string capturedSceneName = sceneName;
+        button.onClick.AddListener(() => LoadStageScene(capturedSceneName));
     }
 
     /// <summary>
@@ -44,6 +63,10 @@ public class AppSceneManager : MonoBehaviour
     /// </summary>
     private string GetSceneNameFromButton(string buttonObjectName)
     {
+        if (buttonObjectName == "Button_Leaderboard")
+        {
+            return "88Leaderboard";
+        }
         // 01Scarecrow ~ 12Snowman 은 버튼 오브젝트 이름과 씬 이름이 동일하다고 가정
         return buttonObjectName;
     }
