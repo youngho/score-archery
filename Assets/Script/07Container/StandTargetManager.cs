@@ -30,7 +30,8 @@ public class StandTargetManager : MonoBehaviour
         if (ringSettings == null || ringSettings.Length == 0)
             return;
 
-        var targets = FindObjectsOfType<StandTargetBehavior>();
+        // FindObjectsOfType은 하위 버전 호환성을 위해 최신 버전에서는 FindObjectsByType을 권장함
+        var targets = Object.FindObjectsByType<StandTargetBehavior>(FindObjectsInactive.Exclude, FindObjectSortMode.None);
         foreach (var t in targets)
         {
             if (t == null) continue;
