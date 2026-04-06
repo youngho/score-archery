@@ -41,8 +41,13 @@ public class LeaderboardSceneController : MonoBehaviour
     private void Awake()
     {
         EnsureEventSystem();
+        // LegacyRuntime.ttf can miss Korean glyphs depending on platform/build.
         _font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        BuildUi();
+        if (!TryBindExistingUi())
+            BuildUi();
+
+        EnsureUiFonts();
+        WireUiEvents();
     }
 
     private void OnEnable()
@@ -56,6 +61,74 @@ public class LeaderboardSceneController : MonoBehaviour
         var es = new GameObject("EventSystem");
         es.AddComponent<EventSystem>();
         es.AddComponent<InputSystemUIInputModule>();
+    }
+
+    private bool TryBindExistingUi()
+    {
+        var canvas = GameObject.Find("Canvas");
+        if (canvas == null) return false;
+
+        var statusGo = GameObject.Find("Canvas/TopBar/Status");
+        var totalGo = GameObject.Find("Canvas/TopBar/Total");
+        var contentGo = GameObject.Find("Canvas/Scroll/Viewport/Content");
+
+        if (statusGo == null || totalGo == null || contentGo == null)
+            return false;
+
+        _statusText = statusGo.GetComponent<Text>();
+        _totalText = totalGo.GetComponent<Text>();
+        _listContent = contentGo.GetComponent<RectTransform>();
+
+        if (_statusText == null || _totalText == null || _listContent == null)
+            return false;
+
+        return true;
+    }
+
+    private void WireUiEvents()
+    {
+        var backGo = GameObject.Find("Canvas/TopBar/Back");
+        if (backGo != null)
+        {
+            var backButton = backGo.GetComponent<Button>();
+            if (backButton != null)
+            {
+                backButton.onClick.RemoveAllListeners();
+                backButton.onClick.AddListener(() =>
+                    SceneManager.LoadScene(StartSceneName, LoadSceneMode.Single));
+            }
+        }
+
+        string[] keys = { "alltime", "monthly", "weekly", "daily" };
+        foreach (var key in keys)
+        {
+            var go = GameObject.Find($"Canvas/TopBar/PeriodRow/Period_{key}");
+            if (go == null) continue;
+
+            var btn = go.GetComponent<Button>();
+            if (btn == null) continue;
+
+            btn.onClick.RemoveAllListeners();
+            string captured = key;
+            btn.onClick.AddListener(() =>
+            {
+                _period = captured;
+                StartCoroutine(LoadAndRender());
+            });
+        }
+    }
+
+    private void EnsureUiFonts()
+    {
+        var canvas = GameObject.Find("Canvas");
+        if (canvas == null) return;
+
+        var texts = canvas.GetComponentsInChildren<Text>(true);
+        foreach (var t in texts)
+        {
+            if (t == null) continue;
+            if (t.font == null) t.font = _font;
+        }
     }
 
     private void BuildUi()
@@ -105,6 +178,24 @@ public class LeaderboardSceneController : MonoBehaviour
         fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         scroll.content = _listContent;
     }
+
+#if UNITY_EDITOR
+    [ContextMenu("Bake UI Into Scene (Creates Hierarchy Objects)")]
+    private void BakeUiIntoScene()
+    {
+        if (TryBindExistingUi())
+            return;
+
+        EnsureEventSystem();
+        _font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        BuildUi();
+        WireUiEvents();
+
+        var scene = gameObject.scene;
+        if (scene.IsValid())
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+    }
+#endif
 
     private void CreateTopBar(RectTransform root)
     {
@@ -173,6 +264,10 @@ public class LeaderboardSceneController : MonoBehaviour
 
         string url = $"{ScoreApiConfig.ApiBaseUrl}/leaderboard?period={Uri.EscapeDataString(_period)}&offset=1&limit={PageLimit}";
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        Debug.Log($"[Leaderboard] GET {url}");
+#endif
+
         using (var req = UnityWebRequest.Get(url))
         {
             req.downloadHandler = new DownloadHandlerBuffer();
@@ -180,6 +275,9 @@ public class LeaderboardSceneController : MonoBehaviour
 
             if (req.result != UnityWebRequest.Result.Success)
             {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Debug.LogWarning($"[Leaderboard] Request failed: {req.result} / {req.error}");
+#endif
                 _statusText.text = $"오류: {req.error}";
                 ClearRows();
                 yield break;
@@ -192,6 +290,9 @@ public class LeaderboardSceneController : MonoBehaviour
             }
             catch (Exception ex)
             {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Debug.LogWarning($"[Leaderboard] Parse failed: {ex.Message}\n{req.downloadHandler.text}");
+#endif
                 _statusText.text = $"응답 파싱 실패: {ex.Message}";
                 ClearRows();
                 yield break;
