@@ -24,11 +24,27 @@ public class StageRandomBGMController : MonoBehaviour
     private static float _pendingGoOverlapSeconds;
 
     private AudioSource _audioSource;
-    private AudioClip[] _clips;
     private Coroutine _bgmDuckCoroutine;
-    private float _baseBgmVolume = 1f;
+    private float _baseBgmVolume = 0.3f;
 
     private const float BgmVolumeWhileGoSfx = 0.22f;
+
+    private static readonly System.Collections.Generic.Dictionary<string, string> _sceneBgmMapping = 
+        new System.Collections.Generic.Dictionary<string, string>
+    {
+        { "01Scarecrow", "Grasslands Theme" },
+        { "02Leaf", "Grasslands Theme" },
+        { "03MenTarget", "Dungeon Theme" },
+        { "04Balloon", "Mushroom Theme" },
+        { "05RubberDuck", "Mushroom Theme" },
+        { "06AppleOneShot", "Dungeon Theme" },
+        { "07Container", "Desert Theme" },
+        { "08Coconut", "Desert Theme" },
+        { "09Watermelon", "Desert Theme" },
+        { "10Star", "Battle in the Stars" },
+        { "11Candle", "Dungeon Theme" },
+        { "12Snowman", "Iceland Theme" }
+    };
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Bootstrap()
@@ -57,10 +73,6 @@ public class StageRandomBGMController : MonoBehaviour
         _audioSource.loop = true;
         _audioSource.spatialBlend = 0f;
         _audioSource.priority = 200;
-
-        _clips = Resources.LoadAll<AudioClip>(ResourcesBgmFolder);
-        if (_clips == null || _clips.Length == 0)
-            Debug.LogWarning($"[StageRandomBGM] Resources/{ResourcesBgmFolder} 에서 AudioClip을 찾지 못했습니다.");
     }
 
     private void OnEnable()
@@ -110,7 +122,7 @@ public class StageRandomBGMController : MonoBehaviour
     public static void NotifyStageGameplayStarted()
     {
         if (_instance == null) return;
-        _instance.PlayRandomBgmIfStageScene();
+        _instance.PlayStageBgm();
     }
 
     /// <summary>
@@ -137,15 +149,25 @@ public class StageRandomBGMController : MonoBehaviour
         _bgmDuckCoroutine = null;
     }
 
-    private void PlayRandomBgmIfStageScene()
+    private void PlayStageBgm()
     {
         if (_audioSource == null) return;
-        if (!IsStageBgmScene(SceneManager.GetActiveScene().name)) return;
-        if (_clips == null || _clips.Length == 0) return;
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (!IsStageBgmScene(sceneName)) return;
 
-        int idx = Random.Range(0, _clips.Length);
-        AudioClip clip = _clips[idx];
-        if (clip == null) return;
+        // 매핑된 BGM이 없으면 재생 생략 (혹은 기본 BGM 설정 가능)
+        if (!_sceneBgmMapping.TryGetValue(sceneName, out string bgmName))
+        {
+            Debug.LogWarning($"[StageBGM] '{sceneName}'에 대한 BGM 매핑이 없습니다.");
+            return;
+        }
+
+        AudioClip clip = Resources.Load<AudioClip>(ResourcesBgmFolder + "/" + bgmName);
+        if (clip == null)
+        {
+            Debug.LogWarning($"[StageBGM] Resources/{ResourcesBgmFolder}/{bgmName} 파일을 찾지 못했습니다.");
+            return;
+        }
 
         float duckSeconds = _pendingGoOverlapSeconds;
         _pendingGoOverlapSeconds = 0f;
