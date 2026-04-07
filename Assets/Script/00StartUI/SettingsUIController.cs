@@ -25,8 +25,6 @@ public class SettingsUIController : MonoBehaviour
     private float targetWidth = 0f;
     private float velocity = 0f; // for SmoothDamp
 
-    private const string MusicKey = "MusicEnabled";
-    private const string SoundKey = "SoundEnabled";
 
     private void Awake()
     {
@@ -41,11 +39,8 @@ public class SettingsUIController : MonoBehaviour
 
     private void InitializeButtonStates()
     {
-        bool musicEnabled = PlayerPrefs.GetInt(MusicKey, 1) == 1;
-        bool soundEnabled = PlayerPrefs.GetInt(SoundKey, 1) == 1;
-
-        UpdateButtonVisuals(musicButton, musicEnabled, musicOn, musicOff);
-        UpdateButtonVisuals(soundButton, soundEnabled, soundOn, soundOff);
+        UpdateButtonVisuals(musicButton, AudioSettings.IsMusicEnabled, musicOn, musicOff);
+        UpdateButtonVisuals(soundButton, AudioSettings.IsSoundEnabled, soundOn, soundOff);
     }
 
     private void Start()
@@ -86,19 +81,17 @@ public class SettingsUIController : MonoBehaviour
 
     private void ToggleMusic()
     {
-        bool current = PlayerPrefs.GetInt(MusicKey, 1) == 1;
-        current = !current;
-        PlayerPrefs.SetInt(MusicKey, current ? 1 : 0);
-        PlayerPrefs.Save();
+        bool current = !AudioSettings.IsMusicEnabled;
+        AudioSettings.IsMusicEnabled = current;
+        AudioSettings.Save();
         UpdateButtonVisuals(musicButton, current, musicOn, musicOff);
     }
 
     private void ToggleSound()
     {
-        bool current = PlayerPrefs.GetInt(SoundKey, 1) == 1;
-        current = !current;
-        PlayerPrefs.SetInt(SoundKey, current ? 1 : 0);
-        PlayerPrefs.Save();
+        bool current = !AudioSettings.IsSoundEnabled;
+        AudioSettings.IsSoundEnabled = current;
+        AudioSettings.Save();
         UpdateButtonVisuals(soundButton, current, soundOn, soundOff);
     }
 

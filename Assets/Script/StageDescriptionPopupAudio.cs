@@ -34,6 +34,7 @@ public static class StageDescriptionPopupAudio
     private static void PlayClip2D(AudioClip clip)
     {
         if (clip == null) return;
+        if (!AudioSettings.IsSoundEnabled) return; // 전역 설정 체크
         EnsureSfxSource();
         _sfxSource.PlayOneShot(clip);
     }

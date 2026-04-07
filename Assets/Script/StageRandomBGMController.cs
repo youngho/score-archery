@@ -152,6 +152,7 @@ public class StageRandomBGMController : MonoBehaviour
     private void PlayStageBgm()
     {
         if (_audioSource == null) return;
+        if (!AudioSettings.IsMusicEnabled) return; // 전역 설정 체크
         string sceneName = SceneManager.GetActiveScene().name;
         if (!IsStageBgmScene(sceneName)) return;
 

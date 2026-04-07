@@ -1107,6 +1107,7 @@ public class ArcheryGestureManager : MonoBehaviour
     /// </summary>
     private void PlayBowDrawStartSound()
     {
+        if (!AudioSettings.IsSoundEnabled) return; // 전역 설정 체크
         if (audioSource != null && bowDrawStartSound != null)
         {
             audioSource.PlayOneShot(bowDrawStartSound);
@@ -1130,6 +1131,7 @@ public class ArcheryGestureManager : MonoBehaviour
     /// </summary>
     private void PlayBowReleaseSound()
     {
+        if (!AudioSettings.IsSoundEnabled) return; // 전역 설정 체크
         if (audioSource != null && bowReleaseSound != null)
         {
             audioSource.PlayOneShot(bowReleaseSound);
