@@ -10,6 +10,12 @@ public class SettingsUIController : MonoBehaviour
     [SerializeField] private Button musicButton;
     [SerializeField] private Button soundButton;
 
+    [Header("Toggle Sprites")]
+    [SerializeField] private Sprite musicOn;
+    [SerializeField] private Sprite musicOff;
+    [SerializeField] private Sprite soundOn;
+    [SerializeField] private Sprite soundOff;
+
     [Header("Animation Settings")]
     [SerializeField] private float animationDuration = 0.3f;
     [SerializeField] private float expandedWidth = 290f;
@@ -38,8 +44,8 @@ public class SettingsUIController : MonoBehaviour
         bool musicEnabled = PlayerPrefs.GetInt(MusicKey, 1) == 1;
         bool soundEnabled = PlayerPrefs.GetInt(SoundKey, 1) == 1;
 
-        UpdateButtonVisuals(musicButton, musicEnabled);
-        UpdateButtonVisuals(soundButton, soundEnabled);
+        UpdateButtonVisuals(musicButton, musicEnabled, musicOn, musicOff);
+        UpdateButtonVisuals(soundButton, soundEnabled, soundOn, soundOff);
     }
 
     private void Start()
@@ -84,7 +90,7 @@ public class SettingsUIController : MonoBehaviour
         current = !current;
         PlayerPrefs.SetInt(MusicKey, current ? 1 : 0);
         PlayerPrefs.Save();
-        UpdateButtonVisuals(musicButton, current);
+        UpdateButtonVisuals(musicButton, current, musicOn, musicOff);
     }
 
     private void ToggleSound()
@@ -93,17 +99,18 @@ public class SettingsUIController : MonoBehaviour
         current = !current;
         PlayerPrefs.SetInt(SoundKey, current ? 1 : 0);
         PlayerPrefs.Save();
-        UpdateButtonVisuals(soundButton, current);
+        UpdateButtonVisuals(soundButton, current, soundOn, soundOff);
     }
 
-    private void UpdateButtonVisuals(Button button, bool enabled)
+    private void UpdateButtonVisuals(Button button, bool enabled, Sprite onSprite, Sprite offSprite)
     {
         if (button == null) return;
         Image img = button.GetComponent<Image>();
         if (img != null)
         {
+            img.sprite = enabled ? onSprite : offSprite;
             Color c = img.color;
-            c.a = enabled ? 1f : 0.4f;
+            c.a = 1f; // Ensure it's not dimmed
             img.color = c;
         }
     }
