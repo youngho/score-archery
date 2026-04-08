@@ -48,8 +48,6 @@ public class SettingsUIController : MonoBehaviour
         if (settingsButton != null) settingsButton.onClick.AddListener(OnSettingsClicked);
         if (musicButton != null) musicButton.onClick.AddListener(ToggleMusic);
         if (soundButton != null) soundButton.onClick.AddListener(ToggleSound);
-
-        ApplyMusicSetting();
     }
 
     private void Update()
@@ -81,29 +79,12 @@ public class SettingsUIController : MonoBehaviour
         velocity = 0f;
     }
 
-    private void ApplyMusicSetting()
-    {
-        // 씬 내의 BackGroundMusic 오브젝트를 찾아 AudioSource의 mute 속성 제어
-        GameObject bgmObj = GameObject.Find("BackGroundMusic");
-        if (bgmObj != null)
-        {
-            AudioSource bgmSource = bgmObj.GetComponent<AudioSource>();
-            if (bgmSource != null)
-            {
-                // IsMusicEnabled가 false이면 mute를 true로 설정
-                bgmSource.mute = !AudioSettings.IsMusicEnabled;
-            }
-        }
-    }
-
     private void ToggleMusic()
     {
         bool current = !AudioSettings.IsMusicEnabled;
         AudioSettings.IsMusicEnabled = current;
         AudioSettings.Save();
         UpdateButtonVisuals(musicButton, current, musicOn, musicOff);
-
-        ApplyMusicSetting();
     }
 
     private void ToggleSound()

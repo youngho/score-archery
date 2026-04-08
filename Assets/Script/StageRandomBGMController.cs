@@ -26,6 +26,7 @@ public class StageRandomBGMController : MonoBehaviour
     private AudioSource _audioSource;
     private Coroutine _bgmDuckCoroutine;
     private float _baseBgmVolume = 0.3f;
+    private bool _hasStageGameplayStarted = false;
 
     private const float BgmVolumeWhileGoSfx = 0.22f;
 
@@ -73,17 +74,25 @@ public class StageRandomBGMController : MonoBehaviour
         _audioSource.loop = true;
         _audioSource.spatialBlend = 0f;
         _audioSource.priority = 200;
+
+        // 저장된 설정에 따라 현재 오디오 상태를 일치시킴(씬 로드 직후 클립이 null일 수 있음)
+        if (_audioSource != null)
+            _audioSource.mute = !AudioSettings.IsMusicEnabled;
     }
 
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
+        AudioSettings.MusicEnabledChanged += ApplyMusicEnabled;
         ApplyForActiveScene();
+        // 초기 상태 동기화(게임플레이 시작 전에는 unmute만 해두고 재생은 하지 않음)
+        ApplyMusicEnabled(AudioSettings.IsMusicEnabled);
     }
 
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        AudioSettings.MusicEnabledChanged -= ApplyMusicEnabled;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -106,6 +115,7 @@ public class StageRandomBGMController : MonoBehaviour
             _audioSource.volume = _baseBgmVolume;
             _audioSource.Stop();
             _audioSource.clip = null;
+            _hasStageGameplayStarted = false;
             return;
         }
 
@@ -114,6 +124,7 @@ public class StageRandomBGMController : MonoBehaviour
         _audioSource.volume = _baseBgmVolume;
         _audioSource.Stop();
         _audioSource.clip = null;
+        _hasStageGameplayStarted = false;
     }
 
     /// <summary>
@@ -122,7 +133,26 @@ public class StageRandomBGMController : MonoBehaviour
     public static void NotifyStageGameplayStarted()
     {
         if (_instance == null) return;
+        _instance._hasStageGameplayStarted = true;
         _instance.PlayStageBgm();
+    }
+
+    private void ApplyMusicEnabled(bool enabled)
+    {
+        if (_audioSource == null) return;
+
+        _audioSource.mute = !enabled;
+
+        // 게임플레이 시작 전에는 "켜기" 해도 BGM을 시작하지 않음(기존 설계 유지)
+        if (!enabled) return;
+        if (!_hasStageGameplayStarted) return;
+
+        // 토글만으로 클립/재생이 시작되지 않은 경우에만(예: 시작 전에 꺼뒀다가 켠 경우) 재생
+        if (!_audioSource.isPlaying)
+        {
+            // 이미 같은 클립이 재생 중이 아닌 상태에서만 시작
+            PlayStageBgm();
+        }
     }
 
     /// <summary>
