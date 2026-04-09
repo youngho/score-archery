@@ -2396,6 +2396,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: SettingsOverlay
       objectReference: {fileID: 0}
+    - target: {fileID: 4174850397014829650, guid: 889c240bddf06453fbba93a84ce46cec, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4174850397014829650, guid: 889c240bddf06453fbba93a84ce46cec, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4174850397014829650, guid: 889c240bddf06453fbba93a84ce46cec, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4174850397014829650, guid: 889c240bddf06453fbba93a84ce46cec, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5552278286777186049, guid: 889c240bddf06453fbba93a84ce46cec, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2427,6 +2443,10 @@ PrefabInstance:
     - target: {fileID: 5678419713595174210, guid: 889c240bddf06453fbba93a84ce46cec, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6529845485690243853, guid: 889c240bddf06453fbba93a84ce46cec, type: 3}
+      propertyPath: expandedWidth
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 6988757373667223112, guid: 889c240bddf06453fbba93a84ce46cec, type: 3}
       propertyPath: m_Pivot.x

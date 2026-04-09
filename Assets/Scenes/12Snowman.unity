@@ -968,26 +968,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 109016985}
     m_Modifications:
-    - target: {fileID: 0}
-      propertyPath: m_Color.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_Color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_Color.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_RaycastTarget
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3561714140945018857, guid: 889c240bddf06453fbba93a84ce46cec, type: 3}
       propertyPath: m_Name
       value: SettingsOverlay
