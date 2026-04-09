@@ -9,9 +9,11 @@ public class StageResultBGMPlayer : MonoBehaviour
     [Tooltip("루프 재생할 BGM 클립 (StageResultBGM)")]
     public AudioClip bgmClip;
 
+    private AudioSource audioSource;
+
     private void Start()
     {
-        var audioSource = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
 
@@ -20,6 +22,24 @@ public class StageResultBGMPlayer : MonoBehaviour
         audioSource.clip = bgmClip;
         audioSource.loop = true;
         audioSource.spatialBlend = 0f; // 2D (전역 BGM)
+        
+        // AudioSettings의 Music 설정 적용
+        audioSource.mute = !AudioSettings.IsMusicEnabled;
         audioSource.Play();
+
+        AudioSettings.MusicEnabledChanged += OnMusicSettingsChanged;
+    }
+
+    private void OnDestroy()
+    {
+        AudioSettings.MusicEnabledChanged -= OnMusicSettingsChanged;
+    }
+
+    private void OnMusicSettingsChanged(bool isMusicEnabled)
+    {
+        if (audioSource != null)
+        {
+            audioSource.mute = !isMusicEnabled;
+        }
     }
 }
