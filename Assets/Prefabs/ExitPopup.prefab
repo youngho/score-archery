@@ -269,6 +269,7 @@ GameObject:
   - component: {fileID: 8418834446121483629}
   - component: {fileID: 807503000143361275}
   - component: {fileID: 2250997579794935552}
+  - component: {fileID: 252079175839293029}
   m_Layer: 0
   m_Name: ExitPopup
   m_TagString: Untagged
@@ -318,7 +319,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 99
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!114 &807503000143361275
 MonoBehaviour:
@@ -360,6 +361,20 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &252079175839293029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4522155657876646913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 775ab8f6fbc6c43d799836faf1b635d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ExitPopupController
+  yesButton: {fileID: 948785962971164291}
+  noButton: {fileID: 941952478390219909}
 --- !u!1 &4563512593664854291
 GameObject:
   m_ObjectHideFlags: 0

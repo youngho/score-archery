@@ -9,6 +9,8 @@ public class SettingsUIController : MonoBehaviour
     [SerializeField] private RectTransform settingsMoreRect;
     [SerializeField] private Button musicButton;
     [SerializeField] private Button soundButton;
+    [SerializeField] private Button exitButton;
+    [SerializeField] private GameObject exitPopupPrefab;
 
     [Header("Toggle Sprites")]
     [SerializeField] private Sprite musicOn;
@@ -48,6 +50,7 @@ public class SettingsUIController : MonoBehaviour
         if (settingsButton != null) settingsButton.onClick.AddListener(OnSettingsClicked);
         if (musicButton != null) musicButton.onClick.AddListener(ToggleMusic);
         if (soundButton != null) soundButton.onClick.AddListener(ToggleSound);
+        if (exitButton != null) exitButton.onClick.AddListener(ShowExitPopup);
     }
 
     private void Update()
@@ -77,6 +80,18 @@ public class SettingsUIController : MonoBehaviour
         isExpanded = !isExpanded;
         targetWidth = isExpanded ? expandedWidth : 0f;
         velocity = 0f;
+    }
+
+    private void ShowExitPopup()
+    {
+        if (exitPopupPrefab != null)
+        {
+            Instantiate(exitPopupPrefab);
+            if (isExpanded)
+            {
+                OnSettingsClicked();
+            }
+        }
     }
 
     private void ToggleMusic()
@@ -113,5 +128,6 @@ public class SettingsUIController : MonoBehaviour
         if (settingsButton != null) settingsButton.onClick.RemoveListener(OnSettingsClicked);
         if (musicButton != null) musicButton.onClick.RemoveListener(ToggleMusic);
         if (soundButton != null) soundButton.onClick.RemoveListener(ToggleSound);
+        if (exitButton != null) exitButton.onClick.RemoveListener(ShowExitPopup);
     }
 }
